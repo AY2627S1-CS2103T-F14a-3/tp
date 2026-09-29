@@ -268,31 +268,30 @@ _{Explain here how the data archiving feature will be implemented}_
 
 ### Product scope
 
-**Target user profile**:
+**Target user profile**: Private tutors managing a moderate-to-large number of students across different subjects and lesson schedules.
 
-* has a need to manage a significant number of contacts
-* prefers desktop apps over other types of applications
-* can type fast
-* prefers typing to mouse interactions
-* is reasonably comfortable using CLI apps
-
-**Value proposition**: Manage contacts faster than with a typical mouse-driven GUI application.
+**Value proposition**: Manage student contacts efficiently by keeping student-specific information alongside each contact.
 
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …                                    | I want to …                 | So that I can…                                                        |
-|----------|--------------------------------------------|------------------------------|------------------------------------------------------------------------|
-| `* * *`  | new user                                   | see usage instructions       | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person             |                                                                        |
-| `* * *`  | user                                       | delete a person              | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name        | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name         | locate a person easily                                                 |
-
-*{More to be added}*
+| Priority | As a …        | I want to …                                                       | So that I can…                                       |
+|----------|---------------|-------------------------------------------------------------------|------------------------------------------------------|
+| `* * *`  | new user      | view usage instructions                                           | learn how to use TutorTrack                          |
+| `* * *`  | private tutor | add a new student with contact details, subject, and school level | keep the student's information in TutorTrack         |
+| `* * *`  | private tutor | list all students                                                 | see the students currently under my care             |
+| `* * *`  | private tutor | find a student by name                                            | retrieve the student's details quickly               |
+| `* * *`  | private tutor | view all information for a student                                | prepare for a lesson efficiently                     |
+| `* * *`  | private tutor | record the date, time, and topic of a student's next lesson       | know when the lesson is scheduled and prepare for it |
+| `* * *`  | private tutor | delete a student                                                  | remove an incorrect or duplicate record              |
+| `* *`    | private tutor | edit a student's details                                          | keep the student record accurate                     |
+| `* *`    | private tutor | set a recurring lesson schedule for a student                     | avoid entering the same lesson details repeatedly    |
+| `* *`    | private tutor | view my earliest upcoming lesson across all students              | know which lesson to prepare for first               |
+| `*`      | private tutor | sort students by their next lesson                                | prioritise lesson preparation                        |
+| `*`      | private tutor | identify timetable clashes                                        | avoid arranging overlapping lessons                  |
+| `*`      | private tutor | view a student's lesson history and learning analytics            | understand the student's progress over time          |
 
 ### Use cases
 
