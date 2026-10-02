@@ -11,22 +11,12 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 ## Project team
 
-### John Doe
+### Panneer Selvam S/O Rajamanickam
 
 <img src="images/johndoe.png" width="200px">
 
-[[homepage](http://www.comp.nus.edu.sg/~damithch)]
-[[github](https://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
+[[github](http://github.com/johndoe)]
 
-* Role: Project Advisor
-
-### Narayanamurthy Sriram
-
-<img src="images/nsriram18.png" width="200px">
-
-[[github](http://github.com/nsriram18)]
-[[portfolio]()]
 
 * Role: Team Lead
 * Responsibilities: UI
@@ -40,12 +30,12 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 * Role: Developer
 * Responsibilities: Data
 
-### Jean Doe
+### Narayanamurthy Sriram
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/nsriram18.png" width="200px">
 
-[[github](http://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
+[[github](http://github.com/nsriram18)]
+
 
 * Role: Developer
 * Responsibilities: Dev Ops + Threading
@@ -55,7 +45,7 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 <img src="images/johndoe.png" width="200px">
 
 [[github](http://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
+
 
 * Role: Developer
 * Responsibilities: UI
