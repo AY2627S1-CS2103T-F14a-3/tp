@@ -268,72 +268,148 @@ _{Explain here how the data archiving feature will be implemented}_
 
 ### Product scope
 
-**Target user profile**: Private tutors managing a moderate-to-large number of students across different subjects and lesson schedules.
+**Target user profile**: Private tutors who manage multiple students across different subjects, school levels, and lesson schedules, and who are comfortable using a keyboard-driven desktop application.
 
-**Value proposition**: Manage student contacts efficiently by keeping student-specific information alongside each contact.
+**Value proposition**: TutorTrack lets private tutors retrieve and update student information quickly by keeping contact details, academic context, and upcoming lesson information together in one local application.
 
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …        | I want to …                                                       | So that I can…                                       |
-|----------|---------------|-------------------------------------------------------------------|------------------------------------------------------|
-| `* * *`  | new user      | view usage instructions                                           | learn how to use TutorTrack                          |
-| `* * *`  | private tutor | add a new student with contact details, subject, and school level | keep the student's information in TutorTrack         |
-| `* * *`  | private tutor | list all students                                                 | see the students currently under my care             |
-| `* * *`  | private tutor | find a student by name                                            | retrieve the student's details quickly               |
-| `* * *`  | private tutor | view all information for a student                                | prepare for a lesson efficiently                     |
-| `* * *`  | private tutor | record the date, time, and topic of a student's next lesson       | know when the lesson is scheduled and prepare for it |
-| `* * *`  | private tutor | delete a student                                                  | remove an incorrect or duplicate record              |
-| `* *`    | private tutor | edit a student's details                                          | keep the student record accurate                     |
-| `* *`    | private tutor | set a recurring lesson schedule for a student                     | avoid entering the same lesson details repeatedly    |
-| `* *`    | private tutor | view my earliest upcoming lesson across all students              | know which lesson to prepare for first               |
-| `*`      | private tutor | sort students by their next lesson                                | prioritise lesson preparation                        |
-| `*`      | private tutor | identify timetable clashes                                        | avoid arranging overlapping lessons                  |
-| `*`      | private tutor | view a student's lesson history and learning analytics            | understand the student's progress over time          |
+| Priority | As a …        | I want to …                                                            | So that I can…                                                |
+|----------|---------------|------------------------------------------------------------------------|---------------------------------------------------------------|
+| `* * *`  | new user      | view concise usage instructions                                        | start using TutorTrack without external assistance            |
+| `* * *`  | private tutor | add a student with contact details and academic information            | keep the information needed for tutoring in one place         |
+| `* * *`  | private tutor | list all students                                                      | see the students currently under my care                      |
+| `* * *`  | private tutor | find students by name                                                  | retrieve a student's record quickly                           |
+| `* * *`  | private tutor | view a student's complete record                                       | prepare for a lesson efficiently                              |
+| `* * *`  | private tutor | edit a student's details                                               | keep the student record accurate                              |
+| `* * *`  | private tutor | record the date, time, and topic of a student's next lesson            | know when the lesson is scheduled and what to prepare         |
+| `* * *`  | private tutor | delete a student                                                       | remove an obsolete, incorrect, or duplicate record            |
+| `* *`    | private tutor | add free-form notes to a student's record                              | remember student-specific information that has no fixed field |
+| `* *`    | private tutor | tag students using meaningful categories                               | group students by attributes such as subject or school level  |
+| `* *`    | private tutor | view my earliest upcoming lesson across all students                   | know which lesson to prepare for first                        |
+| `* *`    | private tutor | set a recurring lesson schedule for a student                          | avoid entering the same lesson details repeatedly             |
+| `*`      | private tutor | sort students by their next lesson                                     | prioritise lesson preparation                                 |
+| `*`      | private tutor | identify timetable clashes                                             | avoid arranging overlapping lessons                           |
+| `*`      | private tutor | view a student's lesson history and learning-progress summary          | understand the student's progress over time                   |
 
 ### Use cases
 
-(For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
+(For all use cases below, the **System** is TutorTrack and the **Actor** is a private tutor.)
 
-**Use case: Delete a person**
+#### Use case: UC01 — Add a student
 
 **MSS**
 
-1.  User requests to list persons
-2.  AddressBook shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
+1. Tutor enters the details of a new student.
+2. TutorTrack validates the supplied details.
+3. TutorTrack adds the student record.
+4. TutorTrack displays a confirmation containing the added student's details.
 
-    Use case ends.
+   Use case ends.
 
 **Extensions**
 
-* 2a. The list is empty.
+* 2a. One or more required fields are missing or invalid.
+  * 2a1. TutorTrack displays an error describing the expected input.
+  * 2a2. Use case resumes at step 1.
+* 2b. Another student has the same name.
+  * 2b1. TutorTrack informs the tutor that the student already exists.
+  * 2b2. Use case resumes at step 1.
 
-  Use case ends.
+#### Use case: UC02 — Find and update a student
 
-* 3a. The given index is invalid.
+**MSS**
 
-    * 3a1. AddressBook shows an error message.
+1. Tutor searches for a student by name.
+2. TutorTrack displays all matching students.
+3. Tutor selects a student from the displayed list and supplies the updated details.
+4. TutorTrack validates the supplied details.
+5. TutorTrack updates the student record.
+6. TutorTrack displays a confirmation containing the updated student's details.
 
-      Use case resumes at step 2.
+   Use case ends.
 
-*{More to be added}*
+**Extensions**
+
+* 2a. No student matches the search terms.
+  * 2a1. TutorTrack informs the tutor that no students were found.
+  * 2a2. Use case ends.
+* 3a. The selected index does not refer to a student in the displayed list.
+  * 3a1. TutorTrack displays an invalid-index error.
+  * 3a2. Use case resumes at step 3.
+* 4a. One or more updated fields are invalid.
+  * 4a1. TutorTrack displays an error describing the expected input.
+  * 4a2. Use case resumes at step 3.
+
+#### Use case: UC03 — Record a student's next lesson
+
+**MSS**
+
+1. Tutor searches for the student by name.
+2. TutorTrack displays all matching students.
+3. Tutor selects the student and enters the next lesson's date, time, and topic.
+4. TutorTrack validates the lesson information.
+5. TutorTrack records the next lesson in the student's record.
+6. TutorTrack displays the updated student record.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. No student matches the search terms.
+  * 2a1. TutorTrack informs the tutor that no students were found.
+  * 2a2. Use case ends.
+* 3a. The selected index does not refer to a student in the displayed list.
+  * 3a1. TutorTrack displays an invalid-index error.
+  * 3a2. Use case resumes at step 3.
+* 4a. The lesson date, time, or topic is invalid.
+  * 4a1. TutorTrack displays an error describing the expected input.
+  * 4a2. Use case resumes at step 3.
+
+#### Use case: UC04 — Delete a student
+
+**MSS**
+
+1. Tutor requests to list all students.
+2. TutorTrack displays the student list.
+3. Tutor selects a student from the displayed list for deletion.
+4. TutorTrack deletes the student record.
+5. TutorTrack displays a confirmation containing the deleted student's details.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The student list is empty.
+  * 2a1. TutorTrack informs the tutor that there are no students to delete.
+  * 2a2. Use case ends.
+* 3a. The selected index does not refer to a student in the displayed list.
+  * 3a1. TutorTrack displays an invalid-index error.
+  * 3a2. Use case resumes at step 3.
 
 ### Non-Functional Requirements
 
-1.  Should work on any _mainstream OS_ as long as it has Java `25` or above installed.
-2.  Should be able to hold up to 1000 persons without noticeable sluggishness in performance for typical usage.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
-
-*{More to be added}*
+1. TutorTrack should work on any _mainstream OS_ with Java `25` or later installed.
+2. TutorTrack should respond to a command within 1 second when managing up to 1,000 student records under normal operating conditions.
+3. TutorTrack should persist data from every successful data-modifying command and recover that data on the next launch after a normal shutdown.
+4. TutorTrack should store all student data locally and should not require an internet connection for normal operation.
+5. A tutor with above-average typing speed for regular English text should be able to complete common operations faster using commands than by navigating an equivalent mouse-driven interface.
+6. A tutor who is familiar with command-line applications should be able to learn the syntax for the core commands within 30 minutes using only the in-app help and User Guide.
+7. TutorTrack should remain usable on screens with a resolution of 1280 × 720 or higher without information required for common operations being permanently inaccessible.
 
 ### Glossary
 
-* **Mainstream OS**: Windows, Linux, Unix, or macOS
-* **Private contact detail**: A contact detail that is not meant to be shared with others
+* **Academic information**: Tutoring-related information about a student, such as the student's subject and school level.
+* **Displayed student list**: The numbered list of students currently shown in TutorTrack. It may contain every student or only the results of the latest search.
+* **Mainstream OS**: A currently supported version of Windows, Linux, or macOS that can run Java `25` or later.
+* **Next lesson**: The nearest future lesson recorded for a student, including its date, time, and topic.
+* **Private tutor**: A person who independently provides lessons to one or more students and manages the corresponding student information and schedules.
+* **Student index**: The positive integer displayed beside a student in the current displayed student list. It is not a permanent identifier and may change when the displayed list changes.
+* **Student record**: The collection of contact details, academic information, notes, tags, and lesson information that TutorTrack stores for one student.
+* **Tag**: A user-defined label attached to a student record for categorisation.
 
 --------------------------------------------------------------------------------------------------------------------
 
