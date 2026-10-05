@@ -16,6 +16,7 @@ import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.SchoolLevel;
 
 public class JsonAdaptedPersonTest {
     private static final String INVALID_NAME = "R@chel";
@@ -28,6 +29,8 @@ public class JsonAdaptedPersonTest {
     private static final String VALID_PHONE = BENSON.getPhone().toString();
     private static final String VALID_EMAIL = BENSON.getEmail().toString();
     private static final String VALID_ADDRESS = BENSON.getAddress().toString();
+    private static final String VALID_SCHOOL_LEVEL = "Secondary 4";
+    private static final String INVALID_SCHOOL_LEVEL = " ";
     private static final List<JsonAdaptedTag> VALID_TAGS = BENSON.getTags().stream()
             .map(JsonAdaptedTag::new)
             .collect(Collectors.toList());
@@ -36,6 +39,30 @@ public class JsonAdaptedPersonTest {
     public void toModelType_validPersonDetails_returnsPerson() throws Exception {
         JsonAdaptedPerson person = new JsonAdaptedPerson(BENSON);
         assertEquals(BENSON, person.toModelType());
+    }
+
+    @Test
+    public void toModelType_validSchoolLevel_returnsPersonWithSchoolLevel() throws Exception {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_TAGS);
+
+        assertEquals(VALID_SCHOOL_LEVEL, person.toModelType().getSchoolLevel().value);
+    }
+
+    @Test
+    public void toModelType_missingSchoolLevel_usesDefaultSchoolLevel() throws Exception {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_TAGS);
+
+        assertEquals(SchoolLevel.DEFAULT_VALUE, person.toModelType().getSchoolLevel().value);
+    }
+
+    @Test
+    public void toModelType_invalidSchoolLevel_throwsIllegalValueException() {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                INVALID_SCHOOL_LEVEL, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, SchoolLevel.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
     @Test

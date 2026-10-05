@@ -13,6 +13,7 @@ import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -78,6 +79,20 @@ public class ParserUtil {
             throw new ParseException(Address.MESSAGE_CONSTRAINTS);
         }
         return new Address(trimmedAddress);
+    }
+
+    /**
+     * Parses a {@code String schoolLevel} into a {@code SchoolLevel}.
+     *
+     * @throws ParseException if the given {@code schoolLevel} is invalid.
+     */
+    public static SchoolLevel parseSchoolLevel(String schoolLevel) throws ParseException {
+        requireNonNull(schoolLevel);
+        String trimmedSchoolLevel = schoolLevel.trim();
+        if (!SchoolLevel.isValidSchoolLevel(trimmedSchoolLevel)) {
+            throw new ParseException(SchoolLevel.MESSAGE_CONSTRAINTS);
+        }
+        return new SchoolLevel(trimmedSchoolLevel);
     }
 
     /**

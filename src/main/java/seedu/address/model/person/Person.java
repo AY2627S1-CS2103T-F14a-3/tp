@@ -23,17 +23,26 @@ public class Person {
 
     // Data fields
     private final Address address;
+    private final SchoolLevel schoolLevel;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, tags);
+        this(name, phone, email, address, new SchoolLevel(SchoolLevel.DEFAULT_VALUE), tags);
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, schoolLevel, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
+        this.schoolLevel = schoolLevel;
         this.tags.addAll(tags);
     }
 
@@ -51,6 +60,10 @@ public class Person {
 
     public Address getAddress() {
         return address;
+    }
+
+    public SchoolLevel getSchoolLevel() {
+        return schoolLevel;
     }
 
     /**
@@ -93,13 +106,14 @@ public class Person {
                 && phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
+                && schoolLevel.equals(otherPerson.schoolLevel)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags);
+        return Objects.hash(name, phone, email, address, schoolLevel, tags);
     }
 
     @Override
@@ -109,6 +123,7 @@ public class Person {
                 .add("phone", phone)
                 .add("email", email)
                 .add("address", address)
+                .add("schoolLevel", schoolLevel)
                 .add("tags", tags)
                 .toString();
     }
