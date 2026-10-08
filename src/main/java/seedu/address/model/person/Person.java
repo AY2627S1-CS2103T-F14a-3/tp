@@ -24,25 +24,35 @@ public class Person {
     // Data fields
     private final Address address;
     private final SchoolLevel schoolLevel;
+    private final StudentNote note;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags) {
-        this(name, phone, email, address, new SchoolLevel(SchoolLevel.DEFAULT_VALUE), tags);
+        this(name, phone, email, address, new SchoolLevel(SchoolLevel.DEFAULT_VALUE), new StudentNote(""), tags);
     }
 
     /**
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, schoolLevel, tags);
+        this(name, phone, email, address, schoolLevel, new StudentNote(""), tags);
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
+            Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, schoolLevel, note, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.schoolLevel = schoolLevel;
+        this.note = note;
         this.tags.addAll(tags);
     }
 
@@ -64,6 +74,10 @@ public class Person {
 
     public SchoolLevel getSchoolLevel() {
         return schoolLevel;
+    }
+
+    public StudentNote getNote() {
+        return note;
     }
 
     /**
@@ -107,13 +121,14 @@ public class Person {
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
                 && schoolLevel.equals(otherPerson.schoolLevel)
+                && note.equals(otherPerson.note)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, schoolLevel, tags);
+        return Objects.hash(name, phone, email, address, schoolLevel, note, tags);
     }
 
     @Override
@@ -124,6 +139,7 @@ public class Person {
                 .add("email", email)
                 .add("address", address)
                 .add("schoolLevel", schoolLevel)
+                .add("note", note)
                 .add("tags", tags)
                 .toString();
     }

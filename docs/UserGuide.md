@@ -135,6 +135,17 @@ Examples:
 * `find alex david` returns `Alex Yeoh`, `David Li`<br>
   ![result for 'find alex david'](images/findAlexDavidResult.png)
 
+### Adding or replacing a student note: `note`
+
+Adds or replaces the free-form note on a student's record. The index refers to the current displayed student list, including search results.
+
+Format: `note INDEX note/NOTE`
+
+* The note may contain spaces and is saved with the student record.
+* To clear a note, use `note INDEX note/` with no text after `note/`.
+
+Example: `note 1 note/Needs extra time for algebra` records a note for the first displayed student.
+
 ### Deleting a student: `delete`
 
 Deletes the specified student from TutorTrack.
@@ -202,5 +213,6 @@ Action     | Format and Examples
 **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... `<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
+**Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
 **Exit**   | `exit`
