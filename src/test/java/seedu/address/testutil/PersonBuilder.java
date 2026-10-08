@@ -9,6 +9,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
+import seedu.address.model.person.StudentNote;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.util.SampleDataUtil;
 
@@ -27,6 +28,7 @@ public class PersonBuilder {
     private Email email;
     private Address address;
     private SchoolLevel schoolLevel;
+    private StudentNote note;
     private Set<Tag> tags;
 
     /**
@@ -38,6 +40,7 @@ public class PersonBuilder {
         email = new Email(DEFAULT_EMAIL);
         address = new Address(DEFAULT_ADDRESS);
         schoolLevel = new SchoolLevel(SchoolLevel.DEFAULT_VALUE);
+        note = new StudentNote("");
         tags = new HashSet<>();
     }
 
@@ -50,6 +53,7 @@ public class PersonBuilder {
         email = personToCopy.getEmail();
         address = personToCopy.getAddress();
         schoolLevel = personToCopy.getSchoolLevel();
+        note = personToCopy.getNote();
         tags = new HashSet<>(personToCopy.getTags());
     }
 
@@ -101,8 +105,14 @@ public class PersonBuilder {
         return this;
     }
 
+    /** Sets the note of the person being built. */
+    public PersonBuilder withNote(String note) {
+        this.note = new StudentNote(note);
+        return this;
+    }
+
     public Person build() {
-        return new Person(name, phone, email, address, schoolLevel, tags);
+        return new Person(name, phone, email, address, schoolLevel, note, tags);
     }
 
 }

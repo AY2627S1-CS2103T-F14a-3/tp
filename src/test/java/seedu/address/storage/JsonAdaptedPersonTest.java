@@ -17,6 +17,8 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
+import seedu.address.model.person.StudentNote;
+import seedu.address.testutil.PersonBuilder;
 
 public class JsonAdaptedPersonTest {
     private static final String INVALID_NAME = "R@chel";
@@ -55,6 +57,22 @@ public class JsonAdaptedPersonTest {
                 VALID_TAGS);
 
         assertEquals(SchoolLevel.DEFAULT_VALUE, person.toModelType().getSchoolLevel().value);
+    }
+
+    @Test
+    public void toModelType_noteIsPreserved() throws Exception {
+        String note = "Needs extra time for algebra";
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).withNote(note).build());
+
+        assertEquals(new StudentNote(note), adapted.toModelType().getNote());
+    }
+
+    @Test
+    public void toModelType_missingNote_usesEmptyNote() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_TAGS);
+
+        assertEquals(new StudentNote(""), adapted.toModelType().getNote());
     }
 
     @Test
