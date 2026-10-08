@@ -3,6 +3,7 @@ package seedu.address.model.person;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ import java.util.Objects;
 public class NextLesson {
 
     public static final String MESSAGE_TOPIC_CONSTRAINTS = "Lesson topic must not be blank.";
+    public static final String MESSAGE_DATE_TIME_CONSTRAINTS = "Lesson date and time must not be in the past.";
 
     public final LocalDate date;
     public final LocalTime time;
@@ -28,6 +30,9 @@ public class NextLesson {
         requireNonNull(date);
         requireNonNull(time);
         requireNonNull(topic);
+        if (LocalDateTime.of(date, time).isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
+        }
         if (topic.isBlank()) {
             throw new IllegalArgumentException(MESSAGE_TOPIC_CONSTRAINTS);
         }
