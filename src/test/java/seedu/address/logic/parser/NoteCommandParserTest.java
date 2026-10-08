@@ -27,6 +27,12 @@ public class NoteCommandParserTest {
     }
 
     @Test
+    public void parse_missingNotePrefix_failure() {
+        assertParseFailure(parser, "1",
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, NoteCommand.MESSAGE_USAGE));
+    }
+
+    @Test
     public void parse_invalidIndex_failure() {
         assertParseFailure(parser, "zero note/Some note",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NoteCommand.MESSAGE_USAGE));
