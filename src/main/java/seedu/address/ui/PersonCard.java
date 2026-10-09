@@ -1,6 +1,9 @@
 package seedu.address.ui;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.Locale;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -15,6 +18,8 @@ import seedu.address.model.person.Person;
 public class PersonCard extends UiPart<Region> {
 
     private static final String FXML = "PersonListCard.fxml";
+    private static final DateTimeFormatter LESSON_DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a", Locale.ENGLISH);
 
     /**
      * Note: Certain keywords such as "location" and "resources" are reserved keywords in JavaFX.
@@ -43,6 +48,10 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label note;
     @FXML
+    private Label nextLesson;
+    @FXML
+    private Label nextLessonTopic;
+    @FXML
     private FlowPane tags;
 
     /**
@@ -57,6 +66,15 @@ public class PersonCard extends UiPart<Region> {
         address.setText(person.getAddress().value);
         email.setText(person.getEmail().value);
         schoolLevel.setText("Level: " + person.getSchoolLevel().value);
+        person.getNextLesson().ifPresentOrElse(lesson -> {
+            LocalDateTime lessonDateTime = LocalDateTime.of(lesson.date, lesson.time);
+            nextLesson.setText("Next lesson: " + lessonDateTime.format(LESSON_DATE_TIME_FORMATTER));
+            nextLessonTopic.setText("Topic: " + lesson.topic);
+        }, () -> {
+            nextLesson.setText("Next lesson: Not scheduled");
+            nextLessonTopic.setVisible(false);
+            nextLessonTopic.setManaged(false);
+        });
         String noteText = person.getNote().value;
         note.setText("Note: " + noteText);
         if (noteText.isBlank()) {
