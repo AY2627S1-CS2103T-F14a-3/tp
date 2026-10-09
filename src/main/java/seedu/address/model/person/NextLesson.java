@@ -30,7 +30,7 @@ public class NextLesson {
         requireNonNull(date);
         requireNonNull(time);
         requireNonNull(topic);
-        if (LocalDateTime.of(date, time).isBefore(LocalDateTime.now())) {
+        if (isDateTimeInPast(date, time)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
         if (topic.isBlank()) {
@@ -39,6 +39,15 @@ public class NextLesson {
         this.date = date;
         this.time = time;
         this.topic = topic.trim();
+    }
+
+    /**
+     * Returns true if the given lesson date and time are before the current local date and time.
+     */
+    public static boolean isDateTimeInPast(LocalDate date, LocalTime time) {
+        requireNonNull(date);
+        requireNonNull(time);
+        return LocalDateTime.of(date, time).isBefore(LocalDateTime.now());
     }
 
     @Override
