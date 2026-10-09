@@ -58,7 +58,11 @@ public class PersonCard extends UiPart<Region> {
         email.setText(person.getEmail().value);
         schoolLevel.setText("Level: " + person.getSchoolLevel().value);
         String noteText = person.getNote().value;
-        note.setText(noteText.isBlank() ? "Note: NIL" : "Note: " + noteText);
+        note.setText("Note: " + noteText);
+        if (noteText.isBlank()) {
+            note.setVisible(false);
+            note.setManaged(false);
+        }
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
