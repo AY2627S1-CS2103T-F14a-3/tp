@@ -1,9 +1,7 @@
 package seedu.address.ui;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.Locale;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -18,8 +16,6 @@ import seedu.address.model.person.Person;
 public class PersonCard extends UiPart<Region> {
 
     private static final String FXML = "PersonListCard.fxml";
-    private static final DateTimeFormatter LESSON_DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a", Locale.ENGLISH);
 
     /**
      * Note: Certain keywords such as "location" and "resources" are reserved keywords in JavaFX.
@@ -66,23 +62,23 @@ public class PersonCard extends UiPart<Region> {
         address.setText(person.getAddress().value);
         email.setText(person.getEmail().value);
         schoolLevel.setText("Level: " + person.getSchoolLevel().value);
-        person.getNextLesson().ifPresentOrElse(lesson -> {
-            LocalDateTime lessonDateTime = LocalDateTime.of(lesson.date, lesson.time);
-            nextLesson.setText("Next lesson: " + lessonDateTime.format(LESSON_DATE_TIME_FORMATTER));
-            nextLessonTopic.setText("Topic: " + lesson.topic);
-        }, () -> {
-            nextLesson.setText("Next lesson: Not scheduled");
-            nextLessonTopic.setVisible(false);
-            nextLessonTopic.setManaged(false);
-        });
-        String noteText = person.getNote().value;
-        note.setText("Note: " + noteText);
-        if (noteText.isBlank()) {
-            note.setVisible(false);
-            note.setManaged(false);
-        }
+        PersonCardFormatter.LessonDisplay lessonDisplay =
+                PersonCardFormatter.formatNextLesson(person.getNextLesson());
+        nextLesson.setText(lessonDisplay.lessonText());
+        setOptionalLabel(nextLessonTopic, lessonDisplay.topicText());
+        setOptionalLabel(note, PersonCardFormatter.formatNote(person.getNote()));
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+    }
+
+    /**
+     * Sets the label text when present, or removes the label from the layout when absent.
+     */
+    private static void setOptionalLabel(Label label, Optional<String> text) {
+        text.ifPresentOrElse(label::setText, () -> {
+            label.setVisible(false);
+            label.setManaged(false);
+        });
     }
 }
