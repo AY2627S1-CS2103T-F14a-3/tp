@@ -5,6 +5,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import seedu.address.commons.util.ToStringBuilder;
@@ -25,6 +26,7 @@ public class Person {
     private final Address address;
     private final SchoolLevel schoolLevel;
     private final StudentNote note;
+    private final Optional<NextLesson> nextLesson;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
@@ -46,13 +48,22 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
             Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, schoolLevel, note, tags);
+        this(name, phone, email, address, schoolLevel, note, Optional.empty(), tags);
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
+            Optional<NextLesson> nextLesson, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, schoolLevel, note, nextLesson, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.schoolLevel = schoolLevel;
         this.note = note;
+        this.nextLesson = nextLesson;
         this.tags.addAll(tags);
     }
 
@@ -78,6 +89,13 @@ public class Person {
 
     public StudentNote getNote() {
         return note;
+    }
+
+    /**
+     * Returns the next lesson, if one has been scheduled.
+     */
+    public Optional<NextLesson> getNextLesson() {
+        return nextLesson;
     }
 
     /**
@@ -122,13 +140,14 @@ public class Person {
                 && address.equals(otherPerson.address)
                 && schoolLevel.equals(otherPerson.schoolLevel)
                 && note.equals(otherPerson.note)
+                && nextLesson.equals(otherPerson.nextLesson)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, schoolLevel, note, tags);
+        return Objects.hash(name, phone, email, address, schoolLevel, note, nextLesson, tags);
     }
 
     @Override
@@ -140,6 +159,7 @@ public class Person {
                 .add("address", address)
                 .add("schoolLevel", schoolLevel)
                 .add("note", note)
+                .add("nextLesson", nextLesson)
                 .add("tags", tags)
                 .toString();
     }

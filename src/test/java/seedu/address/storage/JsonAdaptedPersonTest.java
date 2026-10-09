@@ -5,16 +5,21 @@ import static seedu.address.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORM
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
+import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
@@ -73,6 +78,53 @@ public class JsonAdaptedPersonTest {
                 VALID_SCHOOL_LEVEL, VALID_TAGS);
 
         assertEquals(new StudentNote(""), adapted.toModelType().getNote());
+    }
+
+    @Test
+    public void toModelType_nextLessonIsPreserved() throws Exception {
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).withNextLesson(lesson).build());
+        String json = JsonUtil.toJsonString(adapted);
+        JsonAdaptedPerson reloaded = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
+
+        assertEquals(Optional.of(lesson), reloaded.toModelType().getNextLesson());
+    }
+
+    @Test
+    public void toModelType_missingNextLesson_usesEmptyLesson() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_TAGS);
+
+        assertEquals(Optional.empty(), adapted.toModelType().getNextLesson());
+    }
+
+    @Test
+    public void toModelType_expiredNextLesson_clearsLesson() throws Exception {
+        JsonAdaptedNextLesson expiredLesson = new JsonAdaptedNextLesson(
+                LocalDate.now().minusDays(1).toString(), "14:30", "Algebra");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, expiredLesson, VALID_TAGS);
+
+        assertEquals(Optional.empty(), adapted.toModelType().getNextLesson());
+    }
+
+    @Test
+    public void toModelType_invalidNextLessonDate_throwsIllegalValueException() {
+        JsonAdaptedNextLesson invalidLesson = new JsonAdaptedNextLesson("tomorrow", "14:30", "Algebra");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, invalidLesson, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, adapted::toModelType);
+    }
+
+    @Test
+    public void toModelType_blankNextLessonTopic_throwsIllegalValueException() {
+        JsonAdaptedNextLesson invalidLesson = new JsonAdaptedNextLesson(
+                LocalDate.now().plusDays(1).toString(), "14:30", "  ");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, invalidLesson, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, NextLesson.MESSAGE_TOPIC_CONSTRAINTS, adapted::toModelType);
     }
 
     @Test

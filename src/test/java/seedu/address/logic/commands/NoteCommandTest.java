@@ -10,6 +10,9 @@ import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
@@ -17,6 +20,7 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.StudentNote;
 import seedu.address.testutil.PersonBuilder;
@@ -37,6 +41,22 @@ public class NoteCommandTest {
                 String.format(NoteCommand.MESSAGE_NOTE_UPDATED, student.getName().fullName, noteText), expectedModel);
         assertEquals(new StudentNote(noteText),
                 model.getAddressBook().getPersonList().get(INDEX_FIRST_PERSON.getZeroBased()).getNote());
+    }
+
+    @Test
+    public void execute_studentWithNextLesson_preservesNextLesson() {
+        Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        Person studentWithLesson = new PersonBuilder(student).withNextLesson(lesson).build();
+        model.setPerson(student, studentWithLesson);
+
+        String noteText = "Needs extra time for algebra";
+        Person updatedStudent = new PersonBuilder(studentWithLesson).withNote(noteText).build();
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(studentWithLesson, updatedStudent);
+
+        assertCommandSuccess(new NoteCommand(INDEX_FIRST_PERSON, new StudentNote(noteText)), model,
+                String.format(NoteCommand.MESSAGE_NOTE_UPDATED, student.getName().fullName, noteText), expectedModel);
     }
 
     @Test

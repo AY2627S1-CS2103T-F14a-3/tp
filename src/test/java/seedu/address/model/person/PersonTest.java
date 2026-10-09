@@ -13,6 +13,10 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
 import seedu.address.testutil.PersonBuilder;
@@ -23,6 +27,19 @@ public class PersonTest {
     public void asObservableList_modifyList_throwsUnsupportedOperationException() {
         Person person = new PersonBuilder().build();
         assertThrows(UnsupportedOperationException.class, () -> person.getTags().remove(0));
+    }
+
+    @Test
+    public void getNextLesson_noLesson_returnsEmpty() {
+        assertEquals(Optional.empty(), new PersonBuilder().build().getNextLesson());
+    }
+
+    @Test
+    public void getNextLesson_lessonScheduled_returnsLesson() {
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        Person person = new PersonBuilder().withNextLesson(lesson).build();
+
+        assertEquals(Optional.of(lesson), person.getNextLesson());
     }
 
     @Test
@@ -97,6 +114,11 @@ public class PersonTest {
         // different note -> returns false
         editedAlice = new PersonBuilder(ALICE).withNote("Needs extra time for algebra").build();
         assertFalse(ALICE.equals(editedAlice));
+
+        // different next lesson -> returns false
+        editedAlice = new PersonBuilder(ALICE).withNextLesson(
+                new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra")).build();
+        assertFalse(ALICE.equals(editedAlice));
     }
 
     @Test
@@ -104,7 +126,7 @@ public class PersonTest {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress()
                 + ", schoolLevel=" + ALICE.getSchoolLevel() + ", note=" + ALICE.getNote()
-                + ", tags=" + ALICE.getTags() + "}";
+                + ", nextLesson=" + ALICE.getNextLesson() + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
     }
 }
