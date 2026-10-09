@@ -1,6 +1,7 @@
 package seedu.address.ui;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -41,6 +42,12 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label schoolLevel;
     @FXML
+    private Label note;
+    @FXML
+    private Label nextLesson;
+    @FXML
+    private Label nextLessonTopic;
+    @FXML
     private FlowPane tags;
 
     /**
@@ -55,8 +62,23 @@ public class PersonCard extends UiPart<Region> {
         address.setText(person.getAddress().value);
         email.setText(person.getEmail().value);
         schoolLevel.setText("Level: " + person.getSchoolLevel().value);
+        PersonCardFormatter.LessonDisplay lessonDisplay =
+                PersonCardFormatter.formatNextLesson(person.getNextLesson());
+        nextLesson.setText(lessonDisplay.lessonText());
+        setOptionalLabel(nextLessonTopic, lessonDisplay.topicText());
+        setOptionalLabel(note, PersonCardFormatter.formatNote(person.getNote()));
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+    }
+
+    /**
+     * Sets the label text when present, or removes the label from the layout when absent.
+     */
+    private static void setOptionalLabel(Label label, Optional<String> text) {
+        text.ifPresentOrElse(label::setText, () -> {
+            label.setVisible(false);
+            label.setManaged(false);
+        });
     }
 }

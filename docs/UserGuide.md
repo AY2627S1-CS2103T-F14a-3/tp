@@ -101,6 +101,15 @@ Shows a list of all students in TutorTrack.
 
 Format: `list`
 
+Each student card displays the student's:
+* Name and contact information
+* Tags
+* School level
+* Next lesson date, time, and topic
+* Student note, if one has been recorded
+
+If a student does not have a scheduled lesson, the card displays Next lesson: Not scheduled. Empty student notes are not displayed.
+
 ### Editing a student: `edit`
 
 Edits an existing student in TutorTrack.
@@ -142,6 +151,7 @@ Adds or replaces the free-form note on a student's record. The index refers to t
 Format: `note INDEX note/NOTE`
 
 * The note may contain spaces and is saved with the student record.
+* Non-empty notes are displayed on the corresponding student card.
 * To clear a note, use `note INDEX note/` with no text after `note/`.
 
 Example: `note 1 note/Needs extra time for algebra` records a note for the first displayed student.
