@@ -26,6 +26,7 @@ public class Person {
     private final Address address;
     private final SchoolLevel schoolLevel;
     private final StudentNote note;
+    private final Remark remark;
     private final Optional<NextLesson> nextLesson;
     private final Set<Tag> tags = new HashSet<>();
 
@@ -40,7 +41,7 @@ public class Person {
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Set<Tag> tags) {
-        this(name, phone, email, address, schoolLevel, new StudentNote(""), tags);
+        this(name, phone, email, address, schoolLevel, new StudentNote(""), new Remark(""), Optional.empty(), tags);
     }
 
     /**
@@ -48,7 +49,7 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
             Set<Tag> tags) {
-        this(name, phone, email, address, schoolLevel, note, Optional.empty(), tags);
+        this(name, phone, email, address, schoolLevel, note, new Remark(""), Optional.empty(), tags);
     }
 
     /**
@@ -56,13 +57,22 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
             Optional<NextLesson> nextLesson, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, schoolLevel, note, nextLesson, tags);
+        this(name, phone, email, address, schoolLevel, note, new Remark(""), nextLesson, tags);
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
+            Remark remark, Optional<NextLesson> nextLesson, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, schoolLevel, note, remark, nextLesson, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.schoolLevel = schoolLevel;
         this.note = note;
+        this.remark = remark;
         this.nextLesson = nextLesson;
         this.tags.addAll(tags);
     }
@@ -89,6 +99,10 @@ public class Person {
 
     public StudentNote getNote() {
         return note;
+    }
+
+    public Remark getRemark() {
+        return remark;
     }
 
     /**
@@ -140,6 +154,7 @@ public class Person {
                 && address.equals(otherPerson.address)
                 && schoolLevel.equals(otherPerson.schoolLevel)
                 && note.equals(otherPerson.note)
+                && remark.equals(otherPerson.remark)
                 && nextLesson.equals(otherPerson.nextLesson)
                 && tags.equals(otherPerson.tags);
     }
@@ -147,7 +162,7 @@ public class Person {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, schoolLevel, note, nextLesson, tags);
+        return Objects.hash(name, phone, email, address, schoolLevel, note, remark, nextLesson, tags);
     }
 
     @Override
@@ -159,6 +174,7 @@ public class Person {
                 .add("address", address)
                 .add("schoolLevel", schoolLevel)
                 .add("note", note)
+                .add("remark", remark)
                 .add("nextLesson", nextLesson)
                 .add("tags", tags)
                 .toString();

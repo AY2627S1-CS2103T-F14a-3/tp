@@ -156,6 +156,19 @@ Format: `note INDEX note/NOTE`
 
 Example: `note 1 note/Needs extra time for algebra` records a note for the first displayed student.
 
+### Adding or replacing a person remark: `remark`
+
+Adds or replaces an optional remark on a person's record. The index refers to the current displayed student list,
+including search results.
+
+Format: `remark INDEX r/REMARK`
+
+* Remarks may contain spaces and are saved with the student record.
+* Remarks are displayed on the corresponding student card.
+* To clear a remark, use `remark INDEX r/` with no text after `r/`.
+
+Example: `remark 1 r/Likes baseball` records a remark for the first displayed student.
+
 ### Deleting a student: `delete`
 
 Deletes the specified student from TutorTrack.
@@ -224,5 +237,6 @@ Action     | Format and Examples
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
+**Remark** | `remark INDEX r/REMARK`<br> e.g., `remark 1 r/Likes baseball`
 **Help**   | `help`
 **Exit**   | `exit`

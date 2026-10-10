@@ -22,6 +22,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Remark;
 import seedu.address.model.person.StudentNote;
 import seedu.address.testutil.PersonBuilder;
 
@@ -44,19 +45,22 @@ public class NoteCommandTest {
     }
 
     @Test
-    public void execute_studentWithNextLesson_preservesNextLesson() {
+    public void execute_studentWithNextLessonAndRemark_preservesBoth() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
-        Person studentWithLesson = new PersonBuilder(student).withNextLesson(lesson).build();
-        model.setPerson(student, studentWithLesson);
+        Person studentWithLessonAndRemark = new PersonBuilder(student).withNextLesson(lesson)
+                .withRemark("Likes baseball").build();
+        model.setPerson(student, studentWithLessonAndRemark);
 
         String noteText = "Needs extra time for algebra";
-        Person updatedStudent = new PersonBuilder(studentWithLesson).withNote(noteText).build();
+        Person updatedStudent = new PersonBuilder(studentWithLessonAndRemark).withNote(noteText).build();
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        expectedModel.setPerson(studentWithLesson, updatedStudent);
+        expectedModel.setPerson(studentWithLessonAndRemark, updatedStudent);
 
         assertCommandSuccess(new NoteCommand(INDEX_FIRST_PERSON, new StudentNote(noteText)), model,
                 String.format(NoteCommand.MESSAGE_NOTE_UPDATED, student.getName().fullName, noteText), expectedModel);
+        assertEquals(new Remark("Likes baseball"),
+                model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()).getRemark());
     }
 
     @Test

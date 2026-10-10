@@ -22,9 +22,11 @@ import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.NoteCommand;
+import seedu.address.logic.commands.RemarkCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Remark;
 import seedu.address.model.person.StudentNote;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
@@ -95,6 +97,14 @@ public class AddressBookParserTest {
         NoteCommand command = (NoteCommand) parser.parseCommand("note " + INDEX_FIRST_PERSON.getOneBased()
                 + " note/" + note);
         assertEquals(new NoteCommand(INDEX_FIRST_PERSON, new StudentNote(note)), command);
+    }
+
+    @Test
+    public void parseCommand_remark() throws Exception {
+        String remark = "Likes baseball";
+        RemarkCommand command = (RemarkCommand) parser.parseCommand("remark " + INDEX_FIRST_PERSON.getOneBased()
+                + " r/" + remark);
+        assertEquals(new RemarkCommand(INDEX_FIRST_PERSON, new Remark(remark)), command);
     }
 
     @Test

@@ -44,6 +44,8 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label note;
     @FXML
+    private Label remark;
+    @FXML
     private Label nextLesson;
     @FXML
     private Label nextLessonTopic;
@@ -67,6 +69,7 @@ public class PersonCard extends UiPart<Region> {
         nextLesson.setText(lessonDisplay.lessonText());
         setOptionalLabel(nextLessonTopic, lessonDisplay.topicText());
         setOptionalLabel(note, PersonCardFormatter.formatNote(person.getNote()));
+        setOptionalLabel(remark, Optional.of(person.getRemark().value).filter(value -> !value.isEmpty()));
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));

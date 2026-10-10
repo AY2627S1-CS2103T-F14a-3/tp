@@ -10,6 +10,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Remark;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.tag.Tag;
@@ -31,6 +32,7 @@ public class PersonBuilder {
     private Address address;
     private SchoolLevel schoolLevel;
     private StudentNote note;
+    private Remark remark;
     private Optional<NextLesson> nextLesson;
     private Set<Tag> tags;
 
@@ -44,6 +46,7 @@ public class PersonBuilder {
         address = new Address(DEFAULT_ADDRESS);
         schoolLevel = new SchoolLevel(SchoolLevel.DEFAULT_VALUE);
         note = new StudentNote("");
+        remark = new Remark("");
         nextLesson = Optional.empty();
         tags = new HashSet<>();
     }
@@ -58,6 +61,7 @@ public class PersonBuilder {
         address = personToCopy.getAddress();
         schoolLevel = personToCopy.getSchoolLevel();
         note = personToCopy.getNote();
+        remark = personToCopy.getRemark();
         nextLesson = personToCopy.getNextLesson();
         tags = new HashSet<>(personToCopy.getTags());
     }
@@ -117,6 +121,14 @@ public class PersonBuilder {
     }
 
     /**
+     * Sets the remark of the {@code Person} that we are building.
+     */
+    public PersonBuilder withRemark(String remark) {
+        this.remark = new Remark(remark);
+        return this;
+    }
+
+    /**
      * Sets the next lesson of the {@code Person} that we are building.
      */
     public PersonBuilder withNextLesson(NextLesson nextLesson) {
@@ -125,7 +137,7 @@ public class PersonBuilder {
     }
 
     public Person build() {
-        return new Person(name, phone, email, address, schoolLevel, note, nextLesson, tags);
+        return new Person(name, phone, email, address, schoolLevel, note, remark, nextLesson, tags);
     }
 
 }

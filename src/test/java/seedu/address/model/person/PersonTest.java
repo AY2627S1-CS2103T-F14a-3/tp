@@ -119,6 +119,10 @@ public class PersonTest {
         editedAlice = new PersonBuilder(ALICE).withNextLesson(
                 new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra")).build();
         assertFalse(ALICE.equals(editedAlice));
+
+        // different remark -> returns false
+        editedAlice = new PersonBuilder(ALICE).withRemark("Likes baseball").build();
+        assertFalse(ALICE.equals(editedAlice));
     }
 
     @Test
@@ -126,7 +130,8 @@ public class PersonTest {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress()
                 + ", schoolLevel=" + ALICE.getSchoolLevel() + ", note=" + ALICE.getNote()
-                + ", nextLesson=" + ALICE.getNextLesson() + ", tags=" + ALICE.getTags() + "}";
+                + ", remark=" + ALICE.getRemark() + ", nextLesson=" + ALICE.getNextLesson()
+                + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
     }
 }

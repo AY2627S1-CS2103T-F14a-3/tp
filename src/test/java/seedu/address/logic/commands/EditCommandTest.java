@@ -29,6 +29,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Remark;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 
@@ -75,10 +76,11 @@ public class EditCommandTest {
     }
 
     @Test
-    public void execute_editPersonWithNextLesson_preservesNextLesson() {
+    public void execute_editPersonWithNextLessonAndRemark_preservesBoth() {
         Person original = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
-        Person originalWithLesson = new PersonBuilder(original).withNextLesson(lesson).build();
+        Person originalWithLesson = new PersonBuilder(original).withNextLesson(lesson)
+                .withRemark("Likes baseball").build();
         model.setPerson(original, originalWithLesson);
 
         Person editedPerson = new PersonBuilder(originalWithLesson).withName(VALID_NAME_BOB).build();
@@ -90,6 +92,8 @@ public class EditCommandTest {
         String expectedMessage = String.format(EditCommand.MESSAGE_EDIT_PERSON_SUCCESS, Messages.format(editedPerson));
 
         assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
+        assertEquals(new Remark("Likes baseball"),
+                model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()).getRemark());
     }
 
     @Test

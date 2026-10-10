@@ -17,6 +17,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Remark;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.tag.Tag;
@@ -34,6 +35,7 @@ class JsonAdaptedPerson {
     private final String address;
     private final String schoolLevel;
     private final String note;
+    private final String remark;
     private final JsonAdaptedNextLesson nextLesson;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
 
@@ -44,7 +46,7 @@ class JsonAdaptedPerson {
     public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
             @JsonProperty("email") String email, @JsonProperty("address") String address,
             @JsonProperty("schoolLevel") String schoolLevel, @JsonProperty("note") String note,
-            @JsonProperty("nextLesson") JsonAdaptedNextLesson nextLesson,
+            @JsonProperty("remark") String remark, @JsonProperty("nextLesson") JsonAdaptedNextLesson nextLesson,
             @JsonProperty("tags") List<JsonAdaptedTag> tags) {
         this.name = name;
         this.phone = phone;
@@ -52,6 +54,7 @@ class JsonAdaptedPerson {
         this.address = address;
         this.schoolLevel = schoolLevel;
         this.note = note;
+        this.remark = remark;
         this.nextLesson = nextLesson;
         if (tags != null) {
             this.tags.addAll(tags);
@@ -62,7 +65,7 @@ class JsonAdaptedPerson {
      * Constructs a {@code JsonAdaptedPerson} without a school level for legacy test data.
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, null, null, null, tags);
+        this(name, phone, email, address, null, null, (JsonAdaptedNextLesson) null, tags);
     }
 
     /**
@@ -70,7 +73,15 @@ class JsonAdaptedPerson {
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, String schoolLevel,
             List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, schoolLevel, null, null, tags);
+        this(name, phone, email, address, schoolLevel, null, null, null, tags);
+    }
+
+    /**
+     * Constructs a {@code JsonAdaptedPerson} with existing note and lesson fields but without a remark.
+     */
+    JsonAdaptedPerson(String name, String phone, String email, String address, String schoolLevel, String note,
+            JsonAdaptedNextLesson nextLesson, List<JsonAdaptedTag> tags) {
+        this(name, phone, email, address, schoolLevel, note, null, nextLesson, tags);
     }
 
     /**
@@ -83,6 +94,7 @@ class JsonAdaptedPerson {
         address = source.getAddress().value;
         schoolLevel = source.getSchoolLevel().value;
         note = source.getNote().value;
+        remark = source.getRemark().value;
         nextLesson = source.getNextLesson().map(JsonAdaptedNextLesson::new).orElse(null);
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
@@ -142,10 +154,11 @@ class JsonAdaptedPerson {
         }
 
         StudentNote modelNote = new StudentNote(note == null ? "" : note);
+        Remark modelRemark = new Remark(remark == null ? "" : remark);
         Optional<NextLesson> modelNextLesson = nextLesson == null ? Optional.empty() : nextLesson.toModelType();
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSchoolLevel, modelNote,
+        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSchoolLevel, modelNote, modelRemark,
                 modelNextLesson, modelTags);
     }
 
