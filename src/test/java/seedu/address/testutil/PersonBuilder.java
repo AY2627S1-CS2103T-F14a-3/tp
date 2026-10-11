@@ -12,6 +12,7 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.util.SampleDataUtil;
 
@@ -30,6 +31,7 @@ public class PersonBuilder {
     private Email email;
     private Address address;
     private SchoolLevel schoolLevel;
+    private Subject subject;
     private StudentNote note;
     private Optional<NextLesson> nextLesson;
     private Set<Tag> tags;
@@ -43,6 +45,7 @@ public class PersonBuilder {
         email = new Email(DEFAULT_EMAIL);
         address = new Address(DEFAULT_ADDRESS);
         schoolLevel = new SchoolLevel(SchoolLevel.DEFAULT_VALUE);
+        subject = new Subject(Subject.DEFAULT_VALUE);
         note = new StudentNote("");
         nextLesson = Optional.empty();
         tags = new HashSet<>();
@@ -57,6 +60,7 @@ public class PersonBuilder {
         email = personToCopy.getEmail();
         address = personToCopy.getAddress();
         schoolLevel = personToCopy.getSchoolLevel();
+        subject = personToCopy.getSubject();
         note = personToCopy.getNote();
         nextLesson = personToCopy.getNextLesson();
         tags = new HashSet<>(personToCopy.getTags());
@@ -110,6 +114,14 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Sets the subject of the {@code Person} that we are building.
+     */
+    public PersonBuilder withSubject(String subject) {
+        this.subject = new Subject(subject);
+        return this;
+    }
+
     /** Sets the note of the person being built. */
     public PersonBuilder withNote(String note) {
         this.note = new StudentNote(note);
@@ -125,7 +137,7 @@ public class PersonBuilder {
     }
 
     public Person build() {
-        return new Person(name, phone, email, address, schoolLevel, note, nextLesson, tags);
+        return new Person(name, phone, email, address, schoolLevel, subject, note, nextLesson, tags);
     }
 
 }

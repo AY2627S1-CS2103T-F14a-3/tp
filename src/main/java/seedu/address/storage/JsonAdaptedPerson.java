@@ -19,6 +19,7 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -33,6 +34,7 @@ class JsonAdaptedPerson {
     private final String email;
     private final String address;
     private final String schoolLevel;
+    private final String subject;
     private final String note;
     private final JsonAdaptedNextLesson nextLesson;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
@@ -43,7 +45,8 @@ class JsonAdaptedPerson {
     @JsonCreator
     public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
             @JsonProperty("email") String email, @JsonProperty("address") String address,
-            @JsonProperty("schoolLevel") String schoolLevel, @JsonProperty("note") String note,
+            @JsonProperty("schoolLevel") String schoolLevel, @JsonProperty("subject") String subject,
+            @JsonProperty("note") String note,
             @JsonProperty("nextLesson") JsonAdaptedNextLesson nextLesson,
             @JsonProperty("tags") List<JsonAdaptedTag> tags) {
         this.name = name;
@@ -51,6 +54,7 @@ class JsonAdaptedPerson {
         this.email = email;
         this.address = address;
         this.schoolLevel = schoolLevel;
+        this.subject = subject;
         this.note = note;
         this.nextLesson = nextLesson;
         if (tags != null) {
@@ -62,7 +66,7 @@ class JsonAdaptedPerson {
      * Constructs a {@code JsonAdaptedPerson} without a school level for legacy test data.
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, null, null, null, tags);
+        this(name, phone, email, address, null, null, null, null, tags);
     }
 
     /**
@@ -70,7 +74,15 @@ class JsonAdaptedPerson {
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, String schoolLevel,
             List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, schoolLevel, null, null, tags);
+        this(name, phone, email, address, schoolLevel, null, null, null, tags);
+    }
+
+    /**
+     * Constructs a {@code JsonAdaptedPerson} without a subject for legacy test data.
+     */
+    JsonAdaptedPerson(String name, String phone, String email, String address, String schoolLevel, String note,
+            JsonAdaptedNextLesson nextLesson, List<JsonAdaptedTag> tags) {
+        this(name, phone, email, address, schoolLevel, null, note, nextLesson, tags);
     }
 
     /**
@@ -82,6 +94,7 @@ class JsonAdaptedPerson {
         email = source.getEmail().value;
         address = source.getAddress().value;
         schoolLevel = source.getSchoolLevel().value;
+        subject = source.getSubject().value;
         note = source.getNote().value;
         nextLesson = source.getNextLesson().map(JsonAdaptedNextLesson::new).orElse(null);
         tags.addAll(source.getTags().stream()
@@ -141,11 +154,20 @@ class JsonAdaptedPerson {
             modelSchoolLevel = new SchoolLevel(schoolLevel);
         }
 
+        final Subject modelSubject;
+        if (subject == null) {
+            modelSubject = new Subject(Subject.DEFAULT_VALUE);
+        } else if (!Subject.isValidSubject(subject)) {
+            throw new IllegalValueException(Subject.MESSAGE_CONSTRAINTS);
+        } else {
+            modelSubject = new Subject(subject);
+        }
+
         StudentNote modelNote = new StudentNote(note == null ? "" : note);
         Optional<NextLesson> modelNextLesson = nextLesson == null ? Optional.empty() : nextLesson.toModelType();
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSchoolLevel, modelNote,
+        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSchoolLevel, modelSubject, modelNote,
                 modelNextLesson, modelTags);
     }
 
