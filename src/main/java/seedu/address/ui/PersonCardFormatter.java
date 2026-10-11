@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
 
 /**
  * Formats tutoring information for display in a student card.
@@ -41,6 +42,14 @@ final class PersonCardFormatter {
     static Optional<String> formatNote(StudentNote note) {
         requireNonNull(note);
         return note.value.isBlank() ? Optional.empty() : Optional.of("Note: " + note.value);
+    }
+
+    /**
+     * Formats the subject for display in a student card.
+     */
+    static String formatSubject(Subject subject) {
+        requireNonNull(subject);
+        return "Subject: " + subject.value;
     }
 
     /**

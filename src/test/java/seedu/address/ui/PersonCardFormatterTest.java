@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
 
 public class PersonCardFormatterTest {
 
@@ -44,5 +45,10 @@ public class PersonCardFormatterTest {
     @Test
     public void formatNote_blankNote_returnsEmpty() {
         assertTrue(PersonCardFormatter.formatNote(new StudentNote("")).isEmpty());
+    }
+
+    @Test
+    public void formatSubject_validSubject_returnsPrefixedSubject() {
+        assertEquals("Subject: Mathematics", PersonCardFormatter.formatSubject(new Subject("Mathematics")));
     }
 }

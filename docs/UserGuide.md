@@ -82,18 +82,18 @@ Format: `help`
 
 Adds a student to TutorTrack.
 
-Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [t/TAG]... `
+Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]... `
 
 <box type="tip" seamless>
 
 **Tip:** A student can have any number of tags, including zero.
 </box>
 
-* The school level is optional. If it is omitted, TutorTrack records it as `Not specified`.
+* The school level and subject are optional. If either is omitted, TutorTrack records it as `Not specified`.
 
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
-* `add n/Betsy Crowe p/1234567 e/betsycrowe@example.com a/Newgate Prison l/Secondary 4 t/friend t/criminal`
+* `add n/Betsy Crowe p/1234567 e/betsycrowe@example.com a/Newgate Prison l/Secondary 4 s/Mathematics t/friend t/criminal`
 
 ### Listing all students: `list`
 
@@ -105,6 +105,7 @@ Each student card displays the student's:
 * Name and contact information
 * Tags
 * School level
+* Subject
 * Next lesson date, time, and topic
 * Student note, if one has been recorded
 
@@ -114,7 +115,7 @@ If a student does not have a scheduled lesson, the card displays Next lesson: No
 
 Edits an existing student in TutorTrack.
 
-Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [l/SCHOOL_LEVEL] [t/TAG]... `
+Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]... `
 
 * Edits the student at the specified `INDEX`. The index refers to the index number shown in the displayed student list. The index **must be a positive integer** 1, 2, 3, ...
 * At least one of the optional fields must be provided.
@@ -126,6 +127,7 @@ Examples:
 *  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st student to be `91234567` and `johndoe@example.com` respectively.
 *  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd student to be `Betsy Crower` and clears all existing tags.
 *  `edit 1 l/Junior College 1` Updates the school level of the 1st student.
+*  `edit 1 s/Physics` Updates the subject of the 1st student.
 
 ### Locating students by name: `find`
 
