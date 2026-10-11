@@ -156,6 +156,18 @@ Format: `note INDEX note/NOTE`
 
 Example: `note 1 note/Needs extra time for algebra` records a note for the first displayed student.
 
+### Scheduling a student's next lesson: `nextlesson`
+
+Sets or replaces the next lesson for a student. The index refers to the current displayed student list, including search results.
+
+Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`
+
+* The date must be a valid date in `YYYY-MM-DD` format and the time a valid 24-hour time in `HH:mm` format.
+* The lesson must not be in the past, and the topic must not be blank.
+* The lesson is saved with the student and displayed on the student card. Updating it preserves the student's other details, including notes and tags.
+
+Example: `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra` schedules an algebra lesson for the first displayed student.
+
 ### Deleting a student: `delete`
 
 Deletes the specified student from TutorTrack.
@@ -223,6 +235,7 @@ Action     | Format and Examples
 **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... `<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
+**Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
 **Exit**   | `exit`

@@ -7,6 +7,8 @@ import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,9 +23,11 @@ import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.NextLessonCommand;
 import seedu.address.logic.commands.NoteCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.StudentNote;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
@@ -95,6 +99,14 @@ public class AddressBookParserTest {
         NoteCommand command = (NoteCommand) parser.parseCommand("note " + INDEX_FIRST_PERSON.getOneBased()
                 + " note/" + note);
         assertEquals(new NoteCommand(INDEX_FIRST_PERSON, new StudentNote(note)), command);
+    }
+
+    @Test
+    public void parseCommand_nextlesson() throws Exception {
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        NextLessonCommand command = (NextLessonCommand) parser.parseCommand("nextlesson "
+                + INDEX_FIRST_PERSON.getOneBased() + " date/" + lesson.date + " time/14:30 topic/" + lesson.topic);
+        assertEquals(new NextLessonCommand(INDEX_FIRST_PERSON, lesson), command);
     }
 
     @Test
