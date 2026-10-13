@@ -151,6 +151,9 @@ Adds or replaces the free-form note on a student's record. The index refers to t
 Format: `note INDEX note/NOTE`
 
 * The note may contain spaces and is saved with the student record.
+* Each student has one note. Recording another note replaces the previous text.
+* The `note/` prefix is required and must appear exactly once. Repeating it produces an error; ` note/` cannot be included literally inside the note text.
+* Leading and trailing spaces are removed; spaces within the note are preserved.
 * Non-empty notes are displayed on the corresponding student card.
 * To clear a note, use `note INDEX note/` with no text after `note/`.
 
