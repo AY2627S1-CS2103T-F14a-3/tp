@@ -27,6 +27,7 @@ TutorTrack is a desktop contact-management application for private tutors who ma
    ![Ui](images/Ui.png)
 
 1. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
+   The command box is located at the bottom of the window. Command feedback appears directly above it.<br>
    Some example commands you can try:
 
    * `list` : Lists all students.
@@ -101,15 +102,13 @@ Shows a list of all students in TutorTrack.
 
 Format: `list`
 
-Each student card displays the student's:
-* Name and contact information
-* Tags
-* School level
-* Subject
-* Next lesson date, time, and topic
-* Student note, if one has been recorded
+Each student card groups information into the following sections:
 
-If a student does not have a scheduled lesson, the card displays Next lesson: Not scheduled. Empty student notes are not displayed.
+* **Academic Information** — the student's school level and subject
+* **Contact Details** — the student's phone number, email address, and home address
+* **Tutoring Information** — the student's next lesson and note
+
+Student tags are displayed below the student's name. If a student does not have a scheduled lesson, the card displays `Next lesson: Not scheduled`. Empty notes and optional lesson topics are not displayed.
 
 ### Editing a student: `edit`
 
