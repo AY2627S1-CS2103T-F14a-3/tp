@@ -23,6 +23,7 @@ import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
 import seedu.address.testutil.PersonBuilder;
 
 public class JsonAdaptedPersonTest {
@@ -37,6 +38,8 @@ public class JsonAdaptedPersonTest {
     private static final String VALID_EMAIL = BENSON.getEmail().toString();
     private static final String VALID_ADDRESS = BENSON.getAddress().toString();
     private static final String VALID_SCHOOL_LEVEL = "Secondary 4";
+    private static final String VALID_SUBJECT = "Mathematics";
+    private static final String INVALID_SUBJECT = " ";
     private static final String INVALID_SCHOOL_LEVEL = " ";
     private static final List<JsonAdaptedTag> VALID_TAGS = BENSON.getTags().stream()
             .map(JsonAdaptedTag::new)
@@ -62,6 +65,29 @@ public class JsonAdaptedPersonTest {
                 VALID_TAGS);
 
         assertEquals(SchoolLevel.DEFAULT_VALUE, person.toModelType().getSchoolLevel().value);
+    }
+
+    @Test
+    public void toModelType_subjectFromPerson_roundTripsSubject() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).withSubject(VALID_SUBJECT).build());
+
+        assertEquals(new Subject(VALID_SUBJECT), adapted.toModelType().getSubject());
+    }
+
+    @Test
+    public void toModelType_missingSubject_usesDefaultSubject() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_TAGS);
+
+        assertEquals(new Subject(Subject.DEFAULT_VALUE), adapted.toModelType().getSubject());
+    }
+
+    @Test
+    public void toModelType_invalidSubject_throwsIllegalValueException() {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, INVALID_SUBJECT, null, null, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, Subject.MESSAGE_CONSTRAINTS, adapted::toModelType);
     }
 
     @Test

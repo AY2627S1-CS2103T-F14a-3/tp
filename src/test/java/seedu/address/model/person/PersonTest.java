@@ -111,6 +111,10 @@ public class PersonTest {
         editedAlice = new PersonBuilder(ALICE).withSchoolLevel(VALID_SCHOOL_LEVEL_BOB).build();
         assertFalse(ALICE.equals(editedAlice));
 
+        // different subject -> returns false
+        editedAlice = new PersonBuilder(ALICE).withSubject("English").build();
+        assertFalse(ALICE.equals(editedAlice));
+
         // different note -> returns false
         editedAlice = new PersonBuilder(ALICE).withNote("Needs extra time for algebra").build();
         assertFalse(ALICE.equals(editedAlice));
@@ -125,7 +129,8 @@ public class PersonTest {
     public void toStringMethod() {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress()
-                + ", schoolLevel=" + ALICE.getSchoolLevel() + ", note=" + ALICE.getNote()
+                + ", schoolLevel=" + ALICE.getSchoolLevel() + ", subject=" + ALICE.getSubject()
+                + ", note=" + ALICE.getNote()
                 + ", nextLesson=" + ALICE.getNextLesson() + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
     }

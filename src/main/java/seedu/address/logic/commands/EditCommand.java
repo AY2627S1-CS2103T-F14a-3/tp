@@ -6,6 +6,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_SCHOOL_LEVEL;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_SUBJECT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
@@ -29,6 +30,7 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -47,6 +49,7 @@ public class EditCommand extends Command {
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
             + "[" + PREFIX_SCHOOL_LEVEL + "SCHOOL_LEVEL] "
+            + "[" + PREFIX_SUBJECT + "SUBJECT] "
             + "[" + PREFIX_TAG + "TAG]...\n"
             + "Example: " + COMMAND_WORD + " 1 "
             + PREFIX_PHONE + "91234567 "
@@ -104,10 +107,12 @@ public class EditCommand extends Command {
         Email updatedEmail = editPersonDescriptor.getEmail().orElse(personToEdit.getEmail());
         Address updatedAddress = editPersonDescriptor.getAddress().orElse(personToEdit.getAddress());
         SchoolLevel updatedSchoolLevel = editPersonDescriptor.getSchoolLevel().orElse(personToEdit.getSchoolLevel());
+        Subject updatedSubject = editPersonDescriptor.getSubject().orElse(personToEdit.getSubject());
         StudentNote note = personToEdit.getNote();
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedSchoolLevel, note,
+        return new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedSchoolLevel,
+                updatedSubject, note,
                 personToEdit.getNextLesson(), updatedTags);
     }
 
@@ -144,6 +149,7 @@ public class EditCommand extends Command {
         private Email email;
         private Address address;
         private SchoolLevel schoolLevel;
+        private Subject subject;
         private Set<Tag> tags;
 
         public EditPersonDescriptor() {}
@@ -158,6 +164,7 @@ public class EditCommand extends Command {
             setEmail(toCopy.email);
             setAddress(toCopy.address);
             setSchoolLevel(toCopy.schoolLevel);
+            setSubject(toCopy.subject);
             setTags(toCopy.tags);
         }
 
@@ -165,7 +172,7 @@ public class EditCommand extends Command {
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, schoolLevel, tags);
+            return CollectionUtil.isAnyNonNull(name, phone, email, address, schoolLevel, subject, tags);
         }
 
         public void setName(Name name) {
@@ -208,6 +215,14 @@ public class EditCommand extends Command {
             return Optional.ofNullable(schoolLevel);
         }
 
+        public void setSubject(Subject subject) {
+            this.subject = subject;
+        }
+
+        public Optional<Subject> getSubject() {
+            return Optional.ofNullable(subject);
+        }
+
         /**
          * Sets {@code tags} to this object's {@code tags}.
          * A defensive copy of {@code tags} is used internally.
@@ -241,6 +256,7 @@ public class EditCommand extends Command {
                     && Objects.equals(email, otherEditPersonDescriptor.email)
                     && Objects.equals(address, otherEditPersonDescriptor.address)
                     && Objects.equals(schoolLevel, otherEditPersonDescriptor.schoolLevel)
+                    && Objects.equals(subject, otherEditPersonDescriptor.subject)
                     && Objects.equals(tags, otherEditPersonDescriptor.tags);
         }
 
@@ -252,6 +268,7 @@ public class EditCommand extends Command {
                     .add("email", email)
                     .add("address", address)
                     .add("schoolLevel", schoolLevel)
+                    .add("subject", subject)
                     .add("tags", tags)
                     .toString();
         }

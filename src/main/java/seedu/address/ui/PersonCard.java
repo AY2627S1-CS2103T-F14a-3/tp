@@ -42,6 +42,8 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label schoolLevel;
     @FXML
+    private Label subject;
+    @FXML
     private Label note;
     @FXML
     private Label nextLesson;
@@ -62,6 +64,7 @@ public class PersonCard extends UiPart<Region> {
         address.setText(person.getAddress().value);
         email.setText(person.getEmail().value);
         schoolLevel.setText("Level: " + person.getSchoolLevel().value);
+        subject.setText(PersonCardFormatter.formatSubject(person.getSubject()));
         PersonCardFormatter.LessonDisplay lessonDisplay =
                 PersonCardFormatter.formatNextLesson(person.getNextLesson());
         nextLesson.setText(lessonDisplay.lessonText());

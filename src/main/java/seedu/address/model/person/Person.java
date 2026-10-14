@@ -25,6 +25,7 @@ public class Person {
     // Data fields
     private final Address address;
     private final SchoolLevel schoolLevel;
+    private final Subject subject;
     private final StudentNote note;
     private final Optional<NextLesson> nextLesson;
     private final Set<Tag> tags = new HashSet<>();
@@ -33,14 +34,16 @@ public class Person {
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags) {
-        this(name, phone, email, address, new SchoolLevel(SchoolLevel.DEFAULT_VALUE), new StudentNote(""), tags);
+        this(name, phone, email, address, new SchoolLevel(SchoolLevel.DEFAULT_VALUE),
+                new Subject(Subject.DEFAULT_VALUE), new StudentNote(""), Optional.empty(), tags);
     }
 
     /**
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Set<Tag> tags) {
-        this(name, phone, email, address, schoolLevel, new StudentNote(""), tags);
+        this(name, phone, email, address, schoolLevel, new Subject(Subject.DEFAULT_VALUE), new StudentNote(""),
+                Optional.empty(), tags);
     }
 
     /**
@@ -48,7 +51,8 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
             Set<Tag> tags) {
-        this(name, phone, email, address, schoolLevel, note, Optional.empty(), tags);
+        this(name, phone, email, address, schoolLevel, new Subject(Subject.DEFAULT_VALUE), note,
+                Optional.empty(), tags);
     }
 
     /**
@@ -56,12 +60,21 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, StudentNote note,
             Optional<NextLesson> nextLesson, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, schoolLevel, note, nextLesson, tags);
+        this(name, phone, email, address, schoolLevel, new Subject(Subject.DEFAULT_VALUE), note, nextLesson, tags);
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Subject subject,
+            StudentNote note, Optional<NextLesson> nextLesson, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, schoolLevel, subject, note, nextLesson, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.schoolLevel = schoolLevel;
+        this.subject = subject;
         this.note = note;
         this.nextLesson = nextLesson;
         this.tags.addAll(tags);
@@ -85,6 +98,10 @@ public class Person {
 
     public SchoolLevel getSchoolLevel() {
         return schoolLevel;
+    }
+
+    public Subject getSubject() {
+        return subject;
     }
 
     public StudentNote getNote() {
@@ -139,6 +156,7 @@ public class Person {
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
                 && schoolLevel.equals(otherPerson.schoolLevel)
+                && subject.equals(otherPerson.subject)
                 && note.equals(otherPerson.note)
                 && nextLesson.equals(otherPerson.nextLesson)
                 && tags.equals(otherPerson.tags);
@@ -147,7 +165,7 @@ public class Person {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, schoolLevel, note, nextLesson, tags);
+        return Objects.hash(name, phone, email, address, schoolLevel, subject, note, nextLesson, tags);
     }
 
     @Override
@@ -158,6 +176,7 @@ public class Person {
                 .add("email", email)
                 .add("address", address)
                 .add("schoolLevel", schoolLevel)
+                .add("subject", subject)
                 .add("note", note)
                 .add("nextLesson", nextLesson)
                 .add("tags", tags)
