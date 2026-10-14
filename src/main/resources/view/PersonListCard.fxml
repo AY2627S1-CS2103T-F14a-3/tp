@@ -28,14 +28,29 @@
         <Label fx:id="name" text="\$first" styleClass="cell_big_label" />
       </HBox>
       <FlowPane fx:id="tags" />
-      <Label fx:id="phone" styleClass="cell_small_label" text="\$phone" />
-      <Label fx:id="schoolLevel" styleClass="cell_small_label" text="\$schoolLevel" />
-      <Label fx:id="subject" styleClass="cell_small_label" text="\$subject" />
-      <Label fx:id="nextLesson" styleClass="cell_small_label" text="\$nextLesson" />
-      <Label fx:id="nextLessonTopic" styleClass="cell_small_label" text="\$nextLessonTopic" wrapText="true" />
-      <Label fx:id="address" styleClass="cell_small_label" text="\$address" />
-      <Label fx:id="email" styleClass="cell_small_label" text="\$email" />
-      <Label fx:id="note" styleClass="cell_small_label" text="\$note" wrapText="true" />
+      <!-- Academic Information -->
+      <VBox spacing="5" maxWidth="Infinity" styleClass="student-information-box">
+        <Label text="Academic Information" styleClass="student-section-title" />
+        <Label fx:id="schoolLevel" styleClass="cell_small_label" />
+        <Label fx:id="subject" styleClass="cell_small_label" />
+      </VBox>
+
+      <!-- Contact Information -->
+      <VBox spacing="5" maxWidth="Infinity" styleClass="student-information-box">
+        <Label text="Contact Details" styleClass="student-section-title" />
+        <Label fx:id="phone" styleClass="cell_small_label" />
+        <Label fx:id="email" styleClass="cell_small_label" text="\$email" />
+        <Label fx:id="address" styleClass="cell_small_label" text="\$address" />
+      </VBox>
+
+      <!-- Next Lesson -->
+      <VBox spacing="5" maxWidth="Infinity" styleClass="student-information-box">
+        <Label text="Tutoring Information" styleClass="student-section-title" />
+        <Label fx:id="nextLesson" styleClass="cell_small_label" text="\$nextLesson" />
+        <Label fx:id="nextLessonTopic" styleClass="cell_small_label" text="\$nextLessonTopic" wrapText="true" />
+        <Label fx:id="note" styleClass="cell_small_label" text="\$note" wrapText="true" />
+      </VBox>
+
     </VBox>
   </GridPane>
 </HBox>
