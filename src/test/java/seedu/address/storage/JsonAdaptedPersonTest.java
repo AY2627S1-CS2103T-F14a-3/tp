@@ -125,6 +125,15 @@ public class JsonAdaptedPersonTest {
     }
 
     @Test
+    public void toModelType_clearedNextLesson_roundTripsAsEmpty() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).build());
+        String json = JsonUtil.toJsonString(adapted);
+        JsonAdaptedPerson reloaded = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
+
+        assertEquals(Optional.empty(), reloaded.toModelType().getNextLesson());
+    }
+
+    @Test
     public void toModelType_expiredNextLesson_clearsLesson() throws Exception {
         JsonAdaptedNextLesson expiredLesson = new JsonAdaptedNextLesson(
                 LocalDate.now().minusDays(1).toString(), "14:30", "Algebra");
