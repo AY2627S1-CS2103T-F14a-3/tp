@@ -32,7 +32,7 @@ public class NextLessonCommandTest {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         NextLesson oldLesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Old topic");
         Person studentWithDetails = new PersonBuilder(student).withNote("Needs extra practice")
-                .withTags("priority").withNextLesson(oldLesson).build();
+                .withSubject("Biology").withTags("priority").withNextLesson(oldLesson).build();
         model.setPerson(student, studentWithDetails);
 
         NextLesson newLesson = new NextLesson(LocalDate.now().plusDays(2), LocalTime.of(16, 0), "Quadratic equations");

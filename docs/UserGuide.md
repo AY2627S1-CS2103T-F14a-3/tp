@@ -172,6 +172,18 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`
 
 Example: `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra` schedules an algebra lesson for the first displayed student.
 
+### Clearing a student's next lesson: `clearlesson`
+
+Clears the scheduled next lesson for a student. The index refers to the current displayed student list, including search results.
+
+Format: `clearlesson INDEX`
+
+* The index must be a positive integer identifying a student in the displayed list.
+* If the student has no scheduled lesson, TutorTrack reports that no lesson is scheduled.
+* Clearing a lesson preserves the student's other details, including academic information, notes, and tags.
+
+Example: `clearlesson 1` clears the next lesson for the first displayed student.
+
 ### Deleting a student: `delete`
 
 Deletes the specified student from TutorTrack.
@@ -240,6 +252,7 @@ Action     | Format and Examples
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
 **Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra`
+**Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
 **Exit**   | `exit`
