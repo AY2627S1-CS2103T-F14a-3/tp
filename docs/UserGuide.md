@@ -145,6 +145,22 @@ Examples:
 * `find alex david` returns `Alex Yeoh`, `David Li`<br>
   ![result for 'find alex david'](images/findAlexDavidResult.png)
 
+### Filtering students by academic information or tags: `filter`
+
+Filters students by school level, subject, and/or tags.
+
+Format: `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`
+
+* At least one criterion must be supplied.
+* A student must match **every** supplied criterion to be shown.
+* School level and subject matching are case-sensitive. All specified tags must be present on the student.
+* The displayed list changes to show only matching students. Use `list` to show all students again.
+
+Examples:
+* `filter l/Secondary 4` shows students in Secondary 4.
+* `filter s/Mathematics t/weekday` shows students studying Mathematics who have the `weekday` tag.
+* `filter t/weekday t/exam` shows students with both the `weekday` and `exam` tags.
+
 ### Adding or replacing a student note: `note`
 
 Adds or replaces the free-form note on a student's record. The index refers to the current displayed student list, including search results.
@@ -250,6 +266,7 @@ Action     | Format and Examples
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
 **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... `<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
+**Filter** | `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`<br> e.g., `filter l/Secondary 4 s/Mathematics t/weekday`
 **List**   | `list`
 **Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra`
 **Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
