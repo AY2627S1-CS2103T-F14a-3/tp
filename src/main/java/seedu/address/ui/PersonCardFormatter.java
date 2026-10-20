@@ -4,10 +4,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Optional;
 
 import seedu.address.model.person.NextLesson;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
 
@@ -18,6 +20,8 @@ final class PersonCardFormatter {
 
     private static final DateTimeFormatter LESSON_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a", Locale.ENGLISH);
+    private static final DateTimeFormatter LESSON_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
 
     private PersonCardFormatter() {}
 
@@ -37,6 +41,21 @@ final class PersonCardFormatter {
     }
 
     /**
+     * Formats the recurring lesson, including its topic.
+     */
+    static LessonDisplay formatRecurringLesson(Optional<RecurringLesson> recurringLesson) {
+        requireNonNull(recurringLesson);
+        if (recurringLesson.isEmpty()) {
+            return new LessonDisplay("Recurring lesson: Not scheduled", Optional.empty());
+        }
+
+        RecurringLesson lesson = recurringLesson.get();
+        String day = lesson.getDay().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        String lessonText = "Recurring lesson: Every " + day + " at " + lesson.getTime().format(LESSON_TIME_FORMATTER);
+        return new LessonDisplay(lessonText, Optional.of("Topic: " + lesson.getTopic()));
+    }
+
+    /**
      * Formats a non-blank student note, or returns an empty value when there is no note to display.
      */
     static Optional<String> formatNote(StudentNote note) {
@@ -53,7 +72,7 @@ final class PersonCardFormatter {
     }
 
     /**
-     * Contains the text displayed for a student's next lesson.
+     * Contains the schedule and topic text displayed for a student's lesson.
      */
     record LessonDisplay(String lessonText, Optional<String> topicText) {
         LessonDisplay {
