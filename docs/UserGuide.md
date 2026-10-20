@@ -184,6 +184,33 @@ Format: `clearlesson INDEX`
 
 Example: `clearlesson 1` clears the next lesson for the first displayed student.
 
+### Setting a student's recurring lesson: `recurringlesson`
+
+Sets or replaces the recurring weekly lesson for a student. The index refers to the current displayed student list, including search results.
+
+Format: `recurringlesson INDEX day/DAY time/HH:mm topic/TOPIC`
+
+* The index must be a positive integer identifying a student in the displayed list.
+* The day must be a valid day of the week, such as `MONDAY`. Day names are not case-sensitive.
+* The time must be a valid 24-hour time in `HH:mm` format, and the topic must not be blank.
+* Each student can have one recurring lesson. Setting another recurring lesson replaces the existing one.
+* The recurring lesson is saved with the student and displayed on the student card.
+* Updating the recurring lesson preserves the student's other details, including the next lesson, notes, and tags.
+
+Example: `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra` schedules an Algebra lesson every Monday at 4:30 PM for the first displayed student.
+
+### Clearing a student's recurring lesson: `clearrecurringlesson`
+
+Clears the recurring weekly lesson for a student. The index refers to the current displayed student list, including search results.
+
+Format: `clearrecurringlesson INDEX`
+
+* The index must be a positive integer identifying a student in the displayed list.
+* If the student has no recurring lesson, TutorTrack reports that no recurring lesson is scheduled.
+* Clearing a recurring lesson preserves the student's other details, including the next lesson, academic information, notes, and tags.
+
+Example: `clearrecurringlesson 1` clears the recurring lesson for the first displayed student.
+
 ### Deleting a student: `delete`
 
 Deletes the specified student from TutorTrack.
@@ -253,6 +280,8 @@ Action     | Format and Examples
 **List**   | `list`
 **Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra`
 **Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
+**Recurring lesson** | `recurringlesson INDEX day/DAY time/HH:mm topic/TOPIC`<br> e.g., `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra`
+**Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
 **Exit**   | `exit`
