@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.ClearNextLessonCommand;
+import seedu.address.logic.commands.ClearRecurringLessonCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
@@ -60,6 +61,13 @@ public class AddressBookParserTest {
         ClearNextLessonCommand command = (ClearNextLessonCommand) parser.parseCommand(
                 ClearNextLessonCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
         assertEquals(new ClearNextLessonCommand(INDEX_FIRST_PERSON), command);
+    }
+
+    @Test
+    public void parseCommand_clearrecurringlesson() throws Exception {
+        ClearRecurringLessonCommand command = (ClearRecurringLessonCommand) parser.parseCommand(
+                ClearRecurringLessonCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
+        assertEquals(new ClearRecurringLessonCommand(INDEX_FIRST_PERSON), command);
     }
 
     @Test
