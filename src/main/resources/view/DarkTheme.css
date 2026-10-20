@@ -389,6 +389,22 @@
     -fx-opacity: 1;
 }
 
+.lesson-information-box {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 6;
+    -fx-border-color: #E5EAF0;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 8 10;
+}
+
+.lesson-section-title {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 12px;
+    -fx-text-fill: #17213A;
+    -fx-opacity: 1;
+}
+
 /*
  * TutorTrack colour palette:
  * Navy: #243746

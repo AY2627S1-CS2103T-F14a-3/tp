@@ -25,7 +25,7 @@ public class PersonCardFormatterTest {
         PersonCardFormatter.LessonDisplay display =
                 PersonCardFormatter.formatNextLesson(Optional.of(nextLesson));
 
-        assertEquals("Next lesson: 16 Oct 2099, 4:00 PM", display.lessonText());
+        assertEquals("16 Oct 2099, 4:00 PM", display.lessonText());
         assertEquals(Optional.of("Topic: Quadratic equations"), display.topicText());
     }
 
@@ -33,7 +33,7 @@ public class PersonCardFormatterTest {
     public void formatNextLesson_noLesson_returnsNotScheduled() {
         PersonCardFormatter.LessonDisplay display = PersonCardFormatter.formatNextLesson(Optional.empty());
 
-        assertEquals("Next lesson: Not scheduled", display.lessonText());
+        assertEquals("Not scheduled", display.lessonText());
         assertTrue(display.topicText().isEmpty());
     }
 
@@ -45,7 +45,7 @@ public class PersonCardFormatterTest {
         PersonCardFormatter.LessonDisplay display =
                 PersonCardFormatter.formatRecurringLesson(Optional.of(recurringLesson));
 
-        assertEquals("Recurring lesson: Every Monday at 4:30 PM", display.lessonText());
+        assertEquals("Every Monday at 4:30 PM", display.lessonText());
         assertEquals(Optional.of("Topic: Algebra"), display.topicText());
     }
 
@@ -53,7 +53,7 @@ public class PersonCardFormatterTest {
     public void formatRecurringLesson_noLesson_returnsNotScheduled() {
         PersonCardFormatter.LessonDisplay display = PersonCardFormatter.formatRecurringLesson(Optional.empty());
 
-        assertEquals("Recurring lesson: Not scheduled", display.lessonText());
+        assertEquals("Not scheduled", display.lessonText());
         assertTrue(display.topicText().isEmpty());
     }
 
