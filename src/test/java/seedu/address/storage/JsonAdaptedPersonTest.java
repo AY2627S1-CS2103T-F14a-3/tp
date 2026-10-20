@@ -5,6 +5,7 @@ import static seedu.address.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORM
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
@@ -85,7 +87,7 @@ public class JsonAdaptedPersonTest {
     @Test
     public void toModelType_invalidSubject_throwsIllegalValueException() {
         JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
-                VALID_SCHOOL_LEVEL, INVALID_SUBJECT, null, null, VALID_TAGS);
+                VALID_SCHOOL_LEVEL, INVALID_SUBJECT, null, null, null, VALID_TAGS);
 
         assertThrows(IllegalValueException.class, Subject.MESSAGE_CONSTRAINTS, adapted::toModelType);
     }
@@ -239,4 +241,55 @@ public class JsonAdaptedPersonTest {
         assertThrows(IllegalValueException.class, person::toModelType);
     }
 
+    @Test
+    public void toModelType_recurringLessonIsPreserved() throws Exception {
+        RecurringLesson lesson = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(
+                new PersonBuilder(BENSON).withRecurringLesson(lesson).build());
+
+        String json = JsonUtil.toJsonString(adapted);
+        JsonAdaptedPerson reloaded = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
+
+        assertEquals(Optional.of(lesson), reloaded.toModelType().getRecurringLesson());
+    }
+
+    @Test
+    public void toModelType_missingRecurringLesson_usesEmptyLesson() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).build());
+
+        String json = JsonUtil.toJsonString(adapted);
+        JsonAdaptedPerson reloaded = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
+
+        assertEquals(Optional.empty(), reloaded.toModelType().getRecurringLesson());
+    }
+
+    @Test
+    public void toModelType_invalidRecurringLessonDay_throwsIllegalValueException() {
+        JsonAdaptedRecurringLesson invalidLesson =
+                new JsonAdaptedRecurringLesson("FUNDAY", "14:30", "Mathematics");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_SUBJECT, null, null, invalidLesson, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, adapted::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidRecurringLessonTime_throwsIllegalValueException() {
+        JsonAdaptedRecurringLesson invalidLesson =
+                new JsonAdaptedRecurringLesson("MONDAY", "25:30", "Mathematics");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_SUBJECT, null, null, invalidLesson, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, adapted::toModelType);
+    }
+
+    @Test
+    public void toModelType_blankRecurringLessonTopic_throwsIllegalValueException() {
+        JsonAdaptedRecurringLesson invalidLesson =
+                new JsonAdaptedRecurringLesson("MONDAY", "14:30", "   ");
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, VALID_SUBJECT, null, null, invalidLesson, VALID_TAGS);
+
+        assertThrows(IllegalValueException.class, RecurringLesson.MESSAGE_TOPIC_CONSTRAINTS, adapted::toModelType);
+    }
 }
