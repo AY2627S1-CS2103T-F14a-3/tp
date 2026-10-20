@@ -28,6 +28,7 @@ public class Person {
     private final Subject subject;
     private final StudentNote note;
     private final Optional<NextLesson> nextLesson;
+    private final Optional<RecurringLesson> recurringLesson;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
@@ -64,11 +65,21 @@ public class Person {
     }
 
     /**
+     * Creates a person without a recurring lesson.
      * Every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Subject subject,
             StudentNote note, Optional<NextLesson> nextLesson, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, schoolLevel, subject, note, nextLesson, tags);
+        this(name, phone, email, address, schoolLevel, subject, note, nextLesson, Optional.empty(), tags);
+    }
+
+    /**
+     * Every field must be present and not null.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, SchoolLevel schoolLevel, Subject subject,
+            StudentNote note, Optional<NextLesson> nextLesson, Optional<RecurringLesson> recurringLesson,
+            Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, schoolLevel, subject, note, nextLesson, recurringLesson, tags);
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -77,6 +88,7 @@ public class Person {
         this.subject = subject;
         this.note = note;
         this.nextLesson = nextLesson;
+        this.recurringLesson = recurringLesson;
         this.tags.addAll(tags);
     }
 
@@ -113,6 +125,13 @@ public class Person {
      */
     public Optional<NextLesson> getNextLesson() {
         return nextLesson;
+    }
+
+    /**
+     * Returns the recurring lesson, if one has been scheduled.
+     */
+    public Optional<RecurringLesson> getRecurringLesson() {
+        return recurringLesson;
     }
 
     /**
@@ -159,13 +178,14 @@ public class Person {
                 && subject.equals(otherPerson.subject)
                 && note.equals(otherPerson.note)
                 && nextLesson.equals(otherPerson.nextLesson)
+                && recurringLesson.equals(otherPerson.recurringLesson)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, schoolLevel, subject, note, nextLesson, tags);
+        return Objects.hash(name, phone, email, address, schoolLevel, subject, note, nextLesson, recurringLesson, tags);
     }
 
     @Override
@@ -179,6 +199,7 @@ public class Person {
                 .add("subject", subject)
                 .add("note", note)
                 .add("nextLesson", nextLesson)
+                .add("recurringLesson", recurringLesson)
                 .add("tags", tags)
                 .toString();
     }

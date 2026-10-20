@@ -13,6 +13,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
@@ -40,6 +41,19 @@ public class PersonTest {
         Person person = new PersonBuilder().withNextLesson(lesson).build();
 
         assertEquals(Optional.of(lesson), person.getNextLesson());
+    }
+
+    @Test
+    public void getRecurringLesson_noLesson_returnsEmpty() {
+        assertEquals(Optional.empty(), new PersonBuilder().build().getRecurringLesson());
+    }
+
+    @Test
+    public void getRecurringLesson_lessonScheduled_returnsLesson() {
+        RecurringLesson lesson = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics");
+        Person person = new PersonBuilder().withRecurringLesson(lesson).build();
+
+        assertEquals(Optional.of(lesson), person.getRecurringLesson());
     }
 
     @Test
@@ -123,6 +137,10 @@ public class PersonTest {
         editedAlice = new PersonBuilder(ALICE).withNextLesson(
                 new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra")).build();
         assertFalse(ALICE.equals(editedAlice));
+
+        editedAlice = new PersonBuilder(ALICE).withRecurringLesson(
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics")).build();
+        assertFalse(ALICE.equals(editedAlice));
     }
 
     @Test
@@ -131,7 +149,8 @@ public class PersonTest {
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress()
                 + ", schoolLevel=" + ALICE.getSchoolLevel() + ", subject=" + ALICE.getSubject()
                 + ", note=" + ALICE.getNote()
-                + ", nextLesson=" + ALICE.getNextLesson() + ", tags=" + ALICE.getTags() + "}";
+                + ", nextLesson=" + ALICE.getNextLesson() + ", recurringLesson=" + ALICE.getRecurringLesson()
+                + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
     }
 }
