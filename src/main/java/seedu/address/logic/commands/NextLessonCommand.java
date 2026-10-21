@@ -21,9 +21,12 @@ public class NextLessonCommand extends Command {
     public static final String COMMAND_WORD = "nextlesson";
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Sets or replaces the next lesson for the student "
             + "at INDEX.\n"
-            + "Parameters: INDEX (must be a positive integer) date/YYYY-MM-DD time/HH:mm topic/TOPIC\n"
-            + "Example: " + COMMAND_WORD + " 1 date/2026-10-11 time/14:30 topic/Algebra";
-    public static final String MESSAGE_NEXT_LESSON_UPDATED = "Updated next lesson for %1$s to %2$s at %3$s: %4$s";
+            + "Parameters: INDEX (must be a positive integer) date/YYYY-MM-DD time/HH:mm "
+            + "dur/MINUTES topic/TOPIC\n"
+            + "Example: " + COMMAND_WORD
+            + " 1 date/2026-12-11 time/14:30 dur/90 topic/Algebra";
+    public static final String MESSAGE_NEXT_LESSON_UPDATED =
+            "Updated next lesson for %1$s to %2$s at %3$s for %4$d minutes: %5$s";
 
     private final Index index;
     private final NextLesson nextLesson;
@@ -57,7 +60,7 @@ public class NextLessonCommand extends Command {
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
 
         return new CommandResult(String.format(MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                nextLesson.date, nextLesson.time, nextLesson.topic));
+                nextLesson.date, nextLesson.time, nextLesson.duration.getDurationMinutes(), nextLesson.topic));
     }
 
     @Override

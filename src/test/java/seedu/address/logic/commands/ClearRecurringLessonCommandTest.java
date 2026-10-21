@@ -21,6 +21,7 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.RecurringLesson;
@@ -33,8 +34,11 @@ public class ClearRecurringLessonCommandTest {
     @Test
     public void execute_validIndex_clearsRecurringLessonAndPreservesStudentDetails() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        NextLesson nextLesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
-        RecurringLesson recurringLesson = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Geometry");
+        LessonDuration duration = new LessonDuration("60");
+        NextLesson nextLesson = new NextLesson(
+                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra", duration);
+        RecurringLesson recurringLesson = new RecurringLesson(
+                DayOfWeek.MONDAY, LocalTime.of(16, 30), "Geometry", duration);
         Person studentWithDetails = new PersonBuilder(student).withSchoolLevel("Secondary 4")
                 .withSubject("Biology").withNote("Needs extra practice").withTags("priority")
                 .withNextLesson(nextLesson).withRecurringLesson(recurringLesson).build();
@@ -68,7 +72,8 @@ public class ClearRecurringLessonCommandTest {
     public void execute_validIndexInFilteredList_clearsCorrectStudentAndResetsFilter() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
         Person student = model.getFilteredPersonList().get(0);
-        RecurringLesson recurringLesson = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Geometry");
+        RecurringLesson recurringLesson = new RecurringLesson(
+                DayOfWeek.MONDAY, LocalTime.of(16, 30), "Geometry", new LessonDuration("60"));
         Person studentWithLesson = new PersonBuilder(student).withRecurringLesson(recurringLesson).build();
         model.setPerson(student, studentWithLesson);
 

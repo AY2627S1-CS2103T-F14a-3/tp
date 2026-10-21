@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.StudentNote;
@@ -20,12 +21,13 @@ public class PersonCardFormatterTest {
     @Test
     public void formatNextLesson_scheduledLesson_returnsFormattedLesson() {
         NextLesson nextLesson = new NextLesson(
-                LocalDate.of(2099, 10, 16), LocalTime.of(16, 0), "Quadratic equations");
+                LocalDate.of(2099, 10, 16), LocalTime.of(16, 0), "Quadratic equations",
+                new LessonDuration("90"));
 
         PersonCardFormatter.LessonDisplay display =
                 PersonCardFormatter.formatNextLesson(Optional.of(nextLesson));
 
-        assertEquals("16 Oct 2099, 4:00 PM", display.lessonText());
+        assertEquals("16 Oct 2099, 4:00 PM (90 min)", display.lessonText());
         assertEquals(Optional.of("Topic: Quadratic equations"), display.topicText());
     }
 
@@ -40,12 +42,13 @@ public class PersonCardFormatterTest {
     @Test
     public void formatRecurringLesson_scheduledLesson_returnsFormattedLesson() {
         RecurringLesson recurringLesson =
-                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Algebra");
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Algebra",
+                        new LessonDuration("60"));
 
         PersonCardFormatter.LessonDisplay display =
                 PersonCardFormatter.formatRecurringLesson(Optional.of(recurringLesson));
 
-        assertEquals("Every Monday at 4:30 PM", display.lessonText());
+        assertEquals("Every Monday at 4:30 PM (60 min)", display.lessonText());
         assertEquals(Optional.of("Topic: Algebra"), display.topicText());
     }
 

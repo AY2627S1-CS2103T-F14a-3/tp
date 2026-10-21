@@ -18,6 +18,7 @@ public class NextLesson {
     public final LocalDate date;
     public final LocalTime time;
     public final String topic;
+    public final LessonDuration duration;
 
     /**
      * Constructs a {@code NextLesson}.
@@ -25,11 +26,13 @@ public class NextLesson {
      * @param date lesson date
      * @param time lesson time
      * @param topic lesson topic
+     * @param duration lesson duration
      */
-    public NextLesson(LocalDate date, LocalTime time, String topic) {
+    public NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration) {
         requireNonNull(date);
         requireNonNull(time);
         requireNonNull(topic);
+        requireNonNull(duration);
         if (isDateTimeInPast(date, time)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
@@ -39,6 +42,7 @@ public class NextLesson {
         this.date = date;
         this.time = time;
         this.topic = topic.trim();
+        this.duration = duration;
     }
 
     /**
@@ -52,7 +56,7 @@ public class NextLesson {
 
     @Override
     public String toString() {
-        return date + " " + time + " " + topic;
+        return date + " " + time + " " + duration + " " + topic;
     }
 
     @Override
@@ -65,11 +69,12 @@ public class NextLesson {
         }
         return date.equals(otherNextLesson.date)
                 && time.equals(otherNextLesson.time)
+                && duration.equals(otherNextLesson.duration)
                 && topic.equals(otherNextLesson.topic);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, time, topic);
+        return Objects.hash(date, time, duration, topic);
     }
 }

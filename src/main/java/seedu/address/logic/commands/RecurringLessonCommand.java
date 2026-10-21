@@ -19,11 +19,11 @@ public class RecurringLessonCommand extends Command {
     public static final String COMMAND_WORD = "recurringlesson";
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Sets or replaces the recurring weekly lesson for "
             + "the student at INDEX.\n"
-            + "Parameters: INDEX (must be a positive integer) day/DAY time/HH:mm topic/TOPIC\n"
+            + "Parameters: INDEX (must be a positive integer) day/DAY time/HH:mm dur/MINUTES topic/TOPIC\n"
             + "DAY must be a day of the week, such as MONDAY.\n"
-            + "Example: " + COMMAND_WORD + " 1 day/MONDAY time/16:30 topic/Algebra";
+            + "Example: " + COMMAND_WORD + " 1 day/MONDAY time/16:30 dur/90 topic/Algebra";
     public static final String MESSAGE_RECURRING_LESSON_UPDATED =
-            "Updated recurring lesson for %1$s to every %2$s at %3$s: %4$s";
+            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$d minutes: %5$s";
 
     private final Index index;
     private final RecurringLesson recurringLesson;
@@ -57,7 +57,8 @@ public class RecurringLessonCommand extends Command {
         model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
 
         return new CommandResult(String.format(MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
-                recurringLesson.getDay(), recurringLesson.getTime(), recurringLesson.getTopic()));
+                recurringLesson.getDay(), recurringLesson.getTime(),
+                recurringLesson.getDuration().getDurationMinutes(), recurringLesson.getTopic()));
     }
 
     @Override

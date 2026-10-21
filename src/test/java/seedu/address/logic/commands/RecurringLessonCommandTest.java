@@ -20,6 +20,7 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.RecurringLesson;
@@ -27,8 +28,9 @@ import seedu.address.testutil.PersonBuilder;
 
 public class RecurringLessonCommandTest {
 
+    private static final LessonDuration DURATION = new LessonDuration("90");
     private static final RecurringLesson RECURRING_LESSON =
-            new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 0), "Algebra");
+            new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 0), "Algebra", DURATION);
 
     private final Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
 
@@ -36,7 +38,7 @@ public class RecurringLessonCommandTest {
     public void execute_validIndex_setsRecurringLessonAndPreservesStudentDetails() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         NextLesson nextLesson = new NextLesson(
-                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Quadratic equations");
+                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Quadratic equations", DURATION);
         Person studentWithDetails = new PersonBuilder(student)
                 .withSubject("Biology")
                 .withNote("Needs extra practice")
@@ -59,7 +61,7 @@ public class RecurringLessonCommandTest {
     public void execute_existingRecurringLesson_replacesRecurringLesson() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         RecurringLesson oldLesson =
-                new RecurringLesson(DayOfWeek.TUESDAY, LocalTime.of(14, 30), "Geometry");
+                new RecurringLesson(DayOfWeek.TUESDAY, LocalTime.of(14, 30), "Geometry", DURATION);
         Person studentWithLesson = new PersonBuilder(student).withRecurringLesson(oldLesson).build();
         model.setPerson(student, studentWithLesson);
 
@@ -112,15 +114,15 @@ public class RecurringLessonCommandTest {
         assertFalse(command.equals(new ClearCommand()));
         assertFalse(command.equals(new RecurringLessonCommand(INDEX_SECOND_PERSON, RECURRING_LESSON)));
         assertFalse(command.equals(new RecurringLessonCommand(INDEX_FIRST_PERSON,
-                new RecurringLesson(DayOfWeek.TUESDAY, LocalTime.of(16, 0), "Algebra"))));
+                new RecurringLesson(DayOfWeek.TUESDAY, LocalTime.of(16, 0), "Algebra", DURATION))));
         assertFalse(command.equals(new RecurringLessonCommand(INDEX_FIRST_PERSON,
-                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(17, 0), "Algebra"))));
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(17, 0), "Algebra", DURATION))));
         assertFalse(command.equals(new RecurringLessonCommand(INDEX_FIRST_PERSON,
-                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 0), "Geometry"))));
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 0), "Geometry", DURATION))));
     }
 
     private String getExpectedSuccessMessage(Person student, RecurringLesson lesson) {
         return String.format(RecurringLessonCommand.MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
-                lesson.getDay(), lesson.getTime(), lesson.getTopic());
+                lesson.getDay(), lesson.getTime(), lesson.getDuration().getDurationMinutes(), lesson.getTopic());
     }
 }

@@ -18,12 +18,14 @@ public class NextLessonTest {
     private static final LocalDate VALID_DATE = FUTURE_DATE_TIME.toLocalDate();
     private static final LocalTime VALID_TIME = FUTURE_DATE_TIME.toLocalTime();
     private static final String VALID_TOPIC = "Algebra";
+    private static final LessonDuration VALID_DURATION = new LessonDuration("60");
 
     @Test
     public void constructor_pastDate_throwsIllegalArgumentException() {
         LocalDate pastDate = LocalDate.now().minusDays(1);
 
-        Assert.assertThrows(IllegalArgumentException.class, () -> new NextLesson(pastDate, LocalTime.MAX, VALID_TOPIC));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new NextLesson(pastDate, LocalTime.MAX, VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
@@ -31,53 +33,69 @@ public class NextLessonTest {
         LocalDateTime pastDateTime = LocalDateTime.now().minusDays(1);
 
         Assert.assertThrows(IllegalArgumentException.class, () -> new NextLesson(pastDateTime.toLocalDate(),
-                pastDateTime.toLocalTime(), VALID_TOPIC));
+                pastDateTime.toLocalTime(), VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
     public void constructor_futureDateTime_succeeds() {
-        NextLesson lesson = new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC);
+        NextLesson lesson = new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, VALID_DURATION);
 
         assertEquals(VALID_DATE, lesson.date);
         assertEquals(VALID_TIME, lesson.time);
+        assertEquals(VALID_DURATION, lesson.duration);
     }
 
     @Test
     public void constructor_nullDate_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(null, VALID_TIME, VALID_TOPIC));
+        Assert.assertThrows(NullPointerException.class,
+                () -> new NextLesson(null, VALID_TIME, VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
     public void constructor_nullTime_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(VALID_DATE, null, VALID_TOPIC));
+        Assert.assertThrows(NullPointerException.class,
+                () -> new NextLesson(VALID_DATE, null, VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
     public void constructor_nullTopic_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(VALID_DATE, VALID_TIME, null));
+        Assert.assertThrows(NullPointerException.class,
+                () -> new NextLesson(VALID_DATE, VALID_TIME, null, VALID_DURATION));
+    }
+
+    @Test
+    public void constructor_nullDuration_throwsNullPointerException() {
+        Assert.assertThrows(NullPointerException.class,
+                () -> new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, null));
     }
 
     @Test
     public void constructor_blankTopic_throwsIllegalArgumentException() {
-        Assert.assertThrows(IllegalArgumentException.class, () -> new NextLesson(VALID_DATE, VALID_TIME, "  "));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new NextLesson(VALID_DATE, VALID_TIME, "  ", VALID_DURATION));
     }
 
     @Test
     public void constructor_validTopic_trimsWhitespace() {
-        NextLesson lesson = new NextLesson(VALID_DATE, VALID_TIME, "  " + VALID_TOPIC + "  ");
+        NextLesson lesson = new NextLesson(
+                VALID_DATE, VALID_TIME, "  " + VALID_TOPIC + "  ", VALID_DURATION);
 
         assertEquals(VALID_TOPIC, lesson.topic);
     }
 
     @Test
     public void equals() {
-        NextLesson lesson = new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC);
+        NextLesson lesson = new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, VALID_DURATION);
 
         assertTrue(lesson.equals(lesson));
-        assertTrue(lesson.equals(new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC)));
-        assertFalse(lesson.equals(new NextLesson(VALID_DATE.plusDays(1), VALID_TIME, VALID_TOPIC)));
-        assertFalse(lesson.equals(new NextLesson(VALID_DATE, VALID_TIME.plusMinutes(30), VALID_TOPIC)));
-        assertFalse(lesson.equals(new NextLesson(VALID_DATE, VALID_TIME, "Geometry")));
+        assertTrue(lesson.equals(new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, VALID_DURATION)));
+        assertFalse(lesson.equals(new NextLesson(
+                VALID_DATE.plusDays(1), VALID_TIME, VALID_TOPIC, VALID_DURATION)));
+        assertFalse(lesson.equals(new NextLesson(
+                VALID_DATE, VALID_TIME.plusMinutes(30), VALID_TOPIC, VALID_DURATION)));
+        assertFalse(lesson.equals(new NextLesson(VALID_DATE, VALID_TIME, "Geometry", VALID_DURATION)));
+        assertFalse(lesson.equals(new NextLesson(
+                VALID_DATE, VALID_TIME, VALID_TOPIC, new LessonDuration("90"))));
         assertFalse(lesson.equals(null));
         assertFalse(lesson.equals(VALID_TOPIC));
     }
