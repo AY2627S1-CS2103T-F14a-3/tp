@@ -94,6 +94,12 @@ The sequence diagram below illustrates the interactions within the `Logic` compo
 
 <puml src="diagrams/DeleteSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the `delete 1` Command" />
 
+The following sequence diagram shows the same flow for the `filter` command. The command parser creates a
+`StudentMatchesCriteriaPredicate` from the supplied school-level, subject, and tag criteria. The command then asks
+the model to apply that predicate to its filtered student list.
+
+<puml src="diagrams/FilterSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the filter Command" />
+
 <box type="info" seamless>
 
 **Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, the lifeline continues till the end of diagram.

@@ -11,6 +11,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
 import seedu.address.logic.commands.ExitCommand;
+import seedu.address.logic.commands.FilterCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
@@ -34,7 +37,11 @@ import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.RecurringLesson;
+import seedu.address.model.person.SchoolLevel;
+import seedu.address.model.person.StudentMatchesCriteriaPredicate;
 import seedu.address.model.person.StudentNote;
+import seedu.address.model.person.Subject;
+import seedu.address.model.tag.Tag;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.PersonUtil;
@@ -98,6 +105,13 @@ public class AddressBookParserTest {
         FindCommand command = (FindCommand) parser.parseCommand(
                 FindCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
         assertEquals(new FindCommand(new NameContainsKeywordsPredicate(keywords)), command);
+    }
+
+    @Test
+    public void parseCommand_filter() throws Exception {
+        FilterCommand command = (FilterCommand) parser.parseCommand("filter l/Secondary 4 s/Mathematics t/weekday");
+        assertEquals(new FilterCommand(new StudentMatchesCriteriaPredicate(Optional.of(new SchoolLevel("Secondary 4")),
+                Optional.of(new Subject("Mathematics")), Set.of(new Tag("weekday")))), command);
     }
 
     @Test
