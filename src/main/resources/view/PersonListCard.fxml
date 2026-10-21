@@ -43,11 +43,20 @@
         <Label fx:id="address" styleClass="cell_small_label" text="\$address" />
       </VBox>
 
-      <!-- Next Lesson -->
-      <VBox spacing="5" maxWidth="Infinity" styleClass="student-information-box">
+      <!-- Tutoring Information -->
+      <VBox spacing="8" maxWidth="Infinity" styleClass="student-information-box">
         <Label text="Tutoring Information" styleClass="student-section-title" />
-        <Label fx:id="nextLesson" styleClass="cell_small_label" text="\$nextLesson" />
-        <Label fx:id="nextLessonTopic" styleClass="cell_small_label" text="\$nextLessonTopic" wrapText="true" />
+        <VBox spacing="3" maxWidth="Infinity" styleClass="lesson-information-box">
+          <Label text="Next Lesson" styleClass="lesson-section-title" />
+          <Label fx:id="nextLesson" styleClass="cell_small_label" text="\$nextLesson" />
+          <Label fx:id="nextLessonTopic" styleClass="cell_small_label" text="\$nextLessonTopic" wrapText="true" />
+        </VBox>
+        <VBox spacing="3" maxWidth="Infinity" styleClass="lesson-information-box">
+          <Label text="Recurring Lesson" styleClass="lesson-section-title" />
+          <Label fx:id="recurringLesson" styleClass="cell_small_label" text="\$recurringLesson" />
+          <Label fx:id="recurringLessonTopic" styleClass="cell_small_label" text="\$recurringLessonTopic"
+                 wrapText="true" />
+        </VBox>
         <Label fx:id="note" styleClass="cell_small_label" text="\$note" wrapText="true" />
       </VBox>
 

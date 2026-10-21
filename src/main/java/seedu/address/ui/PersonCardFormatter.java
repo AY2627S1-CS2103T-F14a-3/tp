@@ -4,10 +4,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Optional;
 
 import seedu.address.model.person.NextLesson;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
 
@@ -18,6 +20,8 @@ final class PersonCardFormatter {
 
     private static final DateTimeFormatter LESSON_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a", Locale.ENGLISH);
+    private static final DateTimeFormatter LESSON_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
 
     private PersonCardFormatter() {}
 
@@ -27,13 +31,28 @@ final class PersonCardFormatter {
     static LessonDisplay formatNextLesson(Optional<NextLesson> nextLesson) {
         requireNonNull(nextLesson);
         if (nextLesson.isEmpty()) {
-            return new LessonDisplay("Next lesson: Not scheduled", Optional.empty());
+            return new LessonDisplay("Not scheduled", Optional.empty());
         }
 
         NextLesson lesson = nextLesson.get();
         LocalDateTime lessonDateTime = LocalDateTime.of(lesson.date, lesson.time);
-        String lessonText = "Next lesson: " + lessonDateTime.format(LESSON_DATE_TIME_FORMATTER);
+        String lessonText = lessonDateTime.format(LESSON_DATE_TIME_FORMATTER);
         return new LessonDisplay(lessonText, Optional.of("Topic: " + lesson.topic));
+    }
+
+    /**
+     * Formats the recurring lesson, including its topic.
+     */
+    static LessonDisplay formatRecurringLesson(Optional<RecurringLesson> recurringLesson) {
+        requireNonNull(recurringLesson);
+        if (recurringLesson.isEmpty()) {
+            return new LessonDisplay("Not scheduled", Optional.empty());
+        }
+
+        RecurringLesson lesson = recurringLesson.get();
+        String day = lesson.getDay().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        String lessonText = "Every " + day + " at " + lesson.getTime().format(LESSON_TIME_FORMATTER);
+        return new LessonDisplay(lessonText, Optional.of("Topic: " + lesson.getTopic()));
     }
 
     /**
@@ -53,7 +72,7 @@ final class PersonCardFormatter {
     }
 
     /**
-     * Contains the text displayed for a student's next lesson.
+     * Contains the schedule and topic text displayed for a student's lesson.
      */
     record LessonDisplay(String lessonText, Optional<String> topicText) {
         LessonDisplay {

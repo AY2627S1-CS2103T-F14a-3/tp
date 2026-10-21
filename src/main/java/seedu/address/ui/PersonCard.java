@@ -50,6 +50,10 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label nextLessonTopic;
     @FXML
+    private Label recurringLesson;
+    @FXML
+    private Label recurringLessonTopic;
+    @FXML
     private FlowPane tags;
 
     /**
@@ -69,6 +73,10 @@ public class PersonCard extends UiPart<Region> {
                 PersonCardFormatter.formatNextLesson(person.getNextLesson());
         nextLesson.setText(lessonDisplay.lessonText());
         setOptionalLabel(nextLessonTopic, lessonDisplay.topicText());
+        PersonCardFormatter.LessonDisplay recurringLessonDisplay =
+                PersonCardFormatter.formatRecurringLesson(person.getRecurringLesson());
+        recurringLesson.setText(recurringLessonDisplay.lessonText());
+        setOptionalLabel(recurringLessonTopic, recurringLessonDisplay.topicText());
         setOptionalLabel(note, PersonCardFormatter.formatNote(person.getNote()));
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))

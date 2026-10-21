@@ -3,6 +3,7 @@ package seedu.address.ui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.model.person.NextLesson;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
 
@@ -23,7 +25,7 @@ public class PersonCardFormatterTest {
         PersonCardFormatter.LessonDisplay display =
                 PersonCardFormatter.formatNextLesson(Optional.of(nextLesson));
 
-        assertEquals("Next lesson: 16 Oct 2099, 4:00 PM", display.lessonText());
+        assertEquals("16 Oct 2099, 4:00 PM", display.lessonText());
         assertEquals(Optional.of("Topic: Quadratic equations"), display.topicText());
     }
 
@@ -31,7 +33,27 @@ public class PersonCardFormatterTest {
     public void formatNextLesson_noLesson_returnsNotScheduled() {
         PersonCardFormatter.LessonDisplay display = PersonCardFormatter.formatNextLesson(Optional.empty());
 
-        assertEquals("Next lesson: Not scheduled", display.lessonText());
+        assertEquals("Not scheduled", display.lessonText());
+        assertTrue(display.topicText().isEmpty());
+    }
+
+    @Test
+    public void formatRecurringLesson_scheduledLesson_returnsFormattedLesson() {
+        RecurringLesson recurringLesson =
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Algebra");
+
+        PersonCardFormatter.LessonDisplay display =
+                PersonCardFormatter.formatRecurringLesson(Optional.of(recurringLesson));
+
+        assertEquals("Every Monday at 4:30 PM", display.lessonText());
+        assertEquals(Optional.of("Topic: Algebra"), display.topicText());
+    }
+
+    @Test
+    public void formatRecurringLesson_noLesson_returnsNotScheduled() {
+        PersonCardFormatter.LessonDisplay display = PersonCardFormatter.formatRecurringLesson(Optional.empty());
+
+        assertEquals("Not scheduled", display.lessonText());
         assertTrue(display.topicText().isEmpty());
     }
 

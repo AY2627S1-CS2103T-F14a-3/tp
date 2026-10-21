@@ -10,6 +10,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
@@ -34,6 +35,7 @@ public class PersonBuilder {
     private Subject subject;
     private StudentNote note;
     private Optional<NextLesson> nextLesson;
+    private Optional<RecurringLesson> recurringLesson;
     private Set<Tag> tags;
 
     /**
@@ -48,6 +50,7 @@ public class PersonBuilder {
         subject = new Subject(Subject.DEFAULT_VALUE);
         note = new StudentNote("");
         nextLesson = Optional.empty();
+        recurringLesson = Optional.empty();
         tags = new HashSet<>();
     }
 
@@ -63,6 +66,7 @@ public class PersonBuilder {
         subject = personToCopy.getSubject();
         note = personToCopy.getNote();
         nextLesson = personToCopy.getNextLesson();
+        recurringLesson = personToCopy.getRecurringLesson();
         tags = new HashSet<>(personToCopy.getTags());
     }
 
@@ -136,8 +140,16 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Sets the recurring lesson of the {@code Person} that we are building.
+     */
+    public PersonBuilder withRecurringLesson(RecurringLesson recurringLesson) {
+        this.recurringLesson = Optional.of(recurringLesson);
+        return this;
+    }
+
     public Person build() {
-        return new Person(name, phone, email, address, schoolLevel, subject, note, nextLesson, tags);
+        return new Person(name, phone, email, address, schoolLevel, subject, note, nextLesson, recurringLesson, tags);
     }
 
 }

@@ -17,6 +17,7 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
@@ -37,6 +38,7 @@ class JsonAdaptedPerson {
     private final String subject;
     private final String note;
     private final JsonAdaptedNextLesson nextLesson;
+    private final JsonAdaptedRecurringLesson recurringLesson;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
 
     /**
@@ -48,6 +50,7 @@ class JsonAdaptedPerson {
             @JsonProperty("schoolLevel") String schoolLevel, @JsonProperty("subject") String subject,
             @JsonProperty("note") String note,
             @JsonProperty("nextLesson") JsonAdaptedNextLesson nextLesson,
+            @JsonProperty("recurringLesson") JsonAdaptedRecurringLesson recurringLesson,
             @JsonProperty("tags") List<JsonAdaptedTag> tags) {
         this.name = name;
         this.phone = phone;
@@ -57,6 +60,7 @@ class JsonAdaptedPerson {
         this.subject = subject;
         this.note = note;
         this.nextLesson = nextLesson;
+        this.recurringLesson = recurringLesson;
         if (tags != null) {
             this.tags.addAll(tags);
         }
@@ -66,7 +70,7 @@ class JsonAdaptedPerson {
      * Constructs a {@code JsonAdaptedPerson} without a school level for legacy test data.
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, null, null, null, null, tags);
+        this(name, phone, email, address, null, null, null, null, null, tags);
     }
 
     /**
@@ -74,7 +78,7 @@ class JsonAdaptedPerson {
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, String schoolLevel,
             List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, schoolLevel, null, null, null, tags);
+        this(name, phone, email, address, schoolLevel, null, null, null, null, tags);
     }
 
     /**
@@ -82,7 +86,7 @@ class JsonAdaptedPerson {
      */
     JsonAdaptedPerson(String name, String phone, String email, String address, String schoolLevel, String note,
             JsonAdaptedNextLesson nextLesson, List<JsonAdaptedTag> tags) {
-        this(name, phone, email, address, schoolLevel, null, note, nextLesson, tags);
+        this(name, phone, email, address, schoolLevel, null, note, nextLesson, null, tags);
     }
 
     /**
@@ -97,6 +101,7 @@ class JsonAdaptedPerson {
         subject = source.getSubject().value;
         note = source.getNote().value;
         nextLesson = source.getNextLesson().map(JsonAdaptedNextLesson::new).orElse(null);
+        recurringLesson = source.getRecurringLesson().map(JsonAdaptedRecurringLesson::new).orElse(null);
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
@@ -165,10 +170,13 @@ class JsonAdaptedPerson {
 
         StudentNote modelNote = new StudentNote(note == null ? "" : note);
         Optional<NextLesson> modelNextLesson = nextLesson == null ? Optional.empty() : nextLesson.toModelType();
+        Optional<RecurringLesson> modelRecurringLesson = recurringLesson == null
+                ? Optional.empty()
+                : Optional.of(recurringLesson.toModelType());
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
         return new Person(modelName, modelPhone, modelEmail, modelAddress, modelSchoolLevel, modelSubject, modelNote,
-                modelNextLesson, modelTags);
+                modelNextLesson, modelRecurringLesson, modelTags);
     }
 
 }
