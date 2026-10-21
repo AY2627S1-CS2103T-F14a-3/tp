@@ -14,6 +14,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.model.person.TimetableClashChecker;
 
 /**
@@ -69,6 +70,16 @@ public class NextLessonCommand extends Command {
             throw new CommandException(String.format(MESSAGE_LESSON_CLASH, conflictingStudent.getName().fullName,
                     conflictingLesson.date, conflictingLesson.time,
                     conflictingLesson.duration.getDurationMinutes()));
+        }
+        Optional<Person> recurringConflict = TimetableClashChecker.findRecurringLessonClash(student, nextLesson,
+                model.getAddressBook().getPersonList());
+        if (recurringConflict.isPresent()) {
+            Person conflictingStudent = recurringConflict.orElseThrow();
+            RecurringLesson lesson = conflictingStudent.getRecurringLesson().orElseThrow();
+            logger.info("Rejected next lesson: recurring timetable overlap detected; student data unchanged.");
+            throw new CommandException(String.format(Messages.MESSAGE_RECURRING_LESSON_CLASH,
+                    conflictingStudent.getName().fullName, lesson.getDay(), lesson.getTime(),
+                    lesson.getDuration().getDurationMinutes()));
         }
         Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
                 student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
