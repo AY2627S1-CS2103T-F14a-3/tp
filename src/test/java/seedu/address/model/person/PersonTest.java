@@ -37,7 +37,8 @@ public class PersonTest {
 
     @Test
     public void getNextLesson_lessonScheduled_returnsLesson() {
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
+                new LessonDuration("60"));
         Person person = new PersonBuilder().withNextLesson(lesson).build();
 
         assertEquals(Optional.of(lesson), person.getNextLesson());
@@ -50,7 +51,8 @@ public class PersonTest {
 
     @Test
     public void getRecurringLesson_lessonScheduled_returnsLesson() {
-        RecurringLesson lesson = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics");
+        RecurringLesson lesson = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics",
+                new LessonDuration("60"));
         Person person = new PersonBuilder().withRecurringLesson(lesson).build();
 
         assertEquals(Optional.of(lesson), person.getRecurringLesson());
@@ -135,11 +137,13 @@ public class PersonTest {
 
         // different next lesson -> returns false
         editedAlice = new PersonBuilder(ALICE).withNextLesson(
-                new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra")).build();
+                new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
+                        new LessonDuration("60"))).build();
         assertFalse(ALICE.equals(editedAlice));
 
         editedAlice = new PersonBuilder(ALICE).withRecurringLesson(
-                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics")).build();
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 30), "Mathematics",
+                        new LessonDuration("60"))).build();
         assertFalse(ALICE.equals(editedAlice));
     }
 

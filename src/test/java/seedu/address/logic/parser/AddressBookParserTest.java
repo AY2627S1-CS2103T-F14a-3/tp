@@ -33,6 +33,7 @@ import seedu.address.logic.commands.NextLessonCommand;
 import seedu.address.logic.commands.NoteCommand;
 import seedu.address.logic.commands.RecurringLessonCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
@@ -136,18 +137,21 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_nextlesson() throws Exception {
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
+                new LessonDuration("90"));
         NextLessonCommand command = (NextLessonCommand) parser.parseCommand("nextlesson "
-                + INDEX_FIRST_PERSON.getOneBased() + " date/" + lesson.date + " time/14:30 topic/" + lesson.topic);
+                + INDEX_FIRST_PERSON.getOneBased() + " date/" + lesson.date
+                + " time/14:30 dur/90 topic/" + lesson.topic);
         assertEquals(new NextLessonCommand(INDEX_FIRST_PERSON, lesson), command);
     }
 
     @Test
     public void parseCommand_recurringlesson() throws Exception {
         RecurringLesson lesson =
-                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Algebra");
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), "Algebra",
+                        new LessonDuration("90"));
         RecurringLessonCommand command = (RecurringLessonCommand) parser.parseCommand("recurringlesson "
-                + INDEX_FIRST_PERSON.getOneBased() + " day/MONDAY time/16:30 topic/Algebra");
+                + INDEX_FIRST_PERSON.getOneBased() + " day/MONDAY time/16:30 dur/90 topic/Algebra");
         assertEquals(new RecurringLessonCommand(INDEX_FIRST_PERSON, lesson), command);
     }
 

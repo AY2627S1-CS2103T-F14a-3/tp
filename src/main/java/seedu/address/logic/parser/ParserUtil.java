@@ -11,6 +11,7 @@ import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.SchoolLevel;
@@ -150,5 +151,19 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a {@code String durationMinutes} into a {@code LessonDuration}.
+     *
+     * @throws ParseException if the given {@code durationMinutes} is invalid.
+     */
+    public static LessonDuration parseLessonDuration(String durationMinutes) throws ParseException {
+        requireNonNull(durationMinutes);
+        String trimmedDurationMinutes = durationMinutes.trim();
+        if (!LessonDuration.isValidDuration(trimmedDurationMinutes)) {
+            throw new ParseException(LessonDuration.MESSAGE_CONSTRAINTS);
+        }
+        return new LessonDuration(trimmedDurationMinutes);
     }
 }

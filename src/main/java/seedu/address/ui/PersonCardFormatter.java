@@ -36,7 +36,8 @@ final class PersonCardFormatter {
 
         NextLesson lesson = nextLesson.get();
         LocalDateTime lessonDateTime = LocalDateTime.of(lesson.date, lesson.time);
-        String lessonText = lessonDateTime.format(LESSON_DATE_TIME_FORMATTER);
+        String lessonText = lessonDateTime.format(LESSON_DATE_TIME_FORMATTER)
+                + " (" + lesson.duration.getDurationMinutes() + " min)";
         return new LessonDisplay(lessonText, Optional.of("Topic: " + lesson.topic));
     }
 
@@ -51,7 +52,8 @@ final class PersonCardFormatter {
 
         RecurringLesson lesson = recurringLesson.get();
         String day = lesson.getDay().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        String lessonText = "Every " + day + " at " + lesson.getTime().format(LESSON_TIME_FORMATTER);
+        String lessonText = "Every " + day + " at " + lesson.getTime().format(LESSON_TIME_FORMATTER)
+                + " (" + lesson.getDuration().getDurationMinutes() + " min)";
         return new LessonDisplay(lessonText, Optional.of("Topic: " + lesson.getTopic()));
     }
 

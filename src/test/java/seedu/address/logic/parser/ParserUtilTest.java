@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
@@ -190,5 +191,22 @@ public class ParserUtilTest {
         Set<Tag> expectedTagSet = Set.of(new Tag(VALID_TAG_1), new Tag(VALID_TAG_2));
 
         assertEquals(expectedTagSet, actualTagSet);
+    }
+
+    @Test
+    public void parseLessonDuration_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseLessonDuration(null));
+    }
+
+    @Test
+    public void parseLessonDuration_invalidValue_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseLessonDuration("0"));
+        assertThrows(ParseException.class, () -> ParserUtil.parseLessonDuration("-30"));
+        assertThrows(ParseException.class, () -> ParserUtil.parseLessonDuration("ninety"));
+    }
+
+    @Test
+    public void parseLessonDuration_validValue_returnsDuration() throws Exception {
+        assertEquals(new LessonDuration("90"), ParserUtil.parseLessonDuration(" 90 "));
     }
 }

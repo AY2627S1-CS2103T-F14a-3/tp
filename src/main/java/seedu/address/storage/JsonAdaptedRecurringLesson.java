@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.RecurringLesson;
 
 /**
@@ -24,16 +25,19 @@ class JsonAdaptedRecurringLesson {
     private final String time;
     @JsonProperty("topic")
     private final String topic;
+    @JsonProperty("durationMinutes")
+    private final Integer durationMinutes;
 
     /**
      * Constructs a {@code JsonAdaptedRecurringLesson} with the given lesson details.
      */
     @JsonCreator
     JsonAdaptedRecurringLesson(@JsonProperty("day") String day, @JsonProperty("time") String time,
-            @JsonProperty("topic") String topic) {
+            @JsonProperty("topic") String topic, @JsonProperty("durationMinutes") Integer durationMinutes) {
         this.day = day;
         this.time = time;
         this.topic = topic;
+        this.durationMinutes = durationMinutes;
     }
 
     /**
@@ -43,6 +47,7 @@ class JsonAdaptedRecurringLesson {
         day = source.getDay().name();
         time = source.getTime().toString();
         topic = source.getTopic();
+        durationMinutes = source.getDuration().getDurationMinutes();
     }
 
     /**
@@ -75,8 +80,17 @@ class JsonAdaptedRecurringLesson {
             throw new IllegalValueException(MESSAGE_INVALID_TIME, exception);
         }
 
+        final LessonDuration modelDuration;
         try {
-            return new RecurringLesson(modelDay, modelTime, topic);
+            int storedDuration = durationMinutes == null
+                    ? LessonDuration.DEFAULT_DURATION_MINUTES : durationMinutes;
+            modelDuration = new LessonDuration(Integer.toString(storedDuration));
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalValueException(exception.getMessage(), exception);
+        }
+
+        try {
+            return new RecurringLesson(modelDay, modelTime, topic, modelDuration);
         } catch (IllegalArgumentException exception) {
             throw new IllegalValueException(exception.getMessage(), exception);
         }

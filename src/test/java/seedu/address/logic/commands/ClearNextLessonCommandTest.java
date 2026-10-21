@@ -20,6 +20,7 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
@@ -31,7 +32,8 @@ public class ClearNextLessonCommandTest {
     @Test
     public void execute_validIndex_clearsNextLessonAndPreservesStudentDetails() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
+                new LessonDuration("60"));
         Person studentWithDetails = new PersonBuilder(student).withSchoolLevel("Secondary 4").withSubject("Biology")
                 .withNote("Needs extra practice").withTags("priority").withNextLesson(lesson).build();
         model.setPerson(student, studentWithDetails);
@@ -63,7 +65,8 @@ public class ClearNextLessonCommandTest {
     public void execute_validIndexInFilteredList_clearsCorrectStudentAndResetsFilter() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
         Person student = model.getFilteredPersonList().get(0);
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra");
+        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
+                new LessonDuration("60"));
         Person studentWithLesson = new PersonBuilder(student).withNextLesson(lesson).build();
         model.setPerson(student, studentWithLesson);
 

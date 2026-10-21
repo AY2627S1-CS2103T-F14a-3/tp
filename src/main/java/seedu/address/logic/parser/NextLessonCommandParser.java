@@ -3,6 +3,7 @@ package seedu.address.logic.parser;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DATE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DURATION;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TIME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TOPIC;
 
@@ -13,6 +14,7 @@ import java.time.format.DateTimeParseException;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.NextLessonCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 
 /**
@@ -27,8 +29,11 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
     public NextLessonCommand parse(String args) throws ParseException {
         requireNonNull(args);
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_LESSON_DATE, PREFIX_LESSON_TIME, PREFIX_LESSON_TOPIC);
-        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_LESSON_DATE, PREFIX_LESSON_TIME, PREFIX_LESSON_TOPIC);
+                PREFIX_LESSON_DATE, PREFIX_LESSON_TIME,
+                PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
+        argMultimap.verifyNoDuplicatePrefixesFor(
+                PREFIX_LESSON_DATE, PREFIX_LESSON_TIME,
+                PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
 
         Index index;
         try {
@@ -40,15 +45,18 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
 
         if (argMultimap.getValue(PREFIX_LESSON_DATE).isEmpty()
                 || argMultimap.getValue(PREFIX_LESSON_TIME).isEmpty()
+                || argMultimap.getValue(PREFIX_LESSON_DURATION).isEmpty()
                 || argMultimap.getValue(PREFIX_LESSON_TOPIC).isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
         }
 
         LocalDate date = parseDate(argMultimap.getValue(PREFIX_LESSON_DATE).orElseThrow());
         LocalTime time = parseTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
+        LessonDuration duration = ParserUtil.parseLessonDuration(
+                argMultimap.getValue(PREFIX_LESSON_DURATION).orElseThrow());
         try {
             return new NextLessonCommand(index, new NextLesson(date, time,
-                    argMultimap.getValue(PREFIX_LESSON_TOPIC).orElseThrow()));
+                    argMultimap.getValue(PREFIX_LESSON_TOPIC).orElseThrow(), duration));
         } catch (IllegalArgumentException e) {
             throw new ParseException(e.getMessage(), e);
         }

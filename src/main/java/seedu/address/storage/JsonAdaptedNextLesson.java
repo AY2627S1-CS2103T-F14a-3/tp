@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 
 /**
@@ -25,16 +26,19 @@ class JsonAdaptedNextLesson {
     private final String time;
     @JsonProperty("topic")
     private final String topic;
+    @JsonProperty("durationMinutes")
+    private final Integer durationMinutes;
 
     /**
      * Constructs a {@code JsonAdaptedNextLesson} with the given lesson details.
      */
     @JsonCreator
     JsonAdaptedNextLesson(@JsonProperty("date") String date, @JsonProperty("time") String time,
-            @JsonProperty("topic") String topic) {
+            @JsonProperty("topic") String topic, @JsonProperty("durationMinutes") Integer durationMinutes) {
         this.date = date;
         this.time = time;
         this.topic = topic;
+        this.durationMinutes = durationMinutes;
     }
 
     /**
@@ -44,6 +48,7 @@ class JsonAdaptedNextLesson {
         date = source.date.toString();
         time = source.time.toString();
         topic = source.topic;
+        durationMinutes = source.duration.getDurationMinutes();
     }
 
     /**
@@ -67,11 +72,17 @@ class JsonAdaptedNextLesson {
 
         final LocalDate modelDate;
         final LocalTime modelTime;
+        final LessonDuration modelDuration;
         try {
             modelDate = LocalDate.parse(date);
             modelTime = LocalTime.parse(time);
+            int storedDuration = durationMinutes == null
+                    ? LessonDuration.DEFAULT_DURATION_MINUTES : durationMinutes;
+            modelDuration = new LessonDuration(Integer.toString(storedDuration));
         } catch (DateTimeParseException exception) {
             throw new IllegalValueException(MESSAGE_INVALID_DATE_TIME, exception);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalValueException(exception.getMessage(), exception);
         }
 
         if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
@@ -80,7 +91,7 @@ class JsonAdaptedNextLesson {
         }
 
         try {
-            return Optional.of(new NextLesson(modelDate, modelTime, topic));
+            return Optional.of(new NextLesson(modelDate, modelTime, topic, modelDuration));
         } catch (IllegalArgumentException exception) {
             if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
                 return Optional.empty();
