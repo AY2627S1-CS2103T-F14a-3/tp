@@ -159,6 +159,56 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Recurring lesson feature
+
+The `recurringlesson` command records a weekly lesson comprising a day, time, and topic for a student. Its implementation spans the Model, Logic, Storage, and UI components while keeping the recurring schedule separate from the student's one-off next lesson.
+
+#### Model representation
+
+`RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, and a topic. Its constructor requires all three values and trims and rejects a blank topic. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
+
+Student records are replaced rather than mutated. When a recurring lesson is set, `RecurringLessonCommand` creates a new `Person` containing the new recurring lesson while preserving the student's name, contact details, academic information, note, next lesson, and tags.
+
+#### Command execution
+
+`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser rejects missing or duplicate `day/`, `time/`, and `topic/` prefixes, parses the displayed student index, accepts a case-insensitive day of the week, and requires time to use the `HH:mm` format. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
+
+When executed, `RecurringLessonCommand` obtains the currently displayed student list and checks that the specified index exists. It passes the original and replacement `Person` objects to `Model#setPerson(...)`, then resets the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. If parsing fails, a `ParseException` is thrown; if the displayed index is invalid, a `CommandException` is thrown. In either case, the model is not changed and the address book is not saved.
+
+The following sequence diagram shows the successful execution of `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra`.
+
+<puml src="diagrams/RecurringLessonSequenceDiagram.puml" alt="Sequence diagram for setting a recurring lesson" />
+
+#### Clearing a recurring lesson
+
+`AddressBookParser` delegates `clearrecurringlesson` to `ClearRecurringLessonCommandParser`, which parses the displayed student index and creates a `ClearRecurringLessonCommand`. The command validates the index against the currently displayed student list and checks whether the selected student has a recurring lesson.
+
+If a recurring lesson exists, the command creates a replacement `Person` with `Optional.empty()` in the recurring-lesson field, preserves the student's other details, and passes both records to `Model#setPerson(...)`. If no recurring lesson exists, the student record is left unchanged and the command reports that no recurring lesson is scheduled. Both outcomes reset the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. An invalid displayed index causes a `CommandException` before the filter is reset or the address book is saved.
+
+The following sequence diagram shows the execution of `clearrecurringlesson 1`, including both possible outcomes for a valid displayed index.
+
+<puml src="diagrams/ClearRecurringLessonSequenceDiagram.puml" alt="Sequence diagram for clearing a recurring lesson" />
+
+Both diagrams treat the Model and Storage components as black boxes. They omit lower-level calls involving argument tokenization, JSON conversion, and exception propagation to keep the command flows readable.
+
+#### Storage and UI updates
+
+After either command completes successfully, `LogicManager` passes the address book to the `Storage` component. This normal save also occurs when `clearrecurringlesson` finds no recurring lesson and leaves the model unchanged. `JsonAdaptedPerson` represents the optional recurring lesson using `JsonAdaptedRecurringLesson`, which stores its day, time, and topic as JSON-compatible strings. When the data is loaded again, the adapter validates those strings before reconstructing the `RecurringLesson` model object.
+
+`PersonListPanel` displays the `ObservableList<Person>` exposed by Logic and backed by the model's filtered list. Replacing the `Person` in the model updates this list, after which `PersonCard` obtains and formats the student's recurring lesson for display.
+
+#### Design considerations
+
+**Aspect: How a recurring schedule is represented:**
+
+* **Alternative 1 (current choice): Store one weekly recurrence rule in each student record.**
+  * Pros: Uses a compact value object, avoids generating an unbounded number of future lesson records, and keeps the schedule with the corresponding student.
+  * Cons: Supports only one weekly recurring lesson per student and cannot represent exceptions such as a cancellation on a specific date.
+
+* **Alternative 2: Generate and store individual future lesson occurrences.**
+  * Pros: Allows a particular occurrence to be cancelled or rescheduled independently.
+  * Cons: Requires an end date or generation limit, stores more data, and can become inconsistent with the original recurrence rule.
+
 ### \[Proposed\] Undo/redo feature
 
 #### Proposed Implementation
