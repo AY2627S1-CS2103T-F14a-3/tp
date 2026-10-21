@@ -24,8 +24,8 @@ public class NextLessonTest {
     public void constructor_pastDate_throwsIllegalArgumentException() {
         LocalDate pastDate = LocalDate.now().minusDays(1);
 
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> new NextLesson(pastDate, LocalTime.MAX, VALID_TOPIC, VALID_DURATION));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new NextLesson(
+                pastDate, LocalTime.MAX, VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
@@ -47,32 +47,32 @@ public class NextLessonTest {
 
     @Test
     public void constructor_nullDate_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new NextLesson(null, VALID_TIME, VALID_TOPIC, VALID_DURATION));
+        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(
+                null, VALID_TIME, VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
     public void constructor_nullTime_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new NextLesson(VALID_DATE, null, VALID_TOPIC, VALID_DURATION));
+        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(
+                VALID_DATE, null, VALID_TOPIC, VALID_DURATION));
     }
 
     @Test
     public void constructor_nullTopic_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new NextLesson(VALID_DATE, VALID_TIME, null, VALID_DURATION));
+        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(
+                VALID_DATE, VALID_TIME, null, VALID_DURATION));
     }
 
     @Test
     public void constructor_nullDuration_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, null));
+        Assert.assertThrows(NullPointerException.class, () -> new NextLesson(
+                VALID_DATE, VALID_TIME, VALID_TOPIC, null));
     }
 
     @Test
     public void constructor_blankTopic_throwsIllegalArgumentException() {
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> new NextLesson(VALID_DATE, VALID_TIME, "  ", VALID_DURATION));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new NextLesson(
+                VALID_DATE, VALID_TIME, "  ", VALID_DURATION));
     }
 
     @Test

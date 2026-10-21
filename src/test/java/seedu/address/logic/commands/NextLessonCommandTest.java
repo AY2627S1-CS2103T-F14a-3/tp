@@ -31,6 +31,36 @@ public class NextLessonCommandTest {
     private final Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
 
     @Test
+    public void execute_clashWithHiddenStudent_rejectsWithoutChangingDataOrFilter() {
+        Person other = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        NextLesson existing = new NextLesson(LocalDate.of(2099, 6, 15), LocalTime.of(14, 0), "Geometry", DURATION);
+        model.setPerson(other, new PersonBuilder(other).withNextLesson(existing).build());
+        showPersonAtIndex(model, INDEX_FIRST_PERSON);
+
+        NextLesson proposed = new NextLesson(existing.date, LocalTime.of(15, 0), "Algebra",
+                new LessonDuration("30"));
+        assertCommandFailure(new NextLessonCommand(INDEX_FIRST_PERSON, proposed), model,
+                String.format(NextLessonCommand.MESSAGE_LESSON_CLASH, other.getName().fullName,
+                        existing.date, existing.time, existing.duration.getDurationMinutes()));
+    }
+
+    @Test
+    public void execute_replacingOwnOverlappingLesson_succeeds() {
+        Person student = model.getFilteredPersonList().getFirst();
+        NextLesson oldLesson = new NextLesson(LocalDate.of(2099, 6, 15), LocalTime.of(14, 0), "Geometry", DURATION);
+        Person original = new PersonBuilder(student).withNextLesson(oldLesson).build();
+        model.setPerson(student, original);
+        NextLesson proposed = new NextLesson(oldLesson.date, LocalTime.of(14, 30), "Algebra", DURATION);
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(original, new PersonBuilder(original).withNextLesson(proposed).build());
+
+        assertCommandSuccess(new NextLessonCommand(INDEX_FIRST_PERSON, proposed), model,
+                String.format(NextLessonCommand.MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
+                        proposed.date, proposed.time, proposed.duration.getDurationMinutes(), proposed.topic),
+                expectedModel);
+    }
+
+    @Test
     public void execute_validIndex_setsNextLessonAndPreservesStudentDetails() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         NextLesson oldLesson = new NextLesson(

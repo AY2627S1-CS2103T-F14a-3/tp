@@ -180,13 +180,19 @@ Example: `note 1 note/Needs extra time for algebra` records a note for the first
 
 Sets or replaces the next lesson for a student. The index refers to the current displayed student list, including search results.
 
-Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`
+Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 
 * The date must be a valid date in `YYYY-MM-DD` format and the time a valid 24-hour time in `HH:mm` format.
 * The lesson must not be in the past, and the topic must not be blank.
+* The duration is required and must be a positive whole number of minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
+* A next lesson cannot overlap another student's next lesson, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
+* If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
+* Replacing a student's next lesson ignores that student's old next lesson. This version checks next lessons against other next lessons only; checks involving recurring schedules are not yet included.
 * The lesson is saved with the student and displayed on the student card. Updating it preserves the student's other details, including notes and tags.
 
-Example: `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra` schedules an algebra lesson for the first displayed student.
+Example: `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra` schedules a 90-minute algebra lesson for the first displayed student.
+
+For example, if another student has a 90-minute next lesson on `2030-06-15` at `14:00`, scheduling at `15:00` on that date is rejected. Scheduling at `15:30` is allowed, provided it does not overlap any other student's next lesson. These examples assume the dates are still in the future when entered.
 
 ### Clearing a student's next lesson: `clearlesson`
 
@@ -204,16 +210,17 @@ Example: `clearlesson 1` clears the next lesson for the first displayed student.
 
 Sets or replaces the recurring weekly lesson for a student. The index refers to the current displayed student list, including search results.
 
-Format: `recurringlesson INDEX day/DAY time/HH:mm topic/TOPIC`
+Format: `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`
 
 * The index must be a positive integer identifying a student in the displayed list.
 * The day must be a valid day of the week, such as `MONDAY`. Day names are not case-sensitive.
+* The duration is required and must be a positive whole number of minutes.
 * The time must be a valid 24-hour time in `HH:mm` format, and the topic must not be blank.
 * Each student can have one recurring lesson. Setting another recurring lesson replaces the existing one.
 * The recurring lesson is saved with the student and displayed on the student card.
 * Updating the recurring lesson preserves the student's other details, including the next lesson, notes, and tags.
 
-Example: `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra` schedules an Algebra lesson every Monday at 4:30 PM for the first displayed student.
+Example: `recurringlesson 1 day/MONDAY time/16:30 dur/90 topic/Algebra` schedules a 90-minute Algebra lesson every Monday at 4:30 PM for the first displayed student.
 
 ### Clearing a student's recurring lesson: `clearrecurringlesson`
 
@@ -295,9 +302,9 @@ Action     | Format and Examples
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **Filter** | `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`<br> e.g., `filter l/Secondary 4 s/Mathematics t/weekday`
 **List**   | `list`
-**Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 topic/Algebra`
+**Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra`
 **Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
-**Recurring lesson** | `recurringlesson INDEX day/DAY time/HH:mm topic/TOPIC`<br> e.g., `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra`
+**Recurring lesson** | `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `recurringlesson 1 day/MONDAY time/16:30 dur/90 topic/Algebra`
 **Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`

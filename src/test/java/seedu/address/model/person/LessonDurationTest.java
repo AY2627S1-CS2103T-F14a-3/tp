@@ -22,8 +22,7 @@ public class LessonDurationTest {
         Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("-30"));
         Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("1.5"));
         Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("minutes"));
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> new LessonDuration("999999999999999999999"));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("999999999999999999999"));
     }
 
     @Test
