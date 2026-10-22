@@ -107,15 +107,18 @@ public class RecurringTimetableClashCheckerTest {
     }
 
     @Test
-    public void durationLongerThanWeek_overlapsRegardlessOfWeekday() {
+    public void maximumDuration_overlapsNextWeekdayButNotAtExactBoundary() {
         Person other = new PersonBuilder().withName("Other Student")
-                .withRecurringLesson(recurring(DayOfWeek.MONDAY, 14, 0, "10081")).build();
+                .withRecurringLesson(recurring(DayOfWeek.MONDAY, 14, 0, "1440")).build();
         assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
-                next(MONDAY.plusDays(3), 10, 0, "30"), List.of(other)));
+                next(MONDAY.plusDays(1), 13, 59, "30"), List.of(other)));
+        assertTrue(TimetableClashChecker.findRecurringLessonClash(target,
+                next(MONDAY.plusDays(1), 14, 0, "30"), List.of(other)).isEmpty());
+
         assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
-                recurring(DayOfWeek.THURSDAY, 10, 0, "30"), List.of(other)));
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
-                next(MONDAY.plusDays(2), 10, 0, "2147483647"), List.of(other)));
+                recurring(DayOfWeek.TUESDAY, 13, 59, "30"), List.of(other)));
+        assertTrue(TimetableClashChecker.findRecurringLessonClash(target,
+                recurring(DayOfWeek.TUESDAY, 14, 0, "30"), List.of(other)).isEmpty());
     }
 
     private NextLesson next(LocalDate date, int hour, int minute, String minutes) {
