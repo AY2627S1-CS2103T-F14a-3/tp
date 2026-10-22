@@ -36,6 +36,42 @@ public class FilterCommandParserTest {
     }
 
     @Test
+    public void parse_blankSchoolLevel_throwsParseException() {
+        assertParseFailure(parser, " l/", SchoolLevel.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " l/   ", SchoolLevel.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " l/ s/Mathematics", SchoolLevel.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_blankSubject_throwsParseException() {
+        assertParseFailure(parser, " s/", Subject.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " s/   ", Subject.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " l/Secondary 4 s/", Subject.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_blankTag_throwsParseException() {
+        assertParseFailure(parser, " t/", Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/   ", Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " s/Mathematics t/", Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/weekday t/", Tag.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_invalidTag_throwsParseException() {
+        assertParseFailure(parser, " t/weekday!", Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/week day", Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/weekday t/exam!", Tag.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_preambleWithValidCriteria_throwsParseException() {
+        String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, FilterCommand.MESSAGE_USAGE);
+
+        assertParseFailure(parser, " students s/Mathematics", expectedMessage);
+    }
+
+    @Test
     public void parse_invalidArguments_throwsParseException() {
         String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, FilterCommand.MESSAGE_USAGE);
 

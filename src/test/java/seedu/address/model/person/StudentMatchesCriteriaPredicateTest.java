@@ -49,6 +49,17 @@ public class StudentMatchesCriteriaPredicateTest {
     }
 
     @Test
+    public void test_someRequiredTagsMissing_returnsFalse() {
+        StudentMatchesCriteriaPredicate predicate = new StudentMatchesCriteriaPredicate(
+                Optional.of(new SchoolLevel("Secondary 4")), Optional.of(new Subject("Mathematics")),
+                Set.of(new Tag("weekday"), new Tag("exam")));
+        Person person = new PersonBuilder().withSchoolLevel("Secondary 4").withSubject("Mathematics")
+                .withTags("weekday", "home").build();
+
+        assertFalse(predicate.test(person));
+    }
+
+    @Test
     public void test_nonMatchingCriterion_returnsFalse() {
         Person person = new PersonBuilder().withSchoolLevel("Secondary 4").withSubject("Mathematics")
                 .withTags("weekday").build();
