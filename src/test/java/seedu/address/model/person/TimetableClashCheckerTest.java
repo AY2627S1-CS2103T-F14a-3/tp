@@ -86,13 +86,14 @@ public class TimetableClashCheckerTest {
     }
 
     @Test
-    public void findNextLessonClash_multidayLesson_checksBeyondNextDay() {
+    public void findNextLessonClash_maxDurationLesson_checksUntilEndOnNextDay() {
         Person other = new PersonBuilder().withName("Multiday Student")
-                .withNextLesson(new NextLesson(DATE, LocalTime.of(23, 30), "Workshop", new LessonDuration("1500")))
+                .withNextLesson(new NextLesson(DATE, LocalTime.of(23, 30), "Workshop",
+                        new LessonDuration(String.valueOf(LessonDuration.MAX_DURATION_MINUTES))))
                 .build();
         assertEquals(Optional.of(other), TimetableClashChecker.findNextLessonClash(target,
-                lesson(DATE.plusDays(2), 0, 15), List.of(other)));
+                lesson(DATE.plusDays(1), 23, 15), List.of(other)));
         assertTrue(TimetableClashChecker.findNextLessonClash(target,
-                lesson(DATE.plusDays(2), 0, 30), List.of(other)).isEmpty());
+                lesson(DATE.plusDays(1), 23, 30), List.of(other)).isEmpty());
     }
 }
