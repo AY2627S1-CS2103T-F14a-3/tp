@@ -78,7 +78,7 @@ class JsonAdaptedNextLesson {
             modelTime = LocalTime.parse(time);
             int storedDuration = durationMinutes == null
                     ? LessonDuration.DEFAULT_DURATION_MINUTES : durationMinutes;
-            modelDuration = new LessonDuration(Integer.toString(storedDuration));
+            modelDuration = LessonDuration.fromStoredValue(storedDuration);
         } catch (DateTimeParseException exception) {
             throw new IllegalValueException(MESSAGE_INVALID_DATE_TIME, exception);
         } catch (IllegalArgumentException exception) {
