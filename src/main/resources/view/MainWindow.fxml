@@ -54,7 +54,7 @@
         </VBox>
 
         <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="feedback-area"
-                   minHeight="60" prefHeight="60" maxHeight="60">
+                   minHeight="110" prefHeight="110" maxHeight="110">
             <padding>
                 <Insets top="6" right="16" bottom="4" left="16" />
             </padding>
