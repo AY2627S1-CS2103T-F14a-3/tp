@@ -5,13 +5,16 @@ import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.TimetableClashChecker;
 
 /**
  * Adds or replaces the next lesson for a student.
@@ -27,6 +30,10 @@ public class NextLessonCommand extends Command {
             + " 1 date/2026-12-11 time/14:30 dur/90 topic/Algebra";
     public static final String MESSAGE_NEXT_LESSON_UPDATED =
             "Updated next lesson for %1$s to %2$s at %3$s for %4$d minutes: %5$s";
+    public static final String MESSAGE_LESSON_CLASH = "Cannot schedule lesson: conflicts with %1$s's next lesson "
+            + "on %2$s at %3$s for %4$d minutes.";
+
+    private static final Logger logger = LogsCenter.getLogger(NextLessonCommand.class);
 
     private final Index index;
     private final NextLesson nextLesson;
@@ -53,6 +60,16 @@ public class NextLessonCommand extends Command {
         }
 
         Person student = displayedStudents.get(index.getZeroBased());
+        Optional<Person> conflict = TimetableClashChecker.findNextLessonClash(student, nextLesson,
+                model.getAddressBook().getPersonList());
+        if (conflict.isPresent()) {
+            Person conflictingStudent = conflict.orElseThrow();
+            NextLesson conflictingLesson = conflictingStudent.getNextLesson().orElseThrow();
+            logger.info("Rejected next lesson: timetable overlap detected; student data unchanged.");
+            throw new CommandException(String.format(MESSAGE_LESSON_CLASH, conflictingStudent.getName().fullName,
+                    conflictingLesson.date, conflictingLesson.time,
+                    conflictingLesson.duration.getDurationMinutes()));
+        }
         Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
                 student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
                 Optional.of(nextLesson), student.getRecurringLesson(), student.getTags());

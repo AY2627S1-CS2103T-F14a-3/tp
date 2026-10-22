@@ -64,7 +64,7 @@ public class AddressBookParser {
             case ClearCommand.COMMAND_WORD -> new ClearCommand();
             case ClearNextLessonCommand.COMMAND_WORD -> new ClearNextLessonCommandParser().parse(arguments);
             case ClearRecurringLessonCommand.COMMAND_WORD ->
-              new ClearRecurringLessonCommandParser().parse(arguments);
+                new ClearRecurringLessonCommandParser().parse(arguments);
             case FilterCommand.COMMAND_WORD -> new FilterCommandParser().parse(arguments);
             case FindCommand.COMMAND_WORD -> new FindCommandParser().parse(arguments);
             case ListCommand.COMMAND_WORD -> new ListCommand();

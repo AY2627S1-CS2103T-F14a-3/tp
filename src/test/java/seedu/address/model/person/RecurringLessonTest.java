@@ -30,32 +30,27 @@ public class RecurringLessonTest {
 
     @Test
     public void constructor_nullDay_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new RecurringLesson(null, TIME, TOPIC, DURATION));
+        Assert.assertThrows(NullPointerException.class, () -> new RecurringLesson(null, TIME, TOPIC, DURATION));
     }
 
     @Test
     public void constructor_nullTime_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new RecurringLesson(DAY, null, TOPIC, DURATION));
+        Assert.assertThrows(NullPointerException.class, () -> new RecurringLesson(DAY, null, TOPIC, DURATION));
     }
 
     @Test
     public void constructor_nullTopic_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new RecurringLesson(DAY, TIME, null, DURATION));
+        Assert.assertThrows(NullPointerException.class, () -> new RecurringLesson(DAY, TIME, null, DURATION));
     }
 
     @Test
     public void constructor_nullDuration_throwsNullPointerException() {
-        Assert.assertThrows(NullPointerException.class,
-                () -> new RecurringLesson(DAY, TIME, TOPIC, null));
+        Assert.assertThrows(NullPointerException.class, () -> new RecurringLesson(DAY, TIME, TOPIC, null));
     }
 
     @Test
     public void constructor_blankTopic_throwsIllegalArgumentException() {
-        Assert.assertThrows(IllegalArgumentException.class,
-                () -> new RecurringLesson(DAY, TIME, "", DURATION));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new RecurringLesson(DAY, TIME, "", DURATION));
     }
 
     @Test
