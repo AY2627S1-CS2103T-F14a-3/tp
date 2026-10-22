@@ -54,6 +54,13 @@ public class NextLesson {
         return LocalDateTime.of(date, time).isBefore(LocalDateTime.now());
     }
 
+    /**
+     * Returns the date and time at which this lesson starts.
+     */
+    public LocalDateTime getDateTime() {
+        return LocalDateTime.of(date, time);
+    }
+
     @Override
     public String toString() {
         return date + " " + time + " " + duration + " " + topic;

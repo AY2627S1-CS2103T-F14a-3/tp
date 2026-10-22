@@ -3,6 +3,7 @@ package seedu.address.model.person;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,6 +17,11 @@ import seedu.address.model.tag.Tag;
  * Guarantees: details are present and not null, field values are validated, immutable.
  */
 public class Person {
+
+    /** Orders persons by next lesson start time, placing persons without a next lesson last. */
+    public static final Comparator<Person> COMPARATOR_BY_NEXT_LESSON = Comparator.comparing(
+            person -> person.getNextLesson().map(NextLesson::getDateTime).orElse(null),
+            Comparator.nullsLast(Comparator.naturalOrder()));
 
     // Identity fields
     private final Name name;

@@ -110,6 +110,25 @@ Each student card groups information into the following sections:
 
 Student tags are displayed below the student's name. If a student does not have a scheduled lesson, the card displays `Next lesson: Not scheduled`. Empty notes and optional lesson topics are not displayed.
 
+### Viewing the earliest upcoming lesson: `upcoming`
+
+Shows the student with the earliest upcoming next lesson.
+
+Format: `upcoming`
+
+* Only scheduled next lessons that have not yet started are considered, across all students.
+* If several students share the earliest lesson time, all of them are shown.
+* If no upcoming lesson is scheduled, an error message is shown. Use `list` to show all students again.
+
+### Sorting students by next lesson: `sort`
+
+Sorts all students by their next scheduled lesson, earliest first.
+
+Format: `sort`
+
+* Students without a scheduled next lesson are placed after all scheduled students, keeping their existing order.
+* The new order is saved and all students are shown after sorting.
+
 ### Editing a student: `edit`
 
 Edits an existing student in TutorTrack.
@@ -306,6 +325,8 @@ Action     | Format and Examples
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **Filter** | `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`<br> e.g., `filter l/Secondary 4 s/Mathematics t/weekday`
 **List**   | `list`
+**Upcoming** | `upcoming`
+**Sort**   | `sort`
 **Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra`
 **Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
 **Recurring lesson** | `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `recurringlesson 1 day/MONDAY time/16:30 dur/90 topic/Algebra`
