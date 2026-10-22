@@ -30,6 +30,10 @@ public class LessonDuration {
         this.durationMinutes = Integer.parseInt(durationMinutes.trim());
     }
 
+    private LessonDuration(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
     /**
      * Creates a lesson duration from a previously saved value, capping legacy values at the current maximum.
      */
@@ -38,10 +42,6 @@ public class LessonDuration {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
         return new LessonDuration(Math.min(durationMinutes, MAX_DURATION_MINUTES));
-    }
-
-    private LessonDuration(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
     }
 
     /**
