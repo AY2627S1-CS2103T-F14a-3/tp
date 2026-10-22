@@ -36,6 +36,19 @@ public class LessonDurationTest {
     }
 
     @Test
+    public void fromStoredValue_legacyDurationAboveLimit_capsDuration() {
+        LessonDuration duration = LessonDuration.fromStoredValue(1441);
+
+        assertEquals(1440, duration.getDurationMinutes());
+    }
+
+    @Test
+    public void fromStoredValue_nonPositiveDuration_throwsIllegalArgumentException() {
+        Assert.assertThrows(IllegalArgumentException.class, () -> LessonDuration.fromStoredValue(0));
+        Assert.assertThrows(IllegalArgumentException.class, () -> LessonDuration.fromStoredValue(-1));
+    }
+
+    @Test
     public void isValidDuration() {
         assertFalse(LessonDuration.isValidDuration(null));
         assertFalse(LessonDuration.isValidDuration("0"));

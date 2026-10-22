@@ -84,7 +84,7 @@ class JsonAdaptedRecurringLesson {
         try {
             int storedDuration = durationMinutes == null
                     ? LessonDuration.DEFAULT_DURATION_MINUTES : durationMinutes;
-            modelDuration = new LessonDuration(Integer.toString(storedDuration));
+            modelDuration = LessonDuration.fromStoredValue(storedDuration);
         } catch (IllegalArgumentException exception) {
             throw new IllegalValueException(exception.getMessage(), exception);
         }

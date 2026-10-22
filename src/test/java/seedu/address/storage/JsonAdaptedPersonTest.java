@@ -177,6 +177,16 @@ public class JsonAdaptedPersonTest {
     }
 
     @Test
+    public void toModelType_legacyNextLessonDurationAboveLimit_capsDuration() throws Exception {
+        JsonAdaptedNextLesson legacyLesson = new JsonAdaptedNextLesson(
+                LocalDate.now().plusDays(1).toString(), "14:30", "Algebra", 1441);
+
+        NextLesson lesson = legacyLesson.toModelType().orElseThrow();
+
+        assertEquals(1440, lesson.duration.getDurationMinutes());
+    }
+
+    @Test
     public void toModelType_invalidNextLessonDuration_throwsIllegalValueException() {
         JsonAdaptedNextLesson invalidLesson = new JsonAdaptedNextLesson(
                 LocalDate.now().plusDays(1).toString(), "14:30", "Algebra", 0);
@@ -324,6 +334,16 @@ public class JsonAdaptedPersonTest {
 
         assertEquals(LessonDuration.DEFAULT_DURATION_MINUTES,
                 lesson.getDuration().getDurationMinutes());
+    }
+
+    @Test
+    public void toModelType_legacyRecurringLessonDurationAboveLimit_capsDuration() throws Exception {
+        JsonAdaptedRecurringLesson legacyLesson =
+                new JsonAdaptedRecurringLesson("MONDAY", "14:30", "Mathematics", 1441);
+
+        RecurringLesson lesson = legacyLesson.toModelType();
+
+        assertEquals(1440, lesson.getDuration().getDurationMinutes());
     }
 
     @Test

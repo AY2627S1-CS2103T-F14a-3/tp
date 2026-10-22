@@ -31,6 +31,20 @@ public class LessonDuration {
     }
 
     /**
+     * Creates a lesson duration from a previously saved value, capping legacy values at the current maximum.
+     */
+    public static LessonDuration fromStoredValue(int durationMinutes) {
+        if (durationMinutes <= 0) {
+            throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
+        }
+        return new LessonDuration(Math.min(durationMinutes, MAX_DURATION_MINUTES));
+    }
+
+    private LessonDuration(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
+    /**
      * Returns true if the given string represents a whole number from 1 to 1440 minutes.
      */
     public static boolean isValidDuration(String test) {
