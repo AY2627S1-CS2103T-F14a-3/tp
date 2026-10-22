@@ -514,6 +514,38 @@ testers are expected to do more *exploratory* testing.
 
 1. _{ more test cases … }_
 
+### Filtering students
+
+Use a separate test copy of TutorTrack in an empty folder so these checks do not affect real student records.
+Run the following commands once to add four test students. The `filtercheck` tag distinguishes them from the
+sample students loaded on first launch.
+
+```text
+add n/Filter Alice p/90000001 e/filteralice@example.com a/Block 1 l/Secondary 4 s/Mathematics t/filtercheck t/weekday t/exam
+add n/Filter Ben p/90000002 e/filterben@example.com a/Block 2 l/Secondary 4 s/Mathematics t/filtercheck t/weekday
+add n/Filter Cara p/90000003 e/filtercara@example.com a/Block 3 l/Secondary 4 s/Physics t/filtercheck t/weekday t/exam
+add n/Filter Dylan p/90000004 e/filterdylan@example.com a/Block 4 l/Secondary 3 s/Mathematics t/filtercheck t/weekday t/exam
+```
+
+Run `filter t/filtercheck` before each case below. It should display all four test students.
+
+| Test case | Expected result |
+| --- | --- |
+| `filter l/Secondary 4 s/Mathematics t/filtercheck t/weekday t/exam` | Only Filter Alice is displayed. All criteria must match; Ben lacks `exam`, Cara has a different subject, and Dylan has a different school level. |
+| `filter t/filtercheck t/weekday t/exam` | Alice, Cara, and Dylan are displayed. Ben is excluded even though he has one of the two requested lesson tags. |
+| `filter t/filtercheck s/Biology` | No students are displayed, and the result reports zero matches. No records are deleted. |
+| `filter` or `filter students s/Mathematics` | The command usage error is displayed, and the four test students remain displayed. |
+| `filter l/` | `School level must not be blank.` is displayed, and the displayed list is unchanged. |
+| `filter s/` | `Subject must not be blank.` is displayed, and the displayed list is unchanged. |
+| `filter t/`, `filter t/week day`, or `filter t/weekday t/exam!` | `Tag names should be alphanumeric` is displayed, and the displayed list is unchanged. |
+
+To test resetting the displayed list:
+
+1. Run `list` and note the total number of students, including the sample students and the four test students.
+1. Run `filter l/Secondary 4 s/Mathematics t/filtercheck t/exam`. Only Filter Alice should be displayed.
+1. Run `list` again. All students should reappear with the original total and unchanged details.
+1. Run `filter t/filtercheck s/Biology`, followed by `list`. All students should also reappear after an empty result.
+
 ### Saving data
 
 1. Dealing with missing/corrupted data files
