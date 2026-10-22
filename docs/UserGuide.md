@@ -184,7 +184,7 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 
 * The date must be a valid date in `YYYY-MM-DD` format and the time a valid 24-hour time in `HH:mm` format.
 * The lesson must not be in the past, and the topic must not be blank.
-* The duration is required and must be a positive whole number of minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
+* The duration is required and must be a whole number from 1 to 1440 minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
 * A next lesson cannot overlap another student's next lesson or a recurring lesson occurrence, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
 * If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
 * Replacing a student's next lesson ignores that student's old next lesson. The student's own recurring lesson is still checked: an exact weekday and start-time match is allowed as the same occurrence, even if the topic or duration differs; other overlapping times are rejected.
@@ -214,7 +214,7 @@ Format: `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`
 
 * The index must be a positive integer identifying a student in the displayed list.
 * The day must be a valid day of the week, such as `MONDAY`. Day names are not case-sensitive.
-* The duration is required and must be a positive whole number of minutes.
+* The duration is required and must be a whole number from 1 to 1440 minutes.
 * The time must be a valid 24-hour time in `HH:mm` format, and the topic must not be blank.
 * Each student can have one recurring lesson. Setting another recurring lesson replaces the existing one.
 * TutorTrack checks the proposed schedule against all students' next lessons and other students' recurring schedules, even when those students are hidden by a filter. Replacing a recurring lesson ignores that student's old recurring schedule.
