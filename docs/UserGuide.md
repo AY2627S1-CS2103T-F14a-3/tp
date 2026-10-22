@@ -185,9 +185,9 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 * The date must be a valid date in `YYYY-MM-DD` format and the time a valid 24-hour time in `HH:mm` format.
 * The lesson must not be in the past, and the topic must not be blank.
 * The duration is required and must be a positive whole number of minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
-* A next lesson cannot overlap another student's next lesson, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
+* A next lesson cannot overlap another student's next lesson or a recurring lesson occurrence, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
 * If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
-* Replacing a student's next lesson ignores that student's old next lesson. This version checks next lessons against other next lessons only; checks involving recurring schedules are not yet included.
+* Replacing a student's next lesson ignores that student's old next lesson. The student's own recurring lesson is still checked: an exact weekday and start-time match is allowed as the same occurrence, even if the topic or duration differs; other overlapping times are rejected.
 * The lesson is saved with the student and displayed on the student card. Updating it preserves the student's other details, including notes and tags.
 
 Example: `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra` schedules a 90-minute algebra lesson for the first displayed student.
@@ -217,6 +217,10 @@ Format: `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`
 * The duration is required and must be a positive whole number of minutes.
 * The time must be a valid 24-hour time in `HH:mm` format, and the topic must not be blank.
 * Each student can have one recurring lesson. Setting another recurring lesson replaces the existing one.
+* TutorTrack checks the proposed schedule against all students' next lessons and other students' recurring schedules, even when those students are hidden by a filter. Replacing a recurring lesson ignores that student's old recurring schedule.
+* An exact weekday and start-time match with the same student's next lesson is allowed as the same occurrence, even if the topic or duration differs. Other partial overlaps with that student's next lesson are rejected.
+* Clashes are checked using actual durations, including lessons crossing midnight or Sunday into Monday. Adjacent lessons are allowed. Weekly schedules have no start or end date and apply every week in local time.
+* On conflict, TutorTrack identifies the conflicting student and either their next lesson's date or their recurring lesson's weekday, along with its start time and duration. The command leaves student data and the displayed list unchanged.
 * The recurring lesson is saved with the student and displayed on the student card.
 * Updating the recurring lesson preserves the student's other details, including the next lesson, notes, and tags.
 
