@@ -22,7 +22,9 @@ public class LessonDurationTest {
         Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("-30"));
         Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("1.5"));
         Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("minutes"));
-        Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("999999999999999999999"));
+        Assert.assertThrows(IllegalArgumentException.class, () -> new LessonDuration("1441"));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new LessonDuration("999999999999999999999"));
     }
 
     @Test
@@ -39,8 +41,10 @@ public class LessonDurationTest {
         assertFalse(LessonDuration.isValidDuration("0"));
         assertFalse(LessonDuration.isValidDuration("-1"));
         assertFalse(LessonDuration.isValidDuration("60.5"));
+        assertFalse(LessonDuration.isValidDuration("1441"));
         assertTrue(LessonDuration.isValidDuration("1"));
         assertTrue(LessonDuration.isValidDuration(" 90 "));
+        assertTrue(LessonDuration.isValidDuration("1440"));
     }
 
     @Test

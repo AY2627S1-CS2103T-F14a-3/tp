@@ -9,8 +9,9 @@ import java.util.Objects;
  */
 public class LessonDuration {
     public static final String MESSAGE_CONSTRAINTS =
-            "Lesson duration must be a positive whole number of minutes.";
+            "Lesson duration must be a whole number from 1 to 1440 minutes.";
     public static final int DEFAULT_DURATION_MINUTES = 60;
+    public static final int MAX_DURATION_MINUTES = 1440;
 
     private static final String VALIDATION_REGEX = "\\d+";
 
@@ -30,7 +31,7 @@ public class LessonDuration {
     }
 
     /**
-     * Returns true if the given string represents a positive whole number of minutes.
+     * Returns true if the given string represents a whole number from 1 to 1440 minutes.
      */
     public static boolean isValidDuration(String test) {
         if (test == null) {
@@ -42,7 +43,8 @@ public class LessonDuration {
         }
 
         try {
-            return Integer.parseInt(test.trim()) > 0;
+            int durationMinutes = Integer.parseInt(test.trim());
+            return durationMinutes > 0 && durationMinutes <= MAX_DURATION_MINUTES;
         } catch (NumberFormatException exception) {
             return false;
         }
