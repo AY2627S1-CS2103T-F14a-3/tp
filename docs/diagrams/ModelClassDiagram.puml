@@ -18,6 +18,12 @@ Class Address
 Class Email
 Class Name
 Class Phone
+Class SchoolLevel
+Class Subject
+Class StudentNote
+Class NextLesson
+Class RecurringLesson
+Class LessonDuration
 Class Tag
 
 Class I #FFFFFF
@@ -41,6 +47,13 @@ Person *--> Name
 Person *--> Phone
 Person *--> Email
 Person *--> Address
+Person *--> SchoolLevel
+Person *--> Subject
+Person *--> StudentNote
+Person *--> "0..1" NextLesson
+Person *--> "0..1" RecurringLesson
+NextLesson *--> LessonDuration
+RecurringLesson *--> LessonDuration
 Person *--> "*" Tag
 
 Person -[hidden]up--> I
