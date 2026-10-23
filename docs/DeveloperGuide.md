@@ -125,7 +125,10 @@ How the parsing works:
 ### Model component
 **API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
 
-<puml src="diagrams/ModelClassDiagram.puml" width="450" />
+<puml src="diagrams/ModelClassDiagram.puml" width="800" />
+
+Each `Person` stores a school level, subject, and student note, and may have one next lesson and one recurring lesson.
+Each lesson has one `LessonDuration`. The `0..1` multiplicities indicate that either lesson may be absent.
 
 
 The `Model` component,

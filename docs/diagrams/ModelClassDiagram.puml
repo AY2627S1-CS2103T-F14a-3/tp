@@ -47,13 +47,13 @@ Person *--> Name
 Person *--> Phone
 Person *--> Email
 Person *--> Address
-Person *--> SchoolLevel
-Person *--> Subject
-Person *--> StudentNote
+Person *--> "1" SchoolLevel
+Person *--> "1" Subject
+Person *--> "1" StudentNote
 Person *--> "0..1" NextLesson
 Person *--> "0..1" RecurringLesson
-NextLesson *--> LessonDuration
-RecurringLesson *--> LessonDuration
+NextLesson *--> "1" LessonDuration
+RecurringLesson *--> "1" LessonDuration
 Person *--> "*" Tag
 
 Person -[hidden]up--> I
