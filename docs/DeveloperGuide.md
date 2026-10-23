@@ -165,6 +165,16 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Timetable-clash detection
+
+Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
+
+The lesson being replaced is excluded. When comparing a next lesson with the same student's recurring schedule, an exact weekday and start-time match represents the same occurrence and is allowed, even if the topic or duration differs. Other overlapping times are rejected.
+
+The activity diagram below follows parsing, validation, clash rejection, and model updates for both scheduling commands. A rejected command leaves the student records and displayed list unchanged. The diagram ends when the command returns successfully; `LogicManager` then saves the address book through the normal Storage flow. Storage errors are outside this diagram's scope.
+
+<puml src="diagrams/TimetableClashActivityDiagram.puml" alt="Activity diagram for timetable-clash validation and model updates" />
+
 ### Recurring lesson feature
 
 The `recurringlesson` command records a weekly lesson comprising a day, time, and topic for a student. Its implementation spans the Model, Logic, Storage, and UI components while keeping the recurring schedule separate from the student's one-off next lesson.
