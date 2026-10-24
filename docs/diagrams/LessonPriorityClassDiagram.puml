@@ -1,0 +1,49 @@
+@startuml
+!include style.puml
+
+skinparam arrowThickness 1.1
+skinparam arrowColor #555555
+skinparam nodesep 45
+skinparam ranksep 40
+
+package "Logic" {
+    class SortCommand LOGIC_COLOR {
+        + execute(model)
+    }
+    class UpcomingCommand LOGIC_COLOR {
+        + execute(model)
+    }
+}
+
+package "Model" {
+    interface Model MODEL_COLOR {
+        + sortPersons(comparator)
+        + getAddressBook()
+        + updateFilteredPersonList(predicate)
+    }
+    class ModelManager MODEL_COLOR
+    class Person MODEL_COLOR {
+        {static} + COMPARATOR_BY_NEXT_LESSON : Comparator<Person>
+        + getNextLesson() : Optional<NextLesson>
+    }
+    class NextLesson MODEL_COLOR {
+        + getDateTime() : LocalDateTime
+    }
+}
+
+show SortCommand methods
+show UpcomingCommand methods
+show Model methods
+show Person members
+show NextLesson methods
+
+SortCommand ..> Model : uses
+UpcomingCommand ..> Model : uses
+ModelManager .up.|> Model
+ModelManager --> "*" Person : filteredPersons
+Person --> "0..1" NextLesson : nextLesson
+SortCommand ..> Person : uses comparator
+UpcomingCommand ..> Person : reads next lessons
+
+SortCommand -[hidden]right-> UpcomingCommand
+@enduml
