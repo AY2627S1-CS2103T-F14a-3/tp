@@ -125,7 +125,6 @@ How the parsing works:
 ### Model component
 **API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
 
-<puml src="diagrams/ModelClassDiagram.puml" width="450" />
 
 
 The `Model` component,
@@ -164,6 +163,21 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 ## **Implementation**
 
 This section describes some noteworthy details on how certain features are implemented.
+
+### Lesson priority and ordering
+
+The following class diagram shows the model and logic classes involved in the `sort` and `upcoming` commands.
+Only members relevant to lesson priority are shown.
+
+<puml src="diagrams/LessonPriorityClassDiagram.puml" alt="Classes and relationships for lesson priority and ordering" width="760" />
+
+* `SortCommand` passes `Person.COMPARATOR_BY_NEXT_LESSON` to `Model.sortPersons(...)`, then resets the filter to show all students.
+  The comparator orders students by their next lesson's start time, placing students without a next lesson last.
+  `ModelManager` delegates sorting to the address book; the storage-list classes are omitted from this focused diagram.
+* `UpcomingCommand` reads all students through `Model.getAddressBook()`, finds the earliest next lesson at or after the current time,
+  and updates the filter to show every student whose lesson starts at that time. If none exists, it reports an error.
+* `Person` may reference one `NextLesson`. `NextLesson.getDateTime()` supplies the start time used by both commands.
+  Recurring schedules do not participate directly in these priority calculations.
 
 ### Timetable-clash detection
 
