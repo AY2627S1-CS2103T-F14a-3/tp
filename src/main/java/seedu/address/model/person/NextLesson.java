@@ -2,6 +2,7 @@ package seedu.address.model.person;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,11 +30,18 @@ public class NextLesson {
      * @param duration lesson duration
      */
     public NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration) {
+        this(date, time, topic, duration, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Constructs a new booking, validating its start against the supplied clock.
+     */
+    public NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration, Clock clock) {
         requireNonNull(date);
         requireNonNull(time);
         requireNonNull(topic);
         requireNonNull(duration);
-        if (isDateTimeInPast(date, time)) {
+        if (isDateTimeInPast(date, time, clock)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
         if (topic.isBlank()) {
@@ -49,9 +57,17 @@ public class NextLesson {
      * Returns true if the given lesson date and time are before the current local date and time.
      */
     public static boolean isDateTimeInPast(LocalDate date, LocalTime time) {
+        return isDateTimeInPast(date, time, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Returns whether the start is strictly before the supplied clock's local date and time.
+     */
+    public static boolean isDateTimeInPast(LocalDate date, LocalTime time, Clock clock) {
         requireNonNull(date);
         requireNonNull(time);
-        return LocalDateTime.of(date, time).isBefore(LocalDateTime.now());
+        requireNonNull(clock);
+        return LocalDateTime.of(date, time).isBefore(LocalDateTime.now(clock));
     }
 
     /**

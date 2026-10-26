@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +21,37 @@ public class NextLessonTest {
     private static final LocalTime VALID_TIME = FUTURE_DATE_TIME.toLocalTime();
     private static final String VALID_TOPIC = "Algebra";
     private static final LessonDuration VALID_DURATION = new LessonDuration("60");
+
+    @Test
+    public void constructor_fixedClock_acceptsStartsAtOrAfterNow() {
+        LocalDateTime start = LocalDateTime.of(2000, 1, 1, 10, 0);
+        ZoneId zone = ZoneId.of("Asia/Singapore");
+        for (LocalDateTime now : new LocalDateTime[]{start.minusNanos(1), start}) {
+            Clock clock = Clock.fixed(now.atZone(zone).toInstant(), zone);
+            NextLesson lesson = new NextLesson(start.toLocalDate(), start.toLocalTime(),
+                    VALID_TOPIC, VALID_DURATION, clock);
+
+            assertEquals(start, lesson.getDateTime());
+            assertFalse(NextLesson.isDateTimeInPast(lesson.date, lesson.time, clock));
+        }
+    }
+
+    @Test
+    public void constructor_fixedClockAfterStart_rejectsPastBooking() {
+        LocalDateTime start = LocalDateTime.of(2000, 1, 1, 10, 0);
+        ZoneId zone = ZoneId.of("Asia/Singapore");
+        Clock clock = Clock.fixed(start.plusNanos(1).atZone(zone).toInstant(), zone);
+
+        assertTrue(NextLesson.isDateTimeInPast(start.toLocalDate(), start.toLocalTime(), clock));
+        Assert.assertThrows(IllegalArgumentException.class, NextLesson.MESSAGE_DATE_TIME_CONSTRAINTS, () ->
+                new NextLesson(start.toLocalDate(), start.toLocalTime(), VALID_TOPIC, VALID_DURATION, clock));
+    }
+
+    @Test
+    public void constructor_nullClock_throwsNullPointerException() {
+        Assert.assertThrows(NullPointerException.class, () ->
+                new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, VALID_DURATION, null));
+    }
 
     @Test
     public void constructor_pastDate_throwsIllegalArgumentException() {

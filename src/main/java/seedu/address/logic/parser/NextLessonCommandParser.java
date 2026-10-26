@@ -7,6 +7,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DURATION;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TIME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TOPIC;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -24,6 +25,22 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
 
     private static final String MESSAGE_INVALID_DATE = "Lesson date must be a valid date in YYYY-MM-DD format.";
     private static final String MESSAGE_INVALID_TIME = "Lesson time must be a valid time in HH:mm format.";
+
+    private final Clock clock;
+
+    /**
+     * Creates a parser using the computer's local time zone.
+     */
+    public NextLessonCommandParser() {
+        this(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates a parser that validates new bookings against the supplied clock.
+     */
+    public NextLessonCommandParser(Clock clock) {
+        this.clock = requireNonNull(clock);
+    }
 
     @Override
     public NextLessonCommand parse(String args) throws ParseException {
@@ -56,7 +73,7 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
                 argMultimap.getValue(PREFIX_LESSON_DURATION).orElseThrow());
         try {
             return new NextLessonCommand(index, new NextLesson(date, time,
-                    argMultimap.getValue(PREFIX_LESSON_TOPIC).orElseThrow(), duration));
+                    argMultimap.getValue(PREFIX_LESSON_TOPIC).orElseThrow(), duration, clock));
         } catch (IllegalArgumentException e) {
             throw new ParseException(e.getMessage(), e);
         }

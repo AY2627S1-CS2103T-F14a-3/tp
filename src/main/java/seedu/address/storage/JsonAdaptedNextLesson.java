@@ -1,5 +1,8 @@
 package seedu.address.storage;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -57,6 +60,15 @@ class JsonAdaptedNextLesson {
      * @throws IllegalValueException if the lesson details are malformed.
      */
     Optional<NextLesson> toModelType() throws IllegalValueException {
+        return toModelType(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Restores this lesson using a single reading of the supplied clock.
+     */
+    Optional<NextLesson> toModelType(Clock clock) throws IllegalValueException {
+        requireNonNull(clock);
+        Clock loadClock = Clock.fixed(clock.instant(), clock.getZone());
         if (date == null) {
             throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "date"));
         }
@@ -85,17 +97,14 @@ class JsonAdaptedNextLesson {
             throw new IllegalValueException(exception.getMessage(), exception);
         }
 
-        if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
+        if (NextLesson.isDateTimeInPast(modelDate, modelTime, loadClock)) {
             // A past appointment is no longer the student's next lesson.
             return Optional.empty();
         }
 
         try {
-            return Optional.of(new NextLesson(modelDate, modelTime, topic, modelDuration));
+            return Optional.of(new NextLesson(modelDate, modelTime, topic, modelDuration, loadClock));
         } catch (IllegalArgumentException exception) {
-            if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
-                return Optional.empty();
-            }
             throw new IllegalValueException(exception.getMessage(), exception);
         }
     }
