@@ -40,7 +40,7 @@ public class NextLessonCommandTest {
         NextLesson proposed = new NextLesson(existing.date, LocalTime.of(15, 0), "Algebra",
                 new LessonDuration("30"));
         assertCommandFailure(new NextLessonCommand(INDEX_FIRST_PERSON, proposed), model,
-                String.format(NextLessonCommand.MESSAGE_LESSON_CLASH, other.getName().fullName,
+                String.format(Messages.MESSAGE_LESSON_CLASH, other.getName().fullName,
                         existing.date, existing.time, existing.duration.getDurationMinutes()));
     }
 
