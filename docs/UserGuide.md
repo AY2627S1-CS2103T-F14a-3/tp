@@ -72,9 +72,8 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
 Shows a message explaining how to access the help page.
 
-![help message](images/helpMessage.png)
-
-<!-- Replace this screenshot after the Help window uses the TutorTrack User Guide URL. -->
+The Help window shows the [TutorTrack User Guide](https://ay2627s1-cs2103t-f14a-3.github.io/tp/UserGuide.html)
+address and lets you copy it.
 
 Format: `help`
 
