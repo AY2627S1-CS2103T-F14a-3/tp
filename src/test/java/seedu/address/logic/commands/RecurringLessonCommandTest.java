@@ -58,10 +58,10 @@ public class RecurringLessonCommandTest {
     }
 
     @Test
-    public void execute_existingRecurringLesson_replacesRecurringLesson() {
+    public void execute_existingOverlappingRecurringLesson_replacesRecurringLesson() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         RecurringLesson oldLesson =
-                new RecurringLesson(DayOfWeek.TUESDAY, LocalTime.of(14, 30), "Geometry", DURATION);
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(15, 30), "Geometry", DURATION);
         Person studentWithLesson = new PersonBuilder(student).withRecurringLesson(oldLesson).build();
         model.setPerson(student, studentWithLesson);
 

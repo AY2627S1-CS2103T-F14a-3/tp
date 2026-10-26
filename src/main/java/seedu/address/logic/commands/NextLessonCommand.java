@@ -55,32 +55,11 @@ public class NextLessonCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        List<Person> displayedStudents = model.getFilteredPersonList();
-        if (index.getZeroBased() >= displayedStudents.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
-        }
+        Person student = getStudent(model);
+        List<Person> allStudents = model.getAddressBook().getPersonList();
+        validateNoNextLessonClash(student, allStudents);
+        validateNoRecurringLessonClash(student, allStudents);
 
-        Person student = displayedStudents.get(index.getZeroBased());
-        Optional<Person> conflict = TimetableClashChecker.findNextLessonClash(student, nextLesson,
-                model.getAddressBook().getPersonList());
-        if (conflict.isPresent()) {
-            Person conflictingStudent = conflict.orElseThrow();
-            NextLesson conflictingLesson = conflictingStudent.getNextLesson().orElseThrow();
-            logger.info("Rejected next lesson: timetable overlap detected; student data unchanged.");
-            throw new CommandException(String.format(MESSAGE_LESSON_CLASH, conflictingStudent.getName().fullName,
-                    conflictingLesson.date, conflictingLesson.time,
-                    conflictingLesson.duration.getDurationMinutes()));
-        }
-        Optional<Person> recurringConflict = TimetableClashChecker.findRecurringLessonClash(student, nextLesson,
-                model.getAddressBook().getPersonList());
-        if (recurringConflict.isPresent()) {
-            Person conflictingStudent = recurringConflict.orElseThrow();
-            RecurringLesson lesson = conflictingStudent.getRecurringLesson().orElseThrow();
-            logger.info("Rejected next lesson: recurring timetable overlap detected; student data unchanged.");
-            throw new CommandException(String.format(Messages.MESSAGE_RECURRING_LESSON_CLASH,
-                    conflictingStudent.getName().fullName, lesson.getDay(), lesson.getTime(),
-                    lesson.getDuration().getDurationMinutes()));
-        }
         Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
                 student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
                 Optional.of(nextLesson), student.getRecurringLesson(), student.getTags());
@@ -89,6 +68,42 @@ public class NextLessonCommand extends Command {
 
         return new CommandResult(String.format(MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
                 nextLesson.date, nextLesson.time, nextLesson.duration.getDurationMinutes(), nextLesson.topic));
+    }
+
+    /** Returns the student at the displayed index, or rejects an index outside the displayed list. */
+    private Person getStudent(Model model) throws CommandException {
+        List<Person> displayedStudents = model.getFilteredPersonList();
+        if (index.getZeroBased() >= displayedStudents.size()) {
+            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        }
+        return displayedStudents.get(index.getZeroBased());
+    }
+
+    /** Rejects a clash with any student's next lesson, excluding the lesson being replaced. */
+    private void validateNoNextLessonClash(Person student, List<Person> allStudents) throws CommandException {
+        Optional<Person> conflict = TimetableClashChecker.findNextLessonClash(student, nextLesson, allStudents);
+        if (conflict.isPresent()) {
+            Person conflictingStudent = conflict.orElseThrow();
+            NextLesson conflictingLesson = conflictingStudent.getNextLesson().orElseThrow();
+            logger.info("Rejected next lesson: timetable overlap detected; student data unchanged.");
+            throw new CommandException(String.format(MESSAGE_LESSON_CLASH, conflictingStudent.getName().fullName,
+                    conflictingLesson.date, conflictingLesson.time,
+                    conflictingLesson.duration.getDurationMinutes()));
+        }
+    }
+
+    /** Rejects a recurring clash unless the proposed lesson is an exact occurrence for the same student. */
+    private void validateNoRecurringLessonClash(Person student, List<Person> allStudents) throws CommandException {
+        Optional<Person> recurringConflict = TimetableClashChecker.findRecurringLessonClash(student, nextLesson,
+                allStudents);
+        if (recurringConflict.isPresent()) {
+            Person conflictingStudent = recurringConflict.orElseThrow();
+            RecurringLesson lesson = conflictingStudent.getRecurringLesson().orElseThrow();
+            logger.info("Rejected next lesson: recurring timetable overlap detected; student data unchanged.");
+            throw new CommandException(String.format(Messages.MESSAGE_RECURRING_LESSON_CLASH,
+                    conflictingStudent.getName().fullName, lesson.getDay(), lesson.getTime(),
+                    lesson.getDuration().getDurationMinutes()));
+        }
     }
 
     @Override

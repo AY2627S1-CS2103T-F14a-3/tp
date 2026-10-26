@@ -31,6 +31,27 @@ public class RecurringClashIntegrationTest {
     private final Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
 
     @Test
+    public void bothCommands_nextAndRecurringClashes_reportNextLessonClashFirst() {
+        Person recurringStudent = model.getFilteredPersonList().get(1);
+        Person nextStudent = model.getFilteredPersonList().get(2);
+        RecurringLesson rule = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 0), "Geometry", DURATION);
+        NextLesson next = new NextLesson(MONDAY, LocalTime.of(14, 0), "Geometry", DURATION);
+        model.setPerson(recurringStudent, new PersonBuilder(recurringStudent).withRecurringLesson(rule).build());
+        model.setPerson(nextStudent, new PersonBuilder(nextStudent).withNextLesson(next).build());
+        showPersonAtIndex(model, INDEX_FIRST_PERSON);
+
+        String expectedError = String.format(NextLessonCommand.MESSAGE_LESSON_CLASH, nextStudent.getName().fullName,
+                next.date, next.time, next.duration.getDurationMinutes());
+        NextLesson proposedNext = new NextLesson(MONDAY, LocalTime.of(15, 0), "Algebra", DURATION);
+        RecurringLesson proposedRecurring =
+                new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(15, 0), "Algebra", DURATION);
+
+        // The recurring conflict appears earlier in the address book, but next-lesson clashes take precedence.
+        assertCommandFailure(new NextLessonCommand(INDEX_FIRST_PERSON, proposedNext), model, expectedError);
+        assertCommandFailure(new RecurringLessonCommand(INDEX_FIRST_PERSON, proposedRecurring), model, expectedError);
+    }
+
+    @Test
     public void nextLesson_hiddenRecurringConflict_rejectsWithoutChangingModel() {
         Person other = model.getFilteredPersonList().get(1);
         RecurringLesson rule = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 0), "Geometry", DURATION);
