@@ -171,6 +171,8 @@ Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker
 
 The lesson being replaced is excluded. When comparing a next lesson with the same student's recurring schedule, an exact weekday and start-time match represents the same occurrence and is allowed, even if the topic or duration differs. Other overlapping times are rejected.
 
+When loading saved next lessons, `JsonAdaptedNextLesson` compares the end of the occupied interval with the current local time. It retains ongoing lessons and discards lessons whose end time has been reached. `NextLesson.fromStoredValues` validates saved details without rejecting a past start; the normal constructor continues to reject past starts for new bookings. This keeps clash detection consistent across a restart during a lesson.
+
 The activity diagram below follows parsing, validation, clash rejection, and model updates for both scheduling commands. A rejected command leaves the student records and displayed list unchanged. The diagram ends when the command returns successfully; `LogicManager` then saves the address book through the normal Storage flow. Storage errors are outside this diagram's scope.
 
 <puml src="diagrams/TimetableClashActivityDiagram.puml" alt="Activity diagram for timetable-clash validation and model updates" />

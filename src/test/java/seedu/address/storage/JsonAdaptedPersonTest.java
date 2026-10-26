@@ -7,6 +7,7 @@ import static seedu.address.testutil.TypicalPersons.BENSON;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,6 +144,31 @@ public class JsonAdaptedPersonTest {
                 LocalDate.now().minusDays(1).toString(), "14:30", "Algebra", 90);
         JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
                 VALID_SCHOOL_LEVEL, null, expiredLesson, VALID_TAGS);
+
+        assertEquals(Optional.empty(), adapted.toModelType().getNextLesson());
+    }
+
+    @Test
+    public void toModelType_ongoingNextLesson_keepsOccupiedInterval() throws Exception {
+        LocalDateTime started = LocalDateTime.now().minusMinutes(10);
+        JsonAdaptedNextLesson ongoing = new JsonAdaptedNextLesson(started.toLocalDate().toString(),
+                started.toLocalTime().toString(), "Algebra", 60);
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, ongoing, VALID_TAGS);
+
+        NextLesson lesson = adapted.toModelType().getNextLesson().orElseThrow();
+
+        assertEquals(started, lesson.getDateTime());
+        assertEquals(started.plusMinutes(60), lesson.getEndDateTime());
+    }
+
+    @Test
+    public void toModelType_completedTodayNextLesson_clearsLesson() throws Exception {
+        LocalDateTime started = LocalDateTime.now().minusMinutes(90);
+        JsonAdaptedNextLesson completed = new JsonAdaptedNextLesson(started.toLocalDate().toString(),
+                started.toLocalTime().toString(), "Algebra", 60);
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, completed, VALID_TAGS);
 
         assertEquals(Optional.empty(), adapted.toModelType().getNextLesson());
     }

@@ -29,11 +29,18 @@ public class NextLesson {
      * @param duration lesson duration
      */
     public NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration) {
+        this(date, time, topic, duration, true);
+    }
+
+    /**
+     * Validates lesson details, additionally rejecting past starts for newly created bookings.
+     */
+    private NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration, boolean isNewBooking) {
         requireNonNull(date);
         requireNonNull(time);
         requireNonNull(topic);
         requireNonNull(duration);
-        if (isDateTimeInPast(date, time)) {
+        if (isNewBooking && isDateTimeInPast(date, time)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
         if (topic.isBlank()) {
@@ -43,6 +50,14 @@ public class NextLesson {
         this.time = time;
         this.topic = topic.trim();
         this.duration = duration;
+    }
+
+    /**
+     * Restores a saved booking without applying the new-booking start-time restriction.
+     * Storage remains responsible for discarding completed lessons.
+     */
+    public static NextLesson fromStoredValues(LocalDate date, LocalTime time, String topic, LessonDuration duration) {
+        return new NextLesson(date, time, topic, duration, false);
     }
 
     /**
@@ -59,6 +74,13 @@ public class NextLesson {
      */
     public LocalDateTime getDateTime() {
         return LocalDateTime.of(date, time);
+    }
+
+    /**
+     * Returns the end of the occupied interval, including lessons that cross midnight.
+     */
+    public LocalDateTime getEndDateTime() {
+        return getDateTime().plusMinutes(duration.getDurationMinutes());
     }
 
     @Override

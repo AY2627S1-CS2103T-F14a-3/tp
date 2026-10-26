@@ -1,6 +1,8 @@
 package seedu.address.storage;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
@@ -85,17 +87,16 @@ class JsonAdaptedNextLesson {
             throw new IllegalValueException(exception.getMessage(), exception);
         }
 
-        if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
-            // A past appointment is no longer the student's next lesson.
-            return Optional.empty();
-        }
-
         try {
-            return Optional.of(new NextLesson(modelDate, modelTime, topic, modelDuration));
-        } catch (IllegalArgumentException exception) {
-            if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
+            NextLesson lesson = NextLesson.fromStoredValues(modelDate, modelTime, topic, modelDuration);
+            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now())) {
+                // An ongoing lesson still occupies its timetable interval after restarting.
                 return Optional.empty();
             }
+            return Optional.of(lesson);
+        } catch (DateTimeException exception) {
+            throw new IllegalValueException(MESSAGE_INVALID_DATE_TIME, exception);
+        } catch (IllegalArgumentException exception) {
             throw new IllegalValueException(exception.getMessage(), exception);
         }
     }
