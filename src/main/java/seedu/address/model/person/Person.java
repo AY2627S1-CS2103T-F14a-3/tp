@@ -149,6 +149,30 @@ public class Person {
     }
 
     /**
+     * Returns a new person with {@code note}, preserving all other fields.
+     * An empty note clears the existing note; {@code note} must not be null.
+     */
+    public Person withNote(StudentNote note) {
+        return new Person(name, phone, email, address, schoolLevel, subject, note, nextLesson, recurringLesson, tags);
+    }
+
+    /**
+     * Returns a new person with {@code nextLesson}, preserving all other fields.
+     * Use {@link Optional#empty()} to clear the lesson; {@code nextLesson} must not be null.
+     */
+    public Person withNextLesson(Optional<NextLesson> nextLesson) {
+        return new Person(name, phone, email, address, schoolLevel, subject, note, nextLesson, recurringLesson, tags);
+    }
+
+    /**
+     * Returns a new person with {@code recurringLesson}, preserving all other fields.
+     * Use {@link Optional#empty()} to clear the lesson; {@code recurringLesson} must not be null.
+     */
+    public Person withRecurringLesson(Optional<RecurringLesson> recurringLesson) {
+        return new Person(name, phone, email, address, schoolLevel, subject, note, nextLesson, recurringLesson, tags);
+    }
+
+    /**
      * Returns true if both persons have the same name.
      * This defines a weaker notion of equality between two persons.
      */

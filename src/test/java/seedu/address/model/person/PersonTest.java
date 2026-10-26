@@ -2,6 +2,7 @@ package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_ADDRESS_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_EMAIL_BOB;
@@ -23,6 +24,103 @@ import org.junit.jupiter.api.Test;
 import seedu.address.testutil.PersonBuilder;
 
 public class PersonTest {
+
+    private static final NextLesson NEXT_LESSON = new NextLesson(LocalDate.of(2099, 6, 15),
+            LocalTime.of(14, 30), "Algebra", new LessonDuration("60"));
+    private static final RecurringLesson RECURRING_LESSON = new RecurringLesson(DayOfWeek.MONDAY,
+            LocalTime.of(14, 30), "Mathematics", new LessonDuration("90"));
+
+    @Test
+    public void withNote_replacesNote_preservesOtherFieldsAndOriginal() {
+        Person original = detailedPersonBuilder().withNextLesson(NEXT_LESSON)
+                .withRecurringLesson(RECURRING_LESSON).build();
+        Person snapshot = new PersonBuilder(original).build();
+
+        Person updated = original.withNote(new StudentNote("New note"));
+
+        assertNotSame(original, updated);
+        assertEquals(new PersonBuilder(original).withNote("New note").build(), updated);
+        assertEquals(snapshot, original);
+    }
+
+    @Test
+    public void withNote_emptyNote_clearsOnlyNote() {
+        Person original = detailedPersonBuilder().withNextLesson(NEXT_LESSON)
+                .withRecurringLesson(RECURRING_LESSON).build();
+        Person snapshot = new PersonBuilder(original).build();
+
+        Person updated = original.withNote(new StudentNote(""));
+
+        assertNotSame(original, updated);
+        assertEquals(new PersonBuilder(original).withNote("").build(), updated);
+        assertEquals(snapshot, original);
+    }
+
+    @Test
+    public void withNextLesson_setsLesson_preservesOtherFieldsAndOriginal() {
+        Person original = detailedPersonBuilder().withRecurringLesson(RECURRING_LESSON).build();
+        Person snapshot = new PersonBuilder(original).build();
+
+        Person updated = original.withNextLesson(Optional.of(NEXT_LESSON));
+
+        assertNotSame(original, updated);
+        assertEquals(new PersonBuilder(original).withNextLesson(NEXT_LESSON).build(), updated);
+        assertEquals(snapshot, original);
+    }
+
+    @Test
+    public void withNextLesson_emptyOptional_clearsOnlyNextLesson() {
+        Person expected = detailedPersonBuilder().withRecurringLesson(RECURRING_LESSON).build();
+        Person original = new PersonBuilder(expected).withNextLesson(NEXT_LESSON).build();
+        Person snapshot = new PersonBuilder(original).build();
+
+        Person updated = original.withNextLesson(Optional.empty());
+
+        assertNotSame(original, updated);
+        assertEquals(expected, updated);
+        assertEquals(snapshot, original);
+    }
+
+    @Test
+    public void withRecurringLesson_setsLesson_preservesOtherFieldsAndOriginal() {
+        Person original = detailedPersonBuilder().withNextLesson(NEXT_LESSON).build();
+        Person snapshot = new PersonBuilder(original).build();
+
+        Person updated = original.withRecurringLesson(Optional.of(RECURRING_LESSON));
+
+        assertNotSame(original, updated);
+        assertEquals(new PersonBuilder(original).withRecurringLesson(RECURRING_LESSON).build(), updated);
+        assertEquals(snapshot, original);
+    }
+
+    @Test
+    public void withRecurringLesson_emptyOptional_clearsOnlyRecurringLesson() {
+        Person expected = detailedPersonBuilder().withNextLesson(NEXT_LESSON).build();
+        Person original = new PersonBuilder(expected).withRecurringLesson(RECURRING_LESSON).build();
+        Person snapshot = new PersonBuilder(original).build();
+
+        Person updated = original.withRecurringLesson(Optional.empty());
+
+        assertNotSame(original, updated);
+        assertEquals(expected, updated);
+        assertEquals(snapshot, original);
+    }
+
+    @Test
+    public void copyMethods_null_throwsNullPointerException() {
+        Person original = detailedPersonBuilder().withNextLesson(NEXT_LESSON)
+                .withRecurringLesson(RECURRING_LESSON).build();
+
+        assertThrows(NullPointerException.class, () -> original.withNote(null));
+        assertThrows(NullPointerException.class, () -> original.withNextLesson(null));
+        assertThrows(NullPointerException.class, () -> original.withRecurringLesson(null));
+    }
+
+    /** Returns a builder with non-default academic, note, and tag values to detect accidental field resets. */
+    private PersonBuilder detailedPersonBuilder() {
+        return new PersonBuilder(ALICE).withSchoolLevel("Junior College 1").withSubject("Biology")
+                .withNote("Needs extra practice").withTags("priority", "friend");
+    }
 
     @Test
     public void asObservableList_modifyList_throwsUnsupportedOperationException() {
