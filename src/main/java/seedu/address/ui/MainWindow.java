@@ -47,6 +47,9 @@ public class MainWindow extends UiPart<Stage> {
     private StackPane personListPanelPlaceholder;
 
     @FXML
+    private StackPane personDetailsPanelPlaceholder;
+
+    @FXML
     private StackPane resultDisplayPlaceholder;
 
     @FXML
@@ -181,6 +184,11 @@ public class MainWindow extends UiPart<Stage> {
             CommandResult commandResult = logic.execute(commandText);
             logger.info("Result: " + commandResult.getFeedbackToUser());
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
+
+            commandResult.getPersonToView().ifPresent(person -> {
+                PersonDetailsPanel personDetailsPanel = new PersonDetailsPanel(person);
+                personDetailsPanelPlaceholder.getChildren().setAll(personDetailsPanel.getRoot());
+            });
 
             if (commandResult.isShowHelp()) {
                 handleHelp();
