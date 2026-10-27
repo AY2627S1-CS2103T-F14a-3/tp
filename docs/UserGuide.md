@@ -125,7 +125,9 @@ Format: `view INDEX`
 * The complete record includes academic information, contact details, tags, next and recurring lessons, lesson topics, and the student's note.
 * Running another successful command clears the detail panel to avoid showing information that may no longer be current.
 
-Example: `view 2` displays the complete record of the second student in the current list.
+Example: `view 1` displays the complete record of the first student in the current list.
+
+![result for 'view 1'](images/viewAlex.png)
 
 ### Viewing the earliest upcoming lesson: `upcoming`
 
