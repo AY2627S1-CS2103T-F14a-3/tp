@@ -1,11 +1,9 @@
 package seedu.address.ui;
 
-import java.util.Comparator;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import seedu.address.model.person.Person;
@@ -36,25 +34,11 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label phone;
     @FXML
-    private Label address;
-    @FXML
-    private Label email;
-    @FXML
-    private Label schoolLevel;
-    @FXML
-    private Label subject;
-    @FXML
-    private Label note;
+    private Label academicInfo;
     @FXML
     private Label nextLesson;
     @FXML
-    private Label nextLessonTopic;
-    @FXML
     private Label recurringLesson;
-    @FXML
-    private Label recurringLessonTopic;
-    @FXML
-    private FlowPane tags;
 
     /**
      * Creates a {@code PersonCard} with the given {@code Person} and index to display.
@@ -64,23 +48,12 @@ public class PersonCard extends UiPart<Region> {
         this.person = person;
         id.setText(displayedIndex + ". ");
         name.setText(person.getName().fullName);
-        phone.setText(person.getPhone().value);
-        address.setText(person.getAddress().value);
-        email.setText(person.getEmail().value);
-        schoolLevel.setText("Level: " + person.getSchoolLevel().value);
-        subject.setText(PersonCardFormatter.formatSubject(person.getSubject()));
-        PersonCardFormatter.LessonDisplay lessonDisplay =
-                PersonCardFormatter.formatNextLesson(person.getNextLesson());
-        nextLesson.setText(lessonDisplay.lessonText());
-        setOptionalLabel(nextLessonTopic, lessonDisplay.topicText());
-        PersonCardFormatter.LessonDisplay recurringLessonDisplay =
-                PersonCardFormatter.formatRecurringLesson(person.getRecurringLesson());
-        recurringLesson.setText(recurringLessonDisplay.lessonText());
-        setOptionalLabel(recurringLessonTopic, recurringLessonDisplay.topicText());
-        setOptionalLabel(note, PersonCardFormatter.formatNote(person.getNote()));
-        person.getTags().stream()
-                .sorted(Comparator.comparing(tag -> tag.tagName))
-                .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+        phone.setText("Phone: " + person.getPhone().value);
+        setOptionalLabel(academicInfo, PersonCardFormatter.formatSummaryAcademicInfo(
+                person.getSchoolLevel(), person.getSubject()));
+        setOptionalLabel(nextLesson, PersonCardFormatter.formatNextLessonSummary(person.getNextLesson()));
+        setOptionalLabel(recurringLesson,
+                PersonCardFormatter.formatRecurringLessonSummary(person.getRecurringLesson()));
     }
 
     /**

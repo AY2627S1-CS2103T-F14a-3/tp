@@ -501,6 +501,20 @@
     -fx-text-fill: #647182;
 }
 
+.summary-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-border-color: #DDE3E8;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.summary-academic-label {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 13px;
+    -fx-text-fill: #17213A;
+}
+
 .command-box-container {
     -fx-background-color: transparent;
 }
