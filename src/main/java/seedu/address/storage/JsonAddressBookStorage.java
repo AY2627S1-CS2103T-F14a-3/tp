@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -22,9 +23,21 @@ public class JsonAddressBookStorage {
     private static final Logger logger = LogsCenter.getLogger(JsonAddressBookStorage.class);
 
     private Path filePath;
+    private final Clock clock;
 
+    /**
+     * Creates storage using the computer's local time zone for saved lessons.
+     */
     public JsonAddressBookStorage(Path filePath) {
+        this(filePath, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates storage that evaluates saved lessons against the supplied clock.
+     */
+    public JsonAddressBookStorage(Path filePath, Clock clock) {
         this.filePath = filePath;
+        this.clock = requireNonNull(clock);
     }
 
     public Path getAddressBookFilePath() {
@@ -57,7 +70,7 @@ public class JsonAddressBookStorage {
         }
 
         try {
-            return Optional.of(jsonAddressBook.get().toModelType());
+            return Optional.of(jsonAddressBook.get().toModelType(clock));
         } catch (IllegalValueException ive) {
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
             throw new DataLoadingException(ive);

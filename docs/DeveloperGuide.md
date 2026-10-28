@@ -125,7 +125,6 @@ How the parsing works:
 ### Model component
 **API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
 
-<puml src="diagrams/ModelClassDiagram.puml" width="450" />
 
 
 The `Model` component,
@@ -172,12 +171,28 @@ The student list uses `PersonCard` to show a concise summary containing the stud
 The `view INDEX` command parses an index relative to the current filtered list. `ViewCommand` rejects an index outside that list and otherwise places the selected immutable `Person` in the returned `CommandResult`. It does not modify the model or storage data.
 
 `MainWindow` reads the optional selected person from `CommandResult` and creates a `PersonDetailsPanel` in the right-hand side of the split layout. The panel shows the student's complete academic, contact, scheduling, tag, and note information. A later successful non-view command restores the prompt, preventing an edited or deleted student's old record from remaining visible.
+### Lesson priority and ordering
+
+The following class diagram shows the model and logic classes involved in the `sort` and `upcoming` commands.
+Only members relevant to lesson priority are shown.
+
+<puml src="diagrams/LessonPriorityClassDiagram.puml" alt="Classes and relationships for lesson priority and ordering" width="760" />
+
+* `SortCommand` passes `Person.COMPARATOR_BY_NEXT_LESSON` to `Model.sortPersons(...)`, then resets the filter to show all students.
+  The comparator orders students by their next lesson's start time, placing students without a next lesson last.
+  `ModelManager` delegates sorting to the address book; the storage-list classes are omitted from this focused diagram.
+* `UpcomingCommand` reads all students through `Model.getAddressBook()`, finds the earliest next lesson at or after the current time,
+  and updates the filter to show every student whose lesson starts at that time. If none exists, it reports an error.
+* `Person` may reference one `NextLesson`. `NextLesson.getDateTime()` supplies the start time used by both commands.
+  Recurring schedules do not participate directly in these priority calculations.
 
 ### Timetable-clash detection
 
 Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
 
 The lesson being replaced is excluded. When comparing a next lesson with the same student's recurring schedule, an exact weekday and start-time match represents the same occurrence and is allowed, even if the topic or duration differs. Other overlapping times are rejected.
+
+When loading saved next lessons, `JsonAdaptedNextLesson` compares the end of the occupied interval with the current local time. It retains ongoing lessons and discards lessons whose end time has been reached. `NextLesson.fromStoredValues` validates saved details without rejecting a past start; the normal constructor continues to reject past starts for new bookings. This keeps clash detection consistent across a restart during a lesson.
 
 The activity diagram below follows parsing, validation, clash rejection, and model updates for both scheduling commands. A rejected command leaves the student records and displayed list unchanged. The diagram ends when the command returns successfully; `LogicManager` then saves the address book through the normal Storage flow. Storage errors are outside this diagram's scope.
 

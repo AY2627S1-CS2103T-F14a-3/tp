@@ -62,7 +62,7 @@ public class RecurringLessonCommand extends Command {
             Person conflictingStudent = nextConflict.orElseThrow();
             NextLesson lesson = conflictingStudent.getNextLesson().orElseThrow();
             logger.info("Rejected recurring lesson: next-lesson overlap detected; student data unchanged.");
-            throw new CommandException(String.format(NextLessonCommand.MESSAGE_LESSON_CLASH,
+            throw new CommandException(String.format(Messages.MESSAGE_LESSON_CLASH,
                     conflictingStudent.getName().fullName, lesson.date, lesson.time,
                     lesson.duration.getDurationMinutes()));
         }
