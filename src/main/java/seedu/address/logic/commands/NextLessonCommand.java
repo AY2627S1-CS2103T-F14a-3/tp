@@ -31,8 +31,6 @@ public class NextLessonCommand extends Command {
             + " 1 date/2026-12-11 time/14:30 dur/90 topic/Algebra";
     public static final String MESSAGE_NEXT_LESSON_UPDATED =
             "Updated next lesson for %1$s to %2$s at %3$s for %4$d minutes: %5$s";
-    public static final String MESSAGE_LESSON_CLASH = "Cannot schedule lesson: conflicts with %1$s's next lesson "
-            + "on %2$s at %3$s for %4$d minutes.";
 
     private static final Logger logger = LogsCenter.getLogger(NextLessonCommand.class);
 
@@ -67,8 +65,8 @@ public class NextLessonCommand extends Command {
             Person conflictingStudent = conflict.orElseThrow();
             NextLesson conflictingLesson = conflictingStudent.getNextLesson().orElseThrow();
             logger.info("Rejected next lesson: timetable overlap detected; student data unchanged.");
-            throw new CommandException(String.format(MESSAGE_LESSON_CLASH, conflictingStudent.getName().fullName,
-                    conflictingLesson.date, conflictingLesson.time,
+            throw new CommandException(String.format(Messages.MESSAGE_LESSON_CLASH,
+                    conflictingStudent.getName().fullName, conflictingLesson.date, conflictingLesson.time,
                     conflictingLesson.duration.getDurationMinutes()));
         }
         Optional<Person> recurringConflict = TimetableClashChecker.findRecurringLessonClash(student, nextLesson,
