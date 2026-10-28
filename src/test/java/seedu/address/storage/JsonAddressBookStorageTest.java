@@ -9,6 +9,7 @@ import static seedu.address.testutil.TypicalPersons.IDA;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -44,6 +45,26 @@ public class JsonAddressBookStorageTest {
     @Test
     public void read_missingFile_emptyResult() throws Exception {
         assertFalse(readAddressBook("NonExistentFile.json").isPresent());
+    }
+
+    @Test
+    public void readAddressBook_jsonNull_throwsDataLoadingExceptionWithoutChangingFile() throws Exception {
+        Path filePath = testFolder.resolve("nullAddressBook.json");
+        String contents = " \n null \n ";
+        Files.writeString(filePath, contents);
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+        assertEquals(contents, Files.readString(filePath));
+    }
+
+    @Test
+    public void readAddressBook_validEmptyAddressBook_returnsPresentEmptyBook() throws Exception {
+        Path filePath = testFolder.resolve("emptyAddressBook.json");
+        Files.writeString(filePath, "{\"persons\": []}");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        assertEquals(new AddressBook(), new AddressBook(storage.readAddressBook().orElseThrow()));
     }
 
     @Test
