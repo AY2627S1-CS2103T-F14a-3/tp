@@ -1,5 +1,6 @@
 package seedu.address.logic.commands;
 
+import static java.util.Locale.ROOT;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
@@ -42,6 +43,34 @@ public class AddCommandIntegrationTest {
     public void execute_duplicatePerson_throwsCommandException() {
         Person personInList = model.getAddressBook().getPersonList().get(0);
         assertCommandFailure(new AddCommand(personInList), model,
+                AddCommand.MESSAGE_DUPLICATE_PERSON);
+    }
+
+    @Test
+    public void execute_personWithNameDifferentOnlyInCase_throwsCommandException() {
+        Person personInList = model.getAddressBook().getPersonList().get(0);
+        Person duplicatePerson = new PersonBuilder(personInList)
+                .withName(personInList.getName().fullName.toLowerCase(ROOT))
+                .withPhone("84444444")
+                .withEmail("alice2@example.com")
+                .withAddress("4 Duplicate Road")
+                .build();
+
+        assertCommandFailure(new AddCommand(duplicatePerson), model,
+                AddCommand.MESSAGE_DUPLICATE_PERSON);
+    }
+
+    @Test
+    public void execute_personWithRepeatedSpacesInName_throwsCommandException() {
+        Person personInList = model.getAddressBook().getPersonList().get(0);
+        Person duplicatePerson = new PersonBuilder(personInList)
+                .withName(personInList.getName().fullName.replace(" ", "  "))
+                .withPhone("85555555")
+                .withEmail("alice3@example.com")
+                .withAddress("5 Duplicate Road")
+                .build();
+
+        assertCommandFailure(new AddCommand(duplicatePerson), model,
                 AddCommand.MESSAGE_DUPLICATE_PERSON);
     }
 

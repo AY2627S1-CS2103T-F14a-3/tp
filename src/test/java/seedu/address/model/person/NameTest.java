@@ -39,6 +39,17 @@ public class NameTest {
     }
 
     @Test
+    public void isSameName() {
+        Name name = new Name("Alice Alpha");
+
+        assertTrue(name.isSameName(new Name("Alice Alpha")));
+        assertTrue(name.isSameName(new Name("alice alpha")));
+        assertTrue(name.isSameName(new Name("Alice  Alpha")));
+        assertFalse(name.isSameName(new Name("Alice Beta")));
+        assertFalse(name.isSameName(null));
+    }
+
+    @Test
     public void equals() {
         Name name = new Name("Valid Name");
 
