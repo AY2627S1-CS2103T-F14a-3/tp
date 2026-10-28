@@ -208,6 +208,7 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 * If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
 * Replacing a student's next lesson ignores that student's old next lesson. The student's own recurring lesson is still checked: an exact weekday and start-time match is allowed as the same occurrence, even if the topic or duration differs; other overlapping times are rejected.
 * The lesson is saved with the student and displayed on the student card. Updating it preserves the student's other details, including notes and tags.
+* Restarting keeps lessons that are still ongoing, so their remaining time cannot be double-booked. Saved lessons are cleared on loading only when their end time has been reached. This does not allow creating new lessons with a past start time.
 
 Example: `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra` schedules a 90-minute algebra lesson for the first displayed student.
 

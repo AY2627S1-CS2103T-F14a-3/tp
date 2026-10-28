@@ -37,6 +37,35 @@ public class NextLessonTest {
     }
 
     @Test
+    public void fromStoredValues_ongoingLesson_preservesPastStartAndDuration() {
+        LocalDateTime start = LocalDateTime.now().minusMinutes(10);
+
+        NextLesson lesson = NextLesson.fromStoredValues(start.toLocalDate(), start.toLocalTime(),
+                VALID_TOPIC, VALID_DURATION);
+
+        assertEquals(start, lesson.getDateTime());
+        assertEquals(start.plusMinutes(60), lesson.getEndDateTime());
+        Assert.assertThrows(IllegalArgumentException.class, NextLesson.MESSAGE_DATE_TIME_CONSTRAINTS, () ->
+                new NextLesson(start.toLocalDate(), start.toLocalTime(), VALID_TOPIC, VALID_DURATION));
+    }
+
+    @Test
+    public void fromStoredValues_crossesMidnight_computesEndOnNextDay() {
+        LocalDate startDate = LocalDate.of(2020, 1, 1);
+
+        NextLesson lesson = NextLesson.fromStoredValues(startDate, LocalTime.of(23, 30),
+                VALID_TOPIC, VALID_DURATION);
+
+        assertEquals(LocalDateTime.of(2020, 1, 2, 0, 30), lesson.getEndDateTime());
+    }
+
+    @Test
+    public void fromStoredValues_blankTopic_isRejected() {
+        Assert.assertThrows(IllegalArgumentException.class, NextLesson.MESSAGE_TOPIC_CONSTRAINTS, () ->
+                NextLesson.fromStoredValues(VALID_DATE, VALID_TIME, " ", VALID_DURATION));
+    }
+
+    @Test
     public void constructor_futureDateTime_succeeds() {
         NextLesson lesson = new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, VALID_DURATION);
 
