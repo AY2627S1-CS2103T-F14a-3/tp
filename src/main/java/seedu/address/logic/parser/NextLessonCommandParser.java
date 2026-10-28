@@ -23,7 +23,6 @@ import seedu.address.model.person.NextLesson;
 public class NextLessonCommandParser implements Parser<NextLessonCommand> {
 
     private static final String MESSAGE_INVALID_DATE = "Lesson date must be a valid date in YYYY-MM-DD format.";
-    private static final String MESSAGE_INVALID_TIME = "Lesson time must be a valid time in HH:mm format.";
 
     @Override
     public NextLessonCommand parse(String args) throws ParseException {
@@ -51,7 +50,7 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
         }
 
         LocalDate date = parseDate(argMultimap.getValue(PREFIX_LESSON_DATE).orElseThrow());
-        LocalTime time = parseTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
+        LocalTime time = ParserUtil.parseLessonTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
         LessonDuration duration = ParserUtil.parseLessonDuration(
                 argMultimap.getValue(PREFIX_LESSON_DURATION).orElseThrow());
         try {
@@ -70,17 +69,6 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
             return LocalDate.parse(date);
         } catch (DateTimeParseException e) {
             throw new ParseException(MESSAGE_INVALID_DATE, e);
-        }
-    }
-
-    private LocalTime parseTime(String time) throws ParseException {
-        if (!time.matches("\\d{2}:\\d{2}")) {
-            throw new ParseException(MESSAGE_INVALID_TIME);
-        }
-        try {
-            return LocalTime.parse(time);
-        } catch (DateTimeParseException e) {
-            throw new ParseException(MESSAGE_INVALID_TIME, e);
         }
     }
 }
