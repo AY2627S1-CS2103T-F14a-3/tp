@@ -289,7 +289,7 @@ TutorTrack automatically saves data after every command. You do not need to save
 
 ### Editing the data file
 
-TutorTrack data is saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
+TutorTrack data is saved automatically as a JSON file `data/addressbook.json`, located inside the folder you launch TutorTrack from (its current working directory). `preferences.json` and the log file are created there too. To keep using the same data, always start TutorTrack from the same folder. Advanced users are welcome to update data directly by editing that data file.
 
 <box type="warning" seamless>
 
@@ -334,3 +334,7 @@ Action     | Format and Examples
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
 **Exit**   | `exit`
+**Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
+**Note** | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
+**Help** | `help`
+**Exit** | `exit`
