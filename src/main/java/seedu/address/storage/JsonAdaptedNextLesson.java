@@ -70,6 +70,7 @@ class JsonAdaptedNextLesson {
      */
     Optional<NextLesson> toModelType(Clock clock) throws IllegalValueException {
         requireNonNull(clock);
+        Clock loadClock = Clock.fixed(clock.instant(), clock.getZone());
         if (date == null) {
             throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "date"));
         }
@@ -100,8 +101,8 @@ class JsonAdaptedNextLesson {
 
         try {
             NextLesson lesson = NextLesson.fromStoredValues(modelDate, modelTime, topic, modelDuration);
-            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now(clock))) {
-                // An ongoing lesson still occupies its timetable interval after restarting.
+            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now(loadClock))) {
+                // A completed lesson no longer occupies its timetable interval.
                 return Optional.empty();
             }
             return Optional.of(lesson);
