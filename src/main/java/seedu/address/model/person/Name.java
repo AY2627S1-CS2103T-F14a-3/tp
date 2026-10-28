@@ -42,7 +42,7 @@ public class Name {
 
     /**
      * Returns true if both names are equivalent for duplicate detection.
-     * Comparison is case-insensitive and treats consecutive spaces as one space.
+     * Comparison is case-insensitive, ignores surrounding spaces, and treats consecutive spaces as one space.
      */
     public boolean isSameName(Name otherName) {
         if (otherName == null) {
@@ -53,7 +53,7 @@ public class Name {
     }
 
     private static String normalizeForComparison(String name) {
-        return name.replaceAll(" +", " ").toLowerCase(Locale.ROOT);
+        return name.trim().replaceAll(" +", " ").toLowerCase(Locale.ROOT);
     }
 
 
