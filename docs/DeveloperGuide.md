@@ -155,6 +155,12 @@ The `Storage` component,
 * is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
 
+JSON saving serializes the complete data before writing a temporary file in the destination directory. The file is
+then moved over the destination atomically where supported. If atomic moves are unsupported, saving falls back to
+a regular replacement move; this fallback does not guarantee atomicity. Temporary files are removed after handled
+write or move failures. This protects existing data from incomplete temporary writes, but is not a guarantee against
+power loss or all filesystem failures. The same saving path is used for student records and user preferences.
+
 ### Common classes
 
 Classes used by multiple components are in the `seedu.address.commons` package.
