@@ -37,11 +37,19 @@ public class NextLesson {
      * Constructs a new booking, validating its start against the supplied clock.
      */
     public NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration, Clock clock) {
+        this(date, time, topic, duration, true, clock);
+    }
+
+    /**
+     * Validates lesson details, additionally rejecting past starts for newly created bookings.
+     */
+    private NextLesson(LocalDate date, LocalTime time, String topic, LessonDuration duration,
+            boolean isNewBooking, Clock clock) {
         requireNonNull(date);
         requireNonNull(time);
         requireNonNull(topic);
         requireNonNull(duration);
-        if (isDateTimeInPast(date, time, clock)) {
+        if (isNewBooking && isDateTimeInPast(date, time, clock)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
         if (topic.isBlank()) {
@@ -51,6 +59,14 @@ public class NextLesson {
         this.time = time;
         this.topic = topic.trim();
         this.duration = duration;
+    }
+
+    /**
+     * Restores a saved booking without applying the new-booking start-time restriction.
+     * Storage remains responsible for discarding completed lessons.
+     */
+    public static NextLesson fromStoredValues(LocalDate date, LocalTime time, String topic, LessonDuration duration) {
+        return new NextLesson(date, time, topic, duration, false, Clock.systemDefaultZone());
     }
 
     /**
@@ -75,6 +91,13 @@ public class NextLesson {
      */
     public LocalDateTime getDateTime() {
         return LocalDateTime.of(date, time);
+    }
+
+    /**
+     * Returns the end of the occupied interval, including lessons that cross midnight.
+     */
+    public LocalDateTime getEndDateTime() {
+        return getDateTime().plusMinutes(duration.getDurationMinutes());
     }
 
     @Override

@@ -12,6 +12,8 @@ import seedu.address.model.person.Person;
  */
 public class Messages {
 
+    public static final String MESSAGE_LESSON_CLASH = "Cannot schedule lesson: conflicts with %1$s's next lesson "
+            + "on %2$s at %3$s for %4$d minutes.";
     public static final String MESSAGE_RECURRING_LESSON_CLASH =
             "Cannot schedule lesson: conflicts with %1$s's recurring lesson every %2$s at %3$s for %4$d minutes.";
 

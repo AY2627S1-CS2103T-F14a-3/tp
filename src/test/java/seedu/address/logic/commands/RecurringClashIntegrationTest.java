@@ -51,7 +51,7 @@ public class RecurringClashIntegrationTest {
 
         RecurringLesson proposed = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(15, 0), "Algebra", DURATION);
         assertCommandFailure(new RecurringLessonCommand(INDEX_FIRST_PERSON, proposed), model,
-                String.format(NextLessonCommand.MESSAGE_LESSON_CLASH, other.getName().fullName,
+                String.format(Messages.MESSAGE_LESSON_CLASH, other.getName().fullName,
                         next.date, next.time, next.duration.getDurationMinutes()));
     }
 
@@ -89,7 +89,7 @@ public class RecurringClashIntegrationTest {
         model.setPerson(student, scheduled);
         assertCommandFailure(new NextLessonCommand(INDEX_FIRST_PERSON, next), model, recurringError(student, rule));
         assertCommandFailure(new RecurringLessonCommand(INDEX_FIRST_PERSON, rule), model,
-                String.format(NextLessonCommand.MESSAGE_LESSON_CLASH, student.getName().fullName,
+                String.format(Messages.MESSAGE_LESSON_CLASH, student.getName().fullName,
                         next.date, next.time, next.duration.getDurationMinutes()));
     }
 
