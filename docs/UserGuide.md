@@ -331,10 +331,7 @@ Action     | Format and Examples
 **Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
 **Recurring lesson** | `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `recurringlesson 1 day/MONDAY time/16:30 dur/90 topic/Algebra`
 **Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
+**Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
 **Exit**   | `exit`
-**Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
-**Note** | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
-**Help** | `help`
-**Exit** | `exit`
