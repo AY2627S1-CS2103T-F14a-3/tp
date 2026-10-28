@@ -165,6 +165,16 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Upcoming lesson selection
+
+`UpcomingCommand` takes one local-time snapshot from its clock and compares each student's future next lesson
+with the next start of their recurring schedule. `RecurringLesson#getNextOccurrence(...)` uses the next matching
+weekday, including today, and advances one week if that start has passed. The command searches all student records
+and filters the displayed list to students whose earliest start matches the overall minimum. A student appears only
+once when both lesson types represent the same occurrence. Selection does not change records, lesson schedules,
+or their saved order. The same time snapshot is retained by the displayed-list predicate until another command
+changes the filter; rerun `upcoming` to refresh the selection. A supplied `Clock` allows deterministic boundary tests.
+
 ### Timetable-clash detection
 
 Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
