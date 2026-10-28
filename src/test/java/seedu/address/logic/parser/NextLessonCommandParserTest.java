@@ -56,6 +56,14 @@ public class NextLessonCommandParserTest {
     }
 
     @Test
+    public void parse_topicBeforeRequiredPrefix_failure() {
+        String futureDate = LocalDate.now().plusDays(1).toString();
+
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 topic/Algebra dur/90",
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
+    }
+
+    @Test
     public void parse_invalidIndex_failure() {
         assertParseFailure(parser, "zero date/2026-10-11 time/14:30 dur/90 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));

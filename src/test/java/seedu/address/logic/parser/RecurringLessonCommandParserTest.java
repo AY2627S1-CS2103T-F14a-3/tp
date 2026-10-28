@@ -72,6 +72,13 @@ public class RecurringLessonCommandParserTest {
     }
 
     @Test
+    public void parse_topicBeforeRequiredPrefix_failure() {
+        String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, RecurringLessonCommand.MESSAGE_USAGE);
+
+        assertParseFailure(parser, "1 day/MONDAY time/16:30 topic/Algebra dur/90", expectedMessage);
+    }
+
+    @Test
     public void parse_invalidIndex_failure() {
         assertParseFailure(parser, "zero day/MONDAY time/16:30 dur/90 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, RecurringLessonCommand.MESSAGE_USAGE));
