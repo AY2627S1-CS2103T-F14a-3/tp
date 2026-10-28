@@ -28,6 +28,8 @@ public class ViewCommand extends Command {
     private final Index targetIndex;
 
     public ViewCommand(Index targetIndex) {
+        requireNonNull(targetIndex);
+
         this.targetIndex = targetIndex;
     }
 
