@@ -79,6 +79,18 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseName_hyphenatedName_returnsName() throws Exception {
+        String hyphenatedName = "Anne-Marie Tan";
+        assertEquals(new Name(hyphenatedName), ParserUtil.parseName(hyphenatedName));
+    }
+
+    @Test
+    public void parseName_nameWithApostrophe_returnsName() throws Exception {
+        String nameWithApostrophe = "Sean O'Connor";
+        assertEquals(new Name(nameWithApostrophe), ParserUtil.parseName(nameWithApostrophe));
+    }
+
+    @Test
     public void parsePhone_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> ParserUtil.parsePhone((String) null));
     }
