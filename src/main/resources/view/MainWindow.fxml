@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <fx:root type="javafx.stage.Stage" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-         title="TutorTrack" minWidth="850" minHeight="500" onCloseRequest="#handleExit">
+         title="TutorTrack" minWidth="640" minHeight="500" onCloseRequest="#handleExit">
   <icons>
     <Image url="@/images/address_book_32.png" />
   </icons>
@@ -49,13 +49,13 @@
 
         <SplitPane dividerPositions="0.36" styleClass="main-content" VBox.vgrow="ALWAYS">
           <items>
-            <VBox fx:id="personList" styleClass="pane-with-border" minWidth="300" prefWidth="380">
+            <VBox fx:id="personList" styleClass="pane-with-border" minWidth="220" prefWidth="380">
               <padding>
                 <Insets top="10" right="10" bottom="10" left="10" />
               </padding>
               <StackPane fx:id="personListPanelPlaceholder" VBox.vgrow="ALWAYS" />
             </VBox>
-            <StackPane fx:id="personDetailsPanelPlaceholder" minWidth="400" styleClass="details-placeholder">
+            <StackPane fx:id="personDetailsPanelPlaceholder" minWidth="280" styleClass="details-placeholder">
               <Label text="Enter 'view INDEX' to view a student's full details."
                      styleClass="details-placeholder-text" wrapText="true" />
             </StackPane>
