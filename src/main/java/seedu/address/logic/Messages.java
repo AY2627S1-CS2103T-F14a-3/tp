@@ -23,6 +23,13 @@ public class Messages {
                 "Multiple values specified for the following single-valued field(s): ";
 
     /**
+     * Formats a lesson duration with the correct singular or plural minute unit.
+     */
+    public static String formatLessonDuration(int durationMinutes) {
+        return durationMinutes + (durationMinutes == 1 ? " minute" : " minutes");
+    }
+
+    /**
      * Returns an error message indicating the duplicate prefixes.
      */
     public static String getErrorMessageForDuplicatePrefixes(Prefix... duplicatePrefixes) {

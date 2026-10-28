@@ -27,7 +27,7 @@ public class RecurringLessonCommand extends Command {
             + "DAY must be a day of the week, such as MONDAY.\n"
             + "Example: " + COMMAND_WORD + " 1 day/MONDAY time/16:30 dur/90 topic/Algebra";
     public static final String MESSAGE_RECURRING_LESSON_UPDATED =
-            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$d %5$s: %6$s";
+            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$s: %5$s";
 
     private static final Logger logger = LogsCenter.getLogger(RecurringLessonCommand.class);
 
@@ -82,10 +82,9 @@ public class RecurringLessonCommand extends Command {
         model.setPerson(student, updatedStudent);
         model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
 
-        int durationMinutes = recurringLesson.getDuration().getDurationMinutes();
-        String durationUnit = durationMinutes == 1 ? "minute" : "minutes";
         return new CommandResult(String.format(MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
-                recurringLesson.getDay(), recurringLesson.getTime(), durationMinutes, durationUnit,
+                recurringLesson.getDay(), recurringLesson.getTime(),
+                Messages.formatLessonDuration(recurringLesson.getDuration().getDurationMinutes()),
                 recurringLesson.getTopic()));
     }
 

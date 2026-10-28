@@ -153,7 +153,7 @@ public class RecurringLessonCommandTest {
 
     private String getExpectedSuccessMessage(Person student, RecurringLesson lesson) {
         return String.format(RecurringLessonCommand.MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
-                lesson.getDay(), lesson.getTime(), lesson.getDuration().getDurationMinutes(), "minutes",
-                lesson.getTopic());
+                lesson.getDay(), lesson.getTime(),
+                Messages.formatLessonDuration(lesson.getDuration().getDurationMinutes()), lesson.getTopic());
     }
 }

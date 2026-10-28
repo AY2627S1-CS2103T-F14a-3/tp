@@ -56,8 +56,8 @@ public class NextLessonCommandTest {
 
         assertCommandSuccess(new NextLessonCommand(INDEX_FIRST_PERSON, proposed), model,
                 String.format(NextLessonCommand.MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                        proposed.date, proposed.time, proposed.duration.getDurationMinutes(), "minutes",
-                        proposed.topic),
+                        proposed.date, proposed.time,
+                        Messages.formatLessonDuration(proposed.duration.getDurationMinutes()), proposed.topic),
                 expectedModel);
     }
 
@@ -108,7 +108,8 @@ public class NextLessonCommandTest {
 
         assertCommandSuccess(new NextLessonCommand(INDEX_FIRST_PERSON, newLesson), model,
                 String.format(NextLessonCommand.MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                        newLesson.date, newLesson.time, DURATION.getDurationMinutes(), "minutes", newLesson.topic),
+                        newLesson.date, newLesson.time,
+                        Messages.formatLessonDuration(DURATION.getDurationMinutes()), newLesson.topic),
                 expectedModel);
     }
 
@@ -123,7 +124,8 @@ public class NextLessonCommandTest {
 
         assertCommandSuccess(new NextLessonCommand(INDEX_FIRST_PERSON, lesson), model,
                 String.format(NextLessonCommand.MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                        lesson.date, lesson.time, DURATION.getDurationMinutes(), "minutes", lesson.topic),
+                        lesson.date, lesson.time,
+                        Messages.formatLessonDuration(DURATION.getDurationMinutes()), lesson.topic),
                 expectedModel);
     }
 
@@ -139,7 +141,8 @@ public class NextLessonCommandTest {
 
         assertCommandSuccess(new NextLessonCommand(INDEX_FIRST_PERSON, lesson), model,
                 String.format(NextLessonCommand.MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                        lesson.date, lesson.time, DURATION.getDurationMinutes(), "minutes", lesson.topic),
+                        lesson.date, lesson.time,
+                        Messages.formatLessonDuration(DURATION.getDurationMinutes()), lesson.topic),
                 expectedModel);
     }
 
