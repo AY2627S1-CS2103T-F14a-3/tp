@@ -5,10 +5,12 @@ import static seedu.address.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORM
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 
+import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -160,6 +162,21 @@ public class JsonAdaptedPersonTest {
 
         assertEquals(started, lesson.getDateTime());
         assertEquals(started.plusMinutes(60), lesson.getEndDateTime());
+    }
+
+    @Test
+    public void toModelType_nextLessonEndBoundary_keepsBeforeEndAndDiscardsAtEnd() throws Exception {
+        LocalDateTime start = LocalDateTime.of(2030, 6, 17, 9, 0);
+        LocalDateTime end = start.plusMinutes(60);
+        JsonAdaptedNextLesson stored = new JsonAdaptedNextLesson(
+                start.toLocalDate().toString(), start.toLocalTime().toString(), "Algebra", 60);
+        NextLesson expected = NextLesson.fromStoredValues(start.toLocalDate(), start.toLocalTime(),
+                "Algebra", new LessonDuration("60"));
+        Clock justBeforeEnd = Clock.fixed(end.minusNanos(1).toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+        Clock exactlyAtEnd = Clock.fixed(end.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+
+        assertEquals(Optional.of(expected), stored.toModelType(justBeforeEnd));
+        assertEquals(Optional.empty(), stored.toModelType(exactlyAtEnd));
     }
 
     @Test

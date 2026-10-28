@@ -1,5 +1,8 @@
 package seedu.address.storage;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,6 +62,14 @@ class JsonAdaptedNextLesson {
      * @throws IllegalValueException if the lesson details are malformed.
      */
     Optional<NextLesson> toModelType() throws IllegalValueException {
+        return toModelType(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Restores a saved lesson using the supplied clock to decide whether it has ended.
+     */
+    Optional<NextLesson> toModelType(Clock clock) throws IllegalValueException {
+        requireNonNull(clock);
         if (date == null) {
             throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "date"));
         }
@@ -89,7 +100,7 @@ class JsonAdaptedNextLesson {
 
         try {
             NextLesson lesson = NextLesson.fromStoredValues(modelDate, modelTime, topic, modelDuration);
-            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now())) {
+            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now(clock))) {
                 // An ongoing lesson still occupies its timetable interval after restarting.
                 return Optional.empty();
             }
