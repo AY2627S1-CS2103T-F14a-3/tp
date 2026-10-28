@@ -90,7 +90,7 @@ Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT
 **Tip:** A student can have any number of tags, including zero.
 </box>
 
-* The school level and subject are optional. If either is omitted, TutorTrack records it as `Not specified`.
+* The school level and subject are optional. If either is omitted, TutorTrack records it as `Not specified`. To return an existing student's academic fields to this state, use `edit` as described under [Editing a student](#editing-a-student-edit).
 
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
@@ -138,6 +138,8 @@ Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [l/SCHOOL_LEVEL] [s
 * Edits the student at the specified `INDEX`. The index refers to the index number shown in the displayed student list. The index **must be a positive integer** 1, 2, 3, ...
 * At least one of the optional fields must be provided.
 * Existing values will be updated to the input values.
+* Omitting `l/` or `s/` when editing keeps the existing school level or subject unchanged. To reset either field, explicitly enter `l/Not specified` or `s/Not specified`, using that exact capitalisation.
+* Empty academic values such as `edit 1 l/` and `edit 1 s/` are rejected with `School level must not be blank.` and `Subject must not be blank.` respectively. Unlike `t/`, an empty academic prefix does not clear the field.
 * When editing tags, all of the student's existing tags are removed; adding tags is not cumulative.
 * To remove all of a student's tags, enter `t/` without a tag after it.
 
@@ -146,6 +148,9 @@ Examples:
 *  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd student to be `Betsy Crower` and clears all existing tags.
 *  `edit 1 l/Junior College 1` Updates the school level of the 1st student.
 *  `edit 1 s/Physics` Updates the subject of the 1st student.
+*  `edit 1 s/Not specified` Resets only the subject of the 1st student, keeping the school level and other details unchanged.
+*  `edit 1 l/Not specified` Resets only the school level of the 1st student, keeping the subject and other details unchanged.
+*  `edit 1 l/Not specified s/Not specified` Resets both academic fields of the 1st student without deleting or recreating the student record.
 
 ### Locating students by name: `find`
 
