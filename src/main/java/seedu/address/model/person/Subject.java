@@ -29,7 +29,7 @@ public class Subject {
      * Returns true if a given string is a valid subject.
      */
     public static boolean isValidSubject(String test) {
-        return test != null && !test.trim().isEmpty();
+        return test != null && !test.trim().isBlank();
     }
 
     @Override

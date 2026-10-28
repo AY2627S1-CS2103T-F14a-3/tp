@@ -37,6 +37,15 @@ public class SubjectTest {
     }
 
     @Test
+    public void constructor_unicodeWhitespace_throwsIllegalArgumentException() {
+        for (String blank : new String[] {"\u2003", "\u3000", " \t\u2003\u3000 "}) {
+            assertFalse(Subject.isValidSubject(blank));
+            Assert.assertThrows(IllegalArgumentException.class, Subject.MESSAGE_CONSTRAINTS, () ->
+                    new Subject(blank));
+        }
+    }
+
+    @Test
     public void equals() {
         Subject subject = new Subject("Mathematics");
         assertTrue(subject.equals(subject));

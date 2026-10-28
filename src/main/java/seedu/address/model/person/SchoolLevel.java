@@ -29,7 +29,7 @@ public class SchoolLevel {
      * Returns true if a given string is a valid school level.
      */
     public static boolean isValidSchoolLevel(String test) {
-        return test != null && !test.trim().isEmpty();
+        return test != null && !test.trim().isBlank();
     }
 
     @Override
