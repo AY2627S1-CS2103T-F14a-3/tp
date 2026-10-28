@@ -167,6 +167,12 @@ This section describes some noteworthy details on how certain features are imple
 
 ### Timetable-clash detection
 
+Clash checks return an immutable `LessonClash<T>` containing the conflicting student and the exact next or
+recurring lesson selected during validation. Commands obtain the date or weekday, time, and duration from that
+result, rather than retrieving the lesson from the student again. The result carries existing immutable objects
+without copying records. Next-lesson conflicts retain precedence over recurring conflicts, and feedback wording
+and rejected-command state remain unchanged.
+
 Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
 
 The lesson being replaced is excluded. When comparing a next lesson with the same student's recurring schedule, an exact weekday and start-time match represents the same occurrence and is allowed, even if the topic or duration differs. Other overlapping times are rejected.

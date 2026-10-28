@@ -22,7 +22,8 @@ public class TimetableClashCheckerTest {
         Person other = new PersonBuilder().withName("Other Student")
                 .withNextLesson(lesson(DATE, 14, 0)).build();
         for (LocalTime time : List.of(LocalTime.of(13, 1), LocalTime.of(14, 0), LocalTime.of(14, 59))) {
-            assertEquals(Optional.of(other), TimetableClashChecker.findNextLessonClash(target,
+            assertEquals(Optional.of(new LessonClash<>(other, other.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target,
                     new NextLesson(DATE, time, "New topic", new LessonDuration("60")), List.of(target, other)));
         }
     }
@@ -41,14 +42,16 @@ public class TimetableClashCheckerTest {
     public void findNextLessonClash_crossMidnight_checksBothDirectionsAndAllowsBoundary() {
         Person lateStudent = new PersonBuilder().withName("Late Student")
                 .withNextLesson(lesson(DATE, 23, 30)).build();
-        assertEquals(Optional.of(lateStudent), TimetableClashChecker.findNextLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(lateStudent, lateStudent.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE.plusDays(1), 0, 15), List.of(lateStudent)));
         assertTrue(TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE.plusDays(1), 0, 30), List.of(lateStudent)).isEmpty());
 
         Person earlyStudent = new PersonBuilder().withName("Early Student")
                 .withNextLesson(lesson(DATE.plusDays(1), 0, 15)).build();
-        assertEquals(Optional.of(earlyStudent), TimetableClashChecker.findNextLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(earlyStudent, earlyStudent.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE, 23, 30), List.of(earlyStudent)));
     }
 
@@ -69,8 +72,9 @@ public class TimetableClashCheckerTest {
         Person longLesson = new PersonBuilder().withName("Long Lesson Student")
                 .withNextLesson(new NextLesson(DATE, LocalTime.of(14, 0), "Algebra", new LessonDuration("120")))
                 .build();
-        assertEquals(Optional.of(longLesson), TimetableClashChecker.findNextLessonClash(target,
-                new NextLesson(DATE, LocalTime.of(15, 30), "Geometry", new LessonDuration("15")),
+        assertEquals(Optional.of(new LessonClash<>(longLesson, longLesson.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target,
+                    new NextLesson(DATE, LocalTime.of(15, 30), "Geometry", new LessonDuration("15")),
                 List.of(longLesson)));
         assertTrue(TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE, 16, 0), List.of(longLesson)).isEmpty());
@@ -80,8 +84,9 @@ public class TimetableClashCheckerTest {
                 .build();
         assertTrue(TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE, 14, 15), List.of(shortLesson)).isEmpty());
-        assertEquals(Optional.of(shortLesson), TimetableClashChecker.findNextLessonClash(target,
-                new NextLesson(DATE, LocalTime.of(13, 0), "Geometry", new LessonDuration("120")),
+        assertEquals(Optional.of(new LessonClash<>(shortLesson, shortLesson.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target,
+                    new NextLesson(DATE, LocalTime.of(13, 0), "Geometry", new LessonDuration("120")),
                 List.of(shortLesson)));
     }
 
@@ -91,7 +96,8 @@ public class TimetableClashCheckerTest {
                 .withNextLesson(new NextLesson(DATE, LocalTime.of(23, 30), "Workshop",
                         new LessonDuration(String.valueOf(LessonDuration.MAX_DURATION_MINUTES))))
                 .build();
-        assertEquals(Optional.of(other), TimetableClashChecker.findNextLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE.plusDays(1), 23, 15), List.of(other)));
         assertTrue(TimetableClashChecker.findNextLessonClash(target,
                 lesson(DATE.plusDays(1), 23, 30), List.of(other)).isEmpty());

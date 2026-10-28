@@ -25,10 +25,12 @@ public class RecurringTimetableClashCheckerTest {
         RecurringLesson sunday = recurring(DayOfWeek.SUNDAY, 23, 30, "90");
         Person other = new PersonBuilder().withName("Other Student").withRecurringLesson(sunday).build();
         NextLesson monday = next(MONDAY, 0, 15, "30");
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target, monday,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target, monday,
                 List.of(other)));
         Person nextStudent = new PersonBuilder().withName("Next Student").withNextLesson(monday).build();
-        assertEquals(Optional.of(nextStudent), TimetableClashChecker.findNextLessonClash(target, sunday,
+        assertEquals(Optional.of(new LessonClash<>(nextStudent, nextStudent.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(target, sunday,
                 List.of(nextStudent)));
         assertTrue(TimetableClashChecker.findRecurringLessonClash(target, next(MONDAY, 1, 0, "30"),
                 List.of(other)).isEmpty());
@@ -36,7 +38,8 @@ public class RecurringTimetableClashCheckerTest {
         RecurringLesson mondayRule = recurring(DayOfWeek.MONDAY, 0, 15, "30");
         Person mondayStudent = new PersonBuilder().withName("Monday Student")
                 .withRecurringLesson(mondayRule).build();
-        assertEquals(Optional.of(mondayStudent), TimetableClashChecker.findRecurringLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(mondayStudent, mondayStudent.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target,
                 next(MONDAY.minusDays(1), 23, 30, "90"), List.of(mondayStudent)));
         assertTrue(TimetableClashChecker.findNextLessonClash(target,
                 recurring(DayOfWeek.SUNDAY, 23, 15, "60"), List.of(nextStudent)).isEmpty());
@@ -46,13 +49,15 @@ public class RecurringTimetableClashCheckerTest {
     public void recurringLessons_weekBoundaryOverlapAndAdjacency() {
         RecurringLesson sunday = recurring(DayOfWeek.SUNDAY, 23, 30, "90");
         Person other = new PersonBuilder().withName("Other Student").withRecurringLesson(sunday).build();
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target,
                 recurring(DayOfWeek.MONDAY, 0, 15, "30"), List.of(other)));
         assertTrue(TimetableClashChecker.findRecurringLessonClash(target,
                 recurring(DayOfWeek.MONDAY, 1, 0, "30"), List.of(other)).isEmpty());
         Person monday = new PersonBuilder().withName("Monday Student")
                 .withRecurringLesson(recurring(DayOfWeek.MONDAY, 0, 15, "30")).build();
-        assertEquals(Optional.of(monday), TimetableClashChecker.findRecurringLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(monday, monday.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target,
                 sunday, List.of(monday)));
     }
 
@@ -70,8 +75,10 @@ public class RecurringTimetableClashCheckerTest {
         RecurringLesson rule = recurring(DayOfWeek.MONDAY, 14, 0, "90");
         NextLesson next = next(MONDAY, 15, 0, "30");
         Person own = new PersonBuilder(target).withRecurringLesson(rule).withNextLesson(next).build();
-        assertEquals(Optional.of(own), TimetableClashChecker.findRecurringLessonClash(own, next, List.of(own)));
-        assertEquals(Optional.of(own), TimetableClashChecker.findNextLessonClash(own, rule, List.of(own)));
+        assertEquals(Optional.of(new LessonClash<>(own, own.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(own, next, List.of(own)));
+        assertEquals(Optional.of(new LessonClash<>(own, own.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(own, rule, List.of(own)));
     }
 
     @Test
@@ -80,9 +87,11 @@ public class RecurringTimetableClashCheckerTest {
         NextLesson next = next(MONDAY, 14, 0, "60");
         Person own = new PersonBuilder(target).withRecurringLesson(rule).withNextLesson(next).build();
         Person other = new PersonBuilder(own).withName("Other Student").build();
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(own, next,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(own, next,
                 List.of(own, other)));
-        assertEquals(Optional.of(other), TimetableClashChecker.findNextLessonClash(own, rule,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getNextLesson().orElseThrow())),
+                TimetableClashChecker.findNextLessonClash(own, rule,
                 List.of(own, other)));
     }
 
@@ -98,7 +107,8 @@ public class RecurringTimetableClashCheckerTest {
     public void recurringLessons_differentWeekdaysAndUnequalDurations() {
         Person other = new PersonBuilder().withName("Other Student")
                 .withRecurringLesson(recurring(DayOfWeek.MONDAY, 14, 0, "120")).build();
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target,
                 recurring(DayOfWeek.MONDAY, 15, 30, "15"), List.of(other)));
         assertTrue(TimetableClashChecker.findRecurringLessonClash(target,
                 recurring(DayOfWeek.TUESDAY, 14, 0, "30"), List.of(other)).isEmpty());
@@ -110,12 +120,14 @@ public class RecurringTimetableClashCheckerTest {
     public void maximumDuration_overlapsNextWeekdayButNotAtExactBoundary() {
         Person other = new PersonBuilder().withName("Other Student")
                 .withRecurringLesson(recurring(DayOfWeek.MONDAY, 14, 0, "1440")).build();
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target,
                 next(MONDAY.plusDays(1), 13, 59, "30"), List.of(other)));
         assertTrue(TimetableClashChecker.findRecurringLessonClash(target,
                 next(MONDAY.plusDays(1), 14, 0, "30"), List.of(other)).isEmpty());
 
-        assertEquals(Optional.of(other), TimetableClashChecker.findRecurringLessonClash(target,
+        assertEquals(Optional.of(new LessonClash<>(other, other.getRecurringLesson().orElseThrow())),
+                TimetableClashChecker.findRecurringLessonClash(target,
                 recurring(DayOfWeek.TUESDAY, 13, 59, "30"), List.of(other)));
         assertTrue(TimetableClashChecker.findRecurringLessonClash(target,
                 recurring(DayOfWeek.TUESDAY, 14, 0, "30"), List.of(other)).isEmpty());

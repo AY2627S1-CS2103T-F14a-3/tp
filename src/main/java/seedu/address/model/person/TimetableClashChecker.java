@@ -16,10 +16,10 @@ public final class TimetableClashChecker {
     private TimetableClashChecker() {}
 
     /**
-     * Returns the first student whose next lesson overlaps the proposed next lesson.
+     * Returns the first conflicting student and their next lesson.
      * The target student's old next lesson is excluded because it is being replaced.
      */
-    public static Optional<Person> findNextLessonClash(Person target, NextLesson proposed,
+    public static Optional<LessonClash<NextLesson>> findNextLessonClash(Person target, NextLesson proposed,
             Iterable<Person> students) {
         requireNonNull(target);
         requireNonNull(proposed);
@@ -33,7 +33,7 @@ public final class TimetableClashChecker {
             NextLesson existing = student.getNextLesson().orElseThrow();
             LocalDateTime existingStart = LocalDateTime.of(existing.date, existing.time);
             if (overlaps(proposedStart, proposed.duration, existingStart, existing.duration)) {
-                return Optional.of(student);
+                return Optional.of(new LessonClash<>(student, existing));
             }
         }
         return Optional.empty();
@@ -43,7 +43,7 @@ public final class TimetableClashChecker {
      * Finds a next lesson conflicting with a proposed recurring schedule.
      * The same student's next lesson is allowed only when its weekday and start time match exactly.
      */
-    public static Optional<Person> findNextLessonClash(Person target, RecurringLesson proposed,
+    public static Optional<LessonClash<NextLesson>> findNextLessonClash(Person target, RecurringLesson proposed,
             Iterable<Person> students) {
         requireNonNull(target);
         requireNonNull(proposed);
@@ -52,7 +52,7 @@ public final class TimetableClashChecker {
             if (student.getNextLesson().isPresent()) {
                 NextLesson existing = student.getNextLesson().orElseThrow();
                 if (!isOwnOccurrence(target, student, existing, proposed) && overlapsWeekly(existing, proposed)) {
-                    return Optional.of(student);
+                    return Optional.of(new LessonClash<>(student, existing));
                 }
             }
         }
@@ -63,7 +63,7 @@ public final class TimetableClashChecker {
      * Finds a recurring schedule conflicting with a proposed next lesson, including the target's schedule.
      * An exact weekday/start-time match for the same student represents the same occurrence and is allowed.
      */
-    public static Optional<Person> findRecurringLessonClash(Person target, NextLesson proposed,
+    public static Optional<LessonClash<RecurringLesson>> findRecurringLessonClash(Person target, NextLesson proposed,
             Iterable<Person> students) {
         requireNonNull(target);
         requireNonNull(proposed);
@@ -72,7 +72,7 @@ public final class TimetableClashChecker {
             if (student.getRecurringLesson().isPresent()) {
                 RecurringLesson existing = student.getRecurringLesson().orElseThrow();
                 if (!isOwnOccurrence(target, student, proposed, existing) && overlapsWeekly(proposed, existing)) {
-                    return Optional.of(student);
+                    return Optional.of(new LessonClash<>(student, existing));
                 }
             }
         }
@@ -82,8 +82,8 @@ public final class TimetableClashChecker {
     /**
      * Finds another student's recurring schedule that overlaps the proposal; excludes the rule being replaced.
      */
-    public static Optional<Person> findRecurringLessonClash(Person target, RecurringLesson proposed,
-            Iterable<Person> students) {
+    public static Optional<LessonClash<RecurringLesson>> findRecurringLessonClash(Person target,
+            RecurringLesson proposed, Iterable<Person> students) {
         requireNonNull(target);
         requireNonNull(proposed);
         requireNonNull(students);
@@ -92,7 +92,7 @@ public final class TimetableClashChecker {
                 RecurringLesson existing = student.getRecurringLesson().orElseThrow();
                 if (overlapsWeekly(weekPosition(proposed), proposed.getDuration(),
                         weekPosition(existing), existing.getDuration())) {
-                    return Optional.of(student);
+                    return Optional.of(new LessonClash<>(student, existing));
                 }
             }
         }
