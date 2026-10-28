@@ -30,7 +30,7 @@ public class NextLessonCommand extends Command {
             + "Example: " + COMMAND_WORD
             + " 1 date/2026-12-11 time/14:30 dur/90 topic/Algebra";
     public static final String MESSAGE_NEXT_LESSON_UPDATED =
-            "Updated next lesson for %1$s to %2$s at %3$s for %4$d minutes: %5$s";
+            "Updated next lesson for %1$s to %2$s at %3$s for %4$d %5$s: %6$s";
     public static final String MESSAGE_LESSON_CLASH = "Cannot schedule lesson: conflicts with %1$s's next lesson "
             + "on %2$s at %3$s for %4$d minutes.";
 
@@ -87,8 +87,10 @@ public class NextLessonCommand extends Command {
         model.setPerson(student, updatedStudent);
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
 
+        int durationMinutes = nextLesson.duration.getDurationMinutes();
+        String durationUnit = durationMinutes == 1 ? "minute" : "minutes";
         return new CommandResult(String.format(MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                nextLesson.date, nextLesson.time, nextLesson.duration.getDurationMinutes(), nextLesson.topic));
+                nextLesson.date, nextLesson.time, durationMinutes, durationUnit, nextLesson.topic));
     }
 
     @Override
