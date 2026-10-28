@@ -28,6 +28,7 @@ public class JsonUtil {
     private static ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules()
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, false)
             .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
@@ -64,6 +65,12 @@ public class JsonUtil {
         } catch (IOException e) {
             logger.warning("Error reading from jsonFile file " + filePath + ": " + e);
             throw new DataLoadingException(e);
+        }
+
+        if (jsonFile == null) {
+            // A file containing only the JSON literal null deserializes to null rather than failing.
+            logger.warning("JSON file " + filePath + " does not contain a JSON object.");
+            throw new DataLoadingException(new IOException("File does not contain a JSON object: " + filePath));
         }
 
         return Optional.of(jsonFile);
