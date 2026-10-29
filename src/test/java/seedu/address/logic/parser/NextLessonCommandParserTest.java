@@ -33,6 +33,17 @@ public class NextLessonCommandParserTest {
     }
 
     @Test
+    public void parse_topicContainsCommandPrefixes_success() {
+        LocalDate date = LocalDate.now().plusDays(1);
+        LocalTime time = LocalTime.of(14, 30);
+        String topic = "Compare date/ formats, time/ notation, dur/ values, and topic/ labels";
+        LessonDuration duration = new LessonDuration("90");
+
+        assertParseSuccess(parser, "1 date/" + date + " time/14:30 dur/90 topic/" + topic,
+                new NextLessonCommand(INDEX_FIRST_PERSON, new NextLesson(date, time, topic, duration)));
+    }
+
+    @Test
     public void parse_missingRequiredPrefix_failure() {
         assertParseFailure(parser, "1 date/2026-10-11 time/14:30 dur/90",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
@@ -41,6 +52,14 @@ public class NextLessonCommandParserTest {
         assertParseFailure(parser, "1 time/14:30 dur/90 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
         assertParseFailure(parser, "1 date/2026-10-11 time/14:30 topic/Algebra",
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parse_topicBeforeRequiredPrefix_failure() {
+        String futureDate = LocalDate.now().plusDays(1).toString();
+
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 topic/Algebra dur/90",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
     }
 

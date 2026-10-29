@@ -31,9 +31,19 @@ public class SchoolLevelTest {
     }
 
     @Test
-    public void constructor_validValue_trimsWhitespace() {
+    public void constructor_validValue_stripsWhitespace() {
         SchoolLevel schoolLevel = new SchoolLevel("  Secondary 4  ");
         assertEquals("Secondary 4", schoolLevel.value);
+        assertEquals("Secondary 4", new SchoolLevel("\u2003Secondary 4\u3000").value);
+    }
+
+    @Test
+    public void constructor_unicodeWhitespace_throwsIllegalArgumentException() {
+        for (String blank : new String[] {"\u2003", "\u3000", " \t\u2003\u3000 "}) {
+            assertFalse(SchoolLevel.isValidSchoolLevel(blank));
+            Assert.assertThrows(IllegalArgumentException.class, SchoolLevel.MESSAGE_CONSTRAINTS, () ->
+                    new SchoolLevel(blank));
+        }
     }
 
     @Test

@@ -177,6 +177,26 @@ public class AddCommandParserTest {
     }
 
     @Test
+    public void parse_hyphenatedName_success() {
+        String hyphenatedName = "Anne-Marie Tan";
+        Person expectedPerson = new PersonBuilder().withName(hyphenatedName).withPhone(VALID_PHONE_BOB)
+                .withEmail(VALID_EMAIL_BOB).withAddress(VALID_ADDRESS_BOB).build();
+
+        assertParseSuccess(parser, " " + PREFIX_NAME + hyphenatedName + PHONE_DESC_BOB + EMAIL_DESC_BOB
+                + ADDRESS_DESC_BOB, new AddCommand(expectedPerson));
+    }
+
+    @Test
+    public void parse_nameWithApostrophe_success() {
+        String nameWithApostrophe = "Sean O'Connor";
+        Person expectedPerson = new PersonBuilder().withName(nameWithApostrophe).withPhone(VALID_PHONE_BOB)
+                .withEmail(VALID_EMAIL_BOB).withAddress(VALID_ADDRESS_BOB).build();
+
+        assertParseSuccess(parser, " " + PREFIX_NAME + nameWithApostrophe + PHONE_DESC_BOB + EMAIL_DESC_BOB
+                + ADDRESS_DESC_BOB, new AddCommand(expectedPerson));
+    }
+
+    @Test
     public void parse_compulsoryFieldMissing_failure() {
         String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddCommand.MESSAGE_USAGE);
 

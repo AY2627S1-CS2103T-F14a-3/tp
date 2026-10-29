@@ -27,7 +27,7 @@ public class RecurringLessonCommand extends Command {
             + "DAY must be a day of the week, such as MONDAY.\n"
             + "Example: " + COMMAND_WORD + " 1 day/MONDAY time/16:30 dur/90 topic/Algebra";
     public static final String MESSAGE_RECURRING_LESSON_UPDATED =
-            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$d minutes: %5$s";
+            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$s: %5$s";
 
     private static final Logger logger = LogsCenter.getLogger(RecurringLessonCommand.class);
 
@@ -62,7 +62,7 @@ public class RecurringLessonCommand extends Command {
             Person conflictingStudent = nextConflict.orElseThrow();
             NextLesson lesson = conflictingStudent.getNextLesson().orElseThrow();
             logger.info("Rejected recurring lesson: next-lesson overlap detected; student data unchanged.");
-            throw new CommandException(String.format(NextLessonCommand.MESSAGE_LESSON_CLASH,
+            throw new CommandException(String.format(Messages.MESSAGE_LESSON_CLASH,
                     conflictingStudent.getName().fullName, lesson.date, lesson.time,
                     lesson.duration.getDurationMinutes()));
         }
@@ -84,7 +84,8 @@ public class RecurringLessonCommand extends Command {
 
         return new CommandResult(String.format(MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
                 recurringLesson.getDay(), recurringLesson.getTime(),
-                recurringLesson.getDuration().getDurationMinutes(), recurringLesson.getTopic()));
+                Messages.formatLessonDuration(recurringLesson.getDuration().getDurationMinutes()),
+                recurringLesson.getTopic()));
     }
 
     @Override
