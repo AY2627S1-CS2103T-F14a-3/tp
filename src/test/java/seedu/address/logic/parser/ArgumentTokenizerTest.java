@@ -137,6 +137,32 @@ public class ArgumentTokenizerTest {
     }
 
     @Test
+    public void tokenizeWithTerminalPrefix_prefixLikeTextInTerminalValue_preservedAsText() {
+        String argsString = "SomePreambleString -t dashT-Value p/terminal -t text p/ value";
+
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTerminalPrefix(
+                argsString, pSlash, dashT, hatQ);
+
+        assertPreamblePresent(argMultimap, "SomePreambleString");
+        assertArgumentPresent(argMultimap, dashT, "dashT-Value");
+        assertArgumentPresent(argMultimap, pSlash, "terminal -t text p/ value");
+        assertArgumentAbsent(argMultimap, hatQ);
+    }
+
+    @Test
+    public void tokenizeWithTerminalPrefix_terminalPrefixAbsent_otherArgumentsTokenized() {
+        String argsString = "SomePreambleString -t dashT-Value ^Q111";
+
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTerminalPrefix(
+                argsString, pSlash, dashT, hatQ);
+
+        assertPreamblePresent(argMultimap, "SomePreambleString");
+        assertArgumentPresent(argMultimap, dashT, "dashT-Value");
+        assertArgumentPresent(argMultimap, hatQ, "111");
+        assertArgumentAbsent(argMultimap, pSlash);
+    }
+
+    @Test
     public void equalsMethod() {
         Prefix aaa = new Prefix("aaa");
 

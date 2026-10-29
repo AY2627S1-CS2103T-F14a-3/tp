@@ -3,9 +3,11 @@ package seedu.address.logic.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
+import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_LESSON_TIME;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -76,6 +78,18 @@ public class ParserUtilTest {
         String nameWithWhitespace = WHITESPACE + VALID_NAME + WHITESPACE;
         Name expectedName = new Name(VALID_NAME);
         assertEquals(expectedName, ParserUtil.parseName(nameWithWhitespace));
+    }
+
+    @Test
+    public void parseName_hyphenatedName_returnsName() throws Exception {
+        String hyphenatedName = "Anne-Marie Tan";
+        assertEquals(new Name(hyphenatedName), ParserUtil.parseName(hyphenatedName));
+    }
+
+    @Test
+    public void parseName_nameWithApostrophe_returnsName() throws Exception {
+        String nameWithApostrophe = "Sean O'Connor";
+        assertEquals(new Name(nameWithApostrophe), ParserUtil.parseName(nameWithApostrophe));
     }
 
     @Test
@@ -191,6 +205,42 @@ public class ParserUtilTest {
         Set<Tag> expectedTagSet = Set.of(new Tag(VALID_TAG_1), new Tag(VALID_TAG_2));
 
         assertEquals(expectedTagSet, actualTagSet);
+    }
+
+    @Test
+    public void parseLessonTime_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseLessonTime(null));
+    }
+
+    @Test
+    public void parseLessonTime_validValues_returnsTime() throws Exception {
+        assertEquals(LocalTime.MIDNIGHT, ParserUtil.parseLessonTime("00:00"));
+        assertEquals(LocalTime.of(0, 1), ParserUtil.parseLessonTime("00:01"));
+        assertEquals(LocalTime.of(9, 5), ParserUtil.parseLessonTime("09:05"));
+        assertEquals(LocalTime.NOON, ParserUtil.parseLessonTime("12:00"));
+        assertEquals(LocalTime.of(23, 59), ParserUtil.parseLessonTime("23:59"));
+    }
+
+    @Test
+    public void parseLessonTime_invalidFormat_throwsParseException() {
+        for (String time : List.of("", " ", "9:05", "09:5", "0905", "09.05", "09:05:00",
+                "09:05:30.123", "09:05Z", "09:05+08:00", "9:05am", "-1:00", "09:-1")) {
+            assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_TIME, () -> ParserUtil.parseLessonTime(time));
+        }
+    }
+
+    @Test
+    public void parseLessonTime_outOfRange_throwsParseException() {
+        for (String time : List.of("24:00", "23:60", "99:59", "12:99")) {
+            assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_TIME, () -> ParserUtil.parseLessonTime(time));
+        }
+    }
+
+    @Test
+    public void parseLessonTime_whitespace_throwsParseException() {
+        for (String time : List.of(" 09:05", "09:05 ", "09 :05", "09: 05", "\t09:05", "09:05\n")) {
+            assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_TIME, () -> ParserUtil.parseLessonTime(time));
+        }
     }
 
     @Test

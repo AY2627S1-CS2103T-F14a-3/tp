@@ -76,6 +76,36 @@ public class RecurringLessonCommandTest {
     }
 
     @Test
+    public void execute_oneMinuteDuration_successMessageUsesSingularMinute() {
+        Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        RecurringLesson lesson = new RecurringLesson(
+                DayOfWeek.MONDAY, LocalTime.of(14, 0), "Minimum", new LessonDuration("1"));
+        Person updatedStudent = new PersonBuilder(student).withRecurringLesson(lesson).build();
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(student, updatedStudent);
+        String expectedMessage = "Updated recurring lesson for " + student.getName().fullName
+                + " to every MONDAY at 14:00 for 1 minute: Minimum";
+
+        assertCommandSuccess(new RecurringLessonCommand(INDEX_FIRST_PERSON, lesson), model,
+                expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_multipleMinutesDuration_successMessageUsesPluralMinutes() {
+        Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        RecurringLesson lesson = new RecurringLesson(
+                DayOfWeek.MONDAY, LocalTime.of(14, 0), "Short lesson", new LessonDuration("2"));
+        Person updatedStudent = new PersonBuilder(student).withRecurringLesson(lesson).build();
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(student, updatedStudent);
+        String expectedMessage = "Updated recurring lesson for " + student.getName().fullName
+                + " to every MONDAY at 14:00 for 2 minutes: Short lesson";
+
+        assertCommandSuccess(new RecurringLessonCommand(INDEX_FIRST_PERSON, lesson), model,
+                expectedMessage, expectedModel);
+    }
+
+    @Test
     public void execute_validIndexInFilteredList_updatesCorrectStudentAndResetsFilter() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
         Person student = model.getFilteredPersonList().get(0);
@@ -123,6 +153,7 @@ public class RecurringLessonCommandTest {
 
     private String getExpectedSuccessMessage(Person student, RecurringLesson lesson) {
         return String.format(RecurringLessonCommand.MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
-                lesson.getDay(), lesson.getTime(), lesson.getDuration().getDurationMinutes(), lesson.getTopic());
+                lesson.getDay(), lesson.getTime(),
+                Messages.formatLessonDuration(lesson.getDuration().getDurationMinutes()), lesson.getTopic());
     }
 }

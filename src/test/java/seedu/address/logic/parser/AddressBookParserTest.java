@@ -54,6 +54,21 @@ public class AddressBookParserTest {
     private final AddressBookParser parser = new AddressBookParser();
 
     @Test
+    public void parseCommand_unicodeWhitespaceAcademicFields_throwsParseException() {
+        for (String blank : List.of("\u2003", "\u3000", " \t\u2003\u3000 ")) {
+            for (String command : List.of(
+                    "add n/Alpha p/90000001 e/alpha@example.com a/Block One",
+                    "edit 1", "filter")) {
+                assertThrows(ParseException.class, SchoolLevel.MESSAGE_CONSTRAINTS, () ->
+                        parser.parseCommand(command + " l/" + blank));
+                assertThrows(ParseException.class, Subject.MESSAGE_CONSTRAINTS, () ->
+                        parser.parseCommand(command + " s/" + blank));
+            }
+        }
+    }
+
+
+    @Test
     public void parseCommand_add() throws Exception {
         Person person = new PersonBuilder().build();
         AddCommand command = (AddCommand) parser.parseCommand(PersonUtil.getAddCommand(person));

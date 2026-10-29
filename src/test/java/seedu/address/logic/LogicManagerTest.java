@@ -9,10 +9,16 @@ import static seedu.address.logic.commands.CommandTestUtil.NAME_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.PHONE_DESC_AMY;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.AMY;
+import static seedu.address.testutil.TypicalPersons.BOB;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.function.Predicate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,10 +29,13 @@ import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.LessonDuration;
+import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.storage.JsonAddressBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
@@ -80,6 +89,75 @@ public class LogicManagerTest {
     public void execute_storageThrowsAdException_throwsCommandException() {
         assertCommandFailureForExceptionFromStorage(DUMMY_AD_EXCEPTION, String.format(
                 LogicManager.FILE_OPS_PERMISSION_ERROR_FORMAT, DUMMY_AD_EXCEPTION.getMessage()));
+    }
+
+    @Test
+    public void execute_saveFails_restoresChangesAndFilter() throws Exception {
+        for (String command : List.of(
+                "add n/Charlie p/90000001 e/charlie@example.com a/Block One",
+                "edit 1 s/Physics", "delete 1", "clear", "note 1 note/Changed",
+                "filter s/Physics", "list", "sort")) {
+            model = new ModelManager();
+            Person amy = new PersonBuilder(AMY).withSubject("Mathematics")
+                    .withNextLesson(new NextLesson(LocalDate.now().plusDays(1), LocalTime.NOON,
+                            "Algebra", new LessonDuration("60"))).build();
+            Person bob = new PersonBuilder(BOB)
+                    .withNextLesson(new NextLesson(LocalDate.now().plusDays(2), LocalTime.NOON,
+                            "Physics", new LessonDuration("60"))).build();
+            model.addPerson(bob);
+            model.addPerson(amy);
+            Predicate<Person> mathematicsFilter = person -> person.getSubject().value.equals("Mathematics");
+            model.updateFilteredPersonList(mathematicsFilter);
+            AddressBook original = new AddressBook(model.getAddressBook());
+            Path dataPath = temporaryFolder.resolve("rollback.json");
+            JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(dataPath) {
+                private boolean hasFailed;
+
+                @Override
+                public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
+                    if (!hasFailed) {
+                        hasFailed = true;
+                        throw DUMMY_IO_EXCEPTION;
+                    }
+                    super.saveAddressBook(addressBook);
+                }
+            };
+            logic = new LogicManager(model, new StorageManager(addressBookStorage,
+                    new JsonUserPrefsStorage(temporaryFolder.resolve("rollbackPrefs.json"))));
+
+            assertThrows(CommandException.class, () -> logic.execute(command));
+            assertEquals(original, model.getAddressBook(), command);
+            assertEquals(List.of(amy), model.getFilteredPersonList(), command);
+
+            // Restoring the actual predicate must also handle later edits to matching fields.
+            Person changedAmy = new PersonBuilder(amy).withSubject("Physics").build();
+            model.setPerson(amy, changedAmy);
+            assertEquals(List.of(), model.getFilteredPersonList(), command);
+            model.setPerson(changedAmy, amy);
+
+            // A later read-only command must persist the restored records, never the failed mutation.
+            logic.execute("list");
+            assertEquals(original, addressBookStorage.readAddressBook().orElseThrow(), command);
+        }
+    }
+
+    @Test
+    public void execute_deleteWithUnavailableSavePath_laterListKeepsStudent() throws Exception {
+        Path dataPath = temporaryFolder.resolve("addressBook.json");
+        Path backupPath = temporaryFolder.resolve("addressBook.backup.json");
+        model.addPerson(AMY);
+        logic.execute("list");
+        Files.move(dataPath, backupPath);
+        Files.createDirectory(dataPath);
+
+        assertThrows(CommandException.class, () -> logic.execute("delete 1"));
+        assertEquals(List.of(AMY), model.getFilteredPersonList());
+
+        Files.delete(dataPath);
+        Files.move(backupPath, dataPath);
+        logic.execute("list");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(dataPath);
+        assertEquals(List.of(AMY), storage.readAddressBook().orElseThrow().getPersonList());
     }
 
     @Test
@@ -166,9 +244,6 @@ public class LogicManagerTest {
         // Triggers the saveAddressBook method by executing an add command
         String addCommand = AddCommand.COMMAND_WORD + NAME_DESC_AMY + PHONE_DESC_AMY
                 + EMAIL_DESC_AMY + ADDRESS_DESC_AMY;
-        Person expectedPerson = new PersonBuilder(AMY).withTags().build();
-        ModelManager expectedModel = new ModelManager();
-        expectedModel.addPerson(expectedPerson);
-        assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
+        assertCommandFailure(addCommand, CommandException.class, expectedMessage);
     }
 }
