@@ -26,7 +26,7 @@ Class "<<utility>>\nTimetableClashChecker" as TimetableClashChecker
 Model <|.. ModelManager
 ModelManager *--> "1" AddressBook
 ModelManager *--> "1" UserPrefs
-ModelManager --> "*" Person : filtered
+ModelManager --> "*" Person : filteredPersons
 
 AddressBook *--> "1" UniquePersonList
 UniquePersonList --> "*" Person
