@@ -179,6 +179,9 @@ class JsonAdaptedPerson {
             modelSubject = new Subject(subject);
         }
 
+        if (note != null && !StudentNote.isValidNote(note)) {
+            throw new IllegalValueException(StudentNote.MESSAGE_CONSTRAINTS);
+        }
         StudentNote modelNote = new StudentNote(note == null ? "" : note);
         Optional<NextLesson> modelNextLesson = nextLesson == null ? Optional.empty() : nextLesson.toModelType(clock);
         Optional<RecurringLesson> modelRecurringLesson = recurringLesson == null

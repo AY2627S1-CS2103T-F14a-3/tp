@@ -29,6 +29,19 @@ public class NoteCommandParserTest {
     }
 
     @Test
+    public void parse_noteAtLimit_success() {
+        String note = "y".repeat(StudentNote.MAX_LENGTH);
+        assertParseSuccess(parser, "1 note/" + note,
+                new NoteCommand(INDEX_FIRST_PERSON, new StudentNote(note)));
+    }
+
+    @Test
+    public void parse_overlongNote_failure() {
+        assertParseFailure(parser, "1 note/" + "y".repeat(StudentNote.MAX_LENGTH + 1),
+                StudentNote.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
     public void parse_missingNotePrefix_failure() {
         assertParseFailure(parser, "1",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NoteCommand.MESSAGE_USAGE));

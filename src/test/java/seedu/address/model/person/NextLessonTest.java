@@ -54,6 +54,14 @@ public class NextLessonTest {
     }
 
     @Test
+    public void constructor_overlongTopic_throwsIllegalArgumentException() {
+        Assert.assertThrows(IllegalArgumentException.class, () -> new NextLesson(VALID_DATE, VALID_TIME,
+                "t".repeat(NextLesson.MAX_TOPIC_LENGTH + 1), VALID_DURATION));
+        assertEquals("t".repeat(NextLesson.MAX_TOPIC_LENGTH), new NextLesson(VALID_DATE, VALID_TIME,
+                "t".repeat(NextLesson.MAX_TOPIC_LENGTH), VALID_DURATION).topic);
+    }
+
+    @Test
     public void constructor_pastDate_throwsIllegalArgumentException() {
         LocalDate pastDate = LocalDate.now().minusDays(1);
 

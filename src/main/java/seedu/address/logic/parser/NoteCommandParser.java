@@ -32,6 +32,9 @@ public class NoteCommandParser implements Parser<NoteCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NOTE);
         String note = argMultimap.getValue(PREFIX_NOTE).get();
+        if (!StudentNote.isValidNote(note)) {
+            throw new ParseException(StudentNote.MESSAGE_CONSTRAINTS);
+        }
         return new NoteCommand(index, new StudentNote(note));
     }
 }

@@ -53,4 +53,11 @@ public class AddressTest {
         // different values -> returns false
         assertFalse(address.equals(new Address("Other Valid Address")));
     }
+
+    @Test
+    public void isValidAddress_lengthLimit() {
+        assertTrue(Address.isValidAddress("x".repeat(Address.MAX_LENGTH)));
+        assertFalse(Address.isValidAddress("x".repeat(Address.MAX_LENGTH + 1)));
+        assertFalse(Address.isValidAddress("x".repeat(20000)));
+    }
 }

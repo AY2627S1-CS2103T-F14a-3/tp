@@ -35,4 +35,10 @@ public class TagTest {
         assertFalse(Tag.isValidTagName("two words"));
     }
 
+    @Test
+    public void isValidTagName_lengthLimit() {
+        assertTrue(Tag.isValidTagName("g".repeat(Tag.MAX_LENGTH)));
+        assertFalse(Tag.isValidTagName("g".repeat(Tag.MAX_LENGTH + 1)));
+    }
+
 }

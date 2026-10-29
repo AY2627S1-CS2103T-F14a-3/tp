@@ -13,7 +13,9 @@ import java.util.Objects;
  */
 public class NextLesson {
 
-    public static final String MESSAGE_TOPIC_CONSTRAINTS = "Lesson topic must not be blank.";
+    public static final int MAX_TOPIC_LENGTH = 200;
+    public static final String MESSAGE_TOPIC_CONSTRAINTS = "Lesson topic must not be blank and can be at most "
+            + MAX_TOPIC_LENGTH + " characters long.";
     public static final String MESSAGE_DATE_TIME_CONSTRAINTS = "Lesson date and time must not be in the past.";
 
     public final LocalDate date;
@@ -52,7 +54,7 @@ public class NextLesson {
         if (isNewBooking && isDateTimeInPast(date, time, clock)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
-        if (topic.isBlank()) {
+        if (topic.isBlank() || topic.trim().codePointCount(0, topic.trim().length()) > MAX_TOPIC_LENGTH) {
             throw new IllegalArgumentException(MESSAGE_TOPIC_CONSTRAINTS);
         }
         this.date = date;

@@ -49,6 +49,14 @@ public class RecurringLessonTest {
     }
 
     @Test
+    public void constructor_overlongTopic_throwsIllegalArgumentException() {
+        Assert.assertThrows(IllegalArgumentException.class, () -> new RecurringLesson(
+                DAY, TIME, "t".repeat(NextLesson.MAX_TOPIC_LENGTH + 1), DURATION));
+        assertEquals("t".repeat(NextLesson.MAX_TOPIC_LENGTH),
+                new RecurringLesson(DAY, TIME, "t".repeat(NextLesson.MAX_TOPIC_LENGTH), DURATION).getTopic());
+    }
+
+    @Test
     public void constructor_blankTopic_throwsIllegalArgumentException() {
         Assert.assertThrows(IllegalArgumentException.class, () -> new RecurringLesson(DAY, TIME, "", DURATION));
     }

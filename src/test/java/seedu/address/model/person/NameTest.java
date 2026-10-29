@@ -85,4 +85,13 @@ public class NameTest {
         // different values -> returns false
         assertFalse(name.equals(new Name("Other Valid Name")));
     }
+
+    @Test
+    public void isValidName_lengthLimit() {
+        assertTrue(Name.isValidName("a".repeat(Name.MAX_LENGTH)));
+        assertFalse(Name.isValidName("a".repeat(Name.MAX_LENGTH + 1)));
+        assertFalse(Name.isValidName("N".repeat(5000)));
+        assertTrue(Name.isValidName("\uD842\uDFB7".repeat(Name.MAX_LENGTH))); // supplementary letters count once
+        assertFalse(Name.isValidName("\uD842\uDFB7".repeat(Name.MAX_LENGTH + 1)));
+    }
 }

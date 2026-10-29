@@ -80,6 +80,8 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 * Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
+* Field length limits: name 100 characters, phone 3 to 20 digits, email 254, address 200, school level and subject 50 each, tag 30, note 1000, and lesson topic 200. Longer input is rejected with an error stating the limit.
+
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 </box>
 

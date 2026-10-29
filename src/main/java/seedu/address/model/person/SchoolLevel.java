@@ -7,7 +7,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class SchoolLevel {
 
-    public static final String MESSAGE_CONSTRAINTS = "School level must not be blank.";
+    public static final int MAX_LENGTH = 50;
+    public static final String MESSAGE_CONSTRAINTS = "School level must not be blank and can be at most "
+            + MAX_LENGTH + " characters long.";
     public static final String DEFAULT_VALUE = "Not specified";
 
     public final String value;
@@ -29,7 +31,8 @@ public class SchoolLevel {
      * Returns true if a given string is a valid school level.
      */
     public static boolean isValidSchoolLevel(String test) {
-        return test != null && !test.trim().isBlank();
+        return test != null && !test.trim().isBlank()
+                && test.trim().codePointCount(0, test.trim().length()) <= MAX_LENGTH;
     }
 
     @Override
