@@ -15,12 +15,12 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
 ## Quick start
 
-1. Ensure that Java `25` or later is installed on your computer.<br>
+1. Ensure that Java `25` is installed on your computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
 1. Download the latest `.jar` file from [here](https://github.com/AY2627S1-CS2103T-F14a-3/tp/releases).
 
-1. Copy the file to the folder you want to use as the _home folder_ for TutorTrack.
+1. Copy the file to a writable folder you want to use as the _home folder_ for TutorTrack. The app creates its data, preferences, and log files in the folder you launch it from.
 
 1. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar "TutorTrack.jar"`.<br>
    A GUI similar to the one below should appear in a few seconds. Note how the app contains some sample data.<br>
@@ -65,6 +65,8 @@ TutorTrack is a desktop contact-management application for private tutors who ma
   For example, if the command specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.
   For `nextlesson` and `recurringlesson`, `topic/TOPIC` must be the final parameter.
 
+* Successful `add`, `edit`, `note`, `nextlesson`, `clearlesson`, `recurringlesson`, and `clearrecurringlesson` commands show all students again. Check the displayed indexes before your next index-based command. `delete` keeps the active search or filter, while `sort` shows all students in the saved sorted order.
+
 * Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
@@ -96,7 +98,7 @@ Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT
 
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
-* `add n/Betsy Crowe p/1234567 e/betsycrowe@example.com a/Newgate Prison l/Secondary 4 s/Mathematics t/friend t/criminal`
+* `add n/Betsy Crowe p/1234567 e/betsycrowe@example.com a/Block 12 Clementi Road l/Secondary 4 s/Mathematics t/weekday t/exam`
 
 ### Listing all students: `list`
 
@@ -198,7 +200,7 @@ Format: `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`
 
 * At least one criterion must be supplied.
 * A student must match **every** supplied criterion to be shown.
-* School level and subject matching are case-sensitive. All specified tags must be present on the student.
+* School level, subject, and tag matching are case-sensitive. All specified tags must be present on the student.
 * The displayed list changes to show only matching students. Use `list` to show all students again.
 
 Examples:
@@ -216,7 +218,7 @@ Format: `note INDEX note/NOTE`
 * Each student has one note. Recording another note replaces the previous text.
 * The `note/` prefix is required and must appear exactly once. Repeating it produces an error; ` note/` cannot be included literally inside the note text.
 * Leading and trailing spaces are removed; spaces within the note are preserved.
-* Non-empty notes are displayed on the corresponding student card.
+* Non-empty notes are displayed in the student's full record. Run `view INDEX` to read the note in the right-hand panel.
 * To clear a note, use `note INDEX note/` with no text after `note/`.
 
 Example: `note 1 note/Needs extra time for algebra` records a note for the first displayed student.
@@ -336,7 +338,7 @@ Student names that differ only in capitalization, repeated spaces, or surroundin
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?<br>
-**A**: Install the app on the other computer and overwrite the data file it creates with the data file from your previous TutorTrack home folder.
+**A**: Close TutorTrack on both computers. Copy `data/addressbook.json` from the folder you used to launch the old copy into the `data` subfolder of the new copy's launch folder, creating that subfolder if needed. Back up any existing destination file before replacing it. Launch the new copy from that folder to load the transferred students.
 
 --------------------------------------------------------------------------------------------------------------------
 
