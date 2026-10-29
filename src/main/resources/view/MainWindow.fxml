@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -46,12 +47,20 @@
           </Menu>
         </MenuBar>
 
-        <VBox fx:id="personList" styleClass="pane-with-border" minWidth="340" prefWidth="340" VBox.vgrow="ALWAYS">
-            <padding>
+        <SplitPane dividerPositions="0.36" styleClass="main-content" VBox.vgrow="ALWAYS">
+          <items>
+            <VBox fx:id="personList" styleClass="pane-with-border" minWidth="220" prefWidth="380">
+              <padding>
                 <Insets top="10" right="10" bottom="10" left="10" />
-            </padding>
-            <StackPane fx:id="personListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
-        </VBox>
+              </padding>
+              <StackPane fx:id="personListPanelPlaceholder" VBox.vgrow="ALWAYS" />
+            </VBox>
+            <StackPane fx:id="personDetailsPanelPlaceholder" minWidth="280" styleClass="details-placeholder">
+              <Label text="Enter 'view INDEX' to view a student's full details."
+                     styleClass="details-placeholder-text" wrapText="true" />
+            </StackPane>
+          </items>
+        </SplitPane>
 
         <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="feedback-area"
                    minHeight="110" prefHeight="110" maxHeight="110">

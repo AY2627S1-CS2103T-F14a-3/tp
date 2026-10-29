@@ -22,14 +22,14 @@ public class Subject {
         if (!isValidSubject(subject)) {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
-        value = subject.trim();
+        value = subject.strip();
     }
 
     /**
      * Returns true if a given string is a valid subject.
      */
     public static boolean isValidSubject(String test) {
-        return test != null && !test.trim().isEmpty();
+        return test != null && !test.trim().isBlank();
     }
 
     @Override

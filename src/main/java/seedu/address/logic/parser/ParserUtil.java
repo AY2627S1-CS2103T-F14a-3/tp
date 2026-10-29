@@ -2,6 +2,8 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +26,7 @@ import seedu.address.model.tag.Tag;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final String MESSAGE_INVALID_LESSON_TIME = "Lesson time must be a valid time in HH:mm format.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -151,6 +154,25 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a lesson time into a {@code LocalTime} using the exact {@code HH:mm} format.
+     * Whitespace is not trimmed; command parsers receive trimmed values from the argument tokenizer.
+     *
+     * @throws NullPointerException if {@code time} is null.
+     * @throws ParseException if {@code time} has an invalid format or is outside the valid clock range.
+     */
+    public static LocalTime parseLessonTime(String time) throws ParseException {
+        requireNonNull(time);
+        if (!time.matches("\\d{2}:\\d{2}")) {
+            throw new ParseException(MESSAGE_INVALID_LESSON_TIME);
+        }
+        try {
+            return LocalTime.parse(time);
+        } catch (DateTimeParseException e) {
+            throw new ParseException(MESSAGE_INVALID_LESSON_TIME, e);
+        }
     }
 
     /**

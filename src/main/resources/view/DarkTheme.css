@@ -460,6 +460,61 @@
     -fx-border-width: 1;
 }
 
+.main-content {
+    -fx-background-color: #F5F7FA;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.main-content > .split-pane-divider {
+    -fx-background-color: #DDE3E8;
+    -fx-padding: 0 1 0 1;
+}
+
+.details-placeholder {
+    -fx-background-color: #F5F7FA;
+    -fx-padding: 24;
+}
+
+.details-placeholder-text {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 15px;
+    -fx-text-fill: #647182;
+    -fx-text-alignment: center;
+}
+
+.detail-scroll,
+.detail-scroll > .viewport,
+.detail-panel {
+    -fx-background-color: #F5F7FA;
+}
+
+.detail-name {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 24px;
+    -fx-text-fill: #17213A;
+}
+
+.detail-value {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-text-fill: #647182;
+}
+
+.summary-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-border-color: #DDE3E8;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.summary-academic-label {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 13px;
+    -fx-text-fill: #17213A;
+}
+
 .command-box-container {
     -fx-background-color: transparent;
 }

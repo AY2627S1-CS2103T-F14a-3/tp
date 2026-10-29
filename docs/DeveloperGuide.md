@@ -71,7 +71,7 @@ The **API** of this component is specified in [`Ui.java`](https://github.com/se-
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
-The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
+The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, `PersonDetailsPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
 The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
 
@@ -125,7 +125,6 @@ How the parsing works:
 ### Model component
 **API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
 
-<puml src="diagrams/ModelClassDiagram.puml" width="450" />
 
 
 The `Model` component,
@@ -155,6 +154,12 @@ The `Storage` component,
 * is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
 
+JSON saving serializes the complete data before writing a temporary file in the destination directory. The file is
+then moved over the destination atomically where supported. If atomic moves are unsupported, saving falls back to
+a regular replacement move; this fallback does not guarantee atomicity. Temporary files are removed after handled
+write or move failures. This protects existing data from incomplete temporary writes, but is not a guarantee against
+power loss or all filesystem failures. The same saving path is used for student records and user preferences.
+
 ### Common classes
 
 Classes used by multiple components are in the `seedu.address.commons` package.
@@ -165,11 +170,59 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Student summary and detail view
+
+The student list uses `PersonCard` to show a concise summary containing the student's name, phone number, and any available academic or lesson information. Default academic values and absent lessons are omitted so that tutors can scan more students without scrolling through complete records.
+
+The `view INDEX` command parses an index relative to the current filtered list. `ViewCommand` rejects an index outside that list and otherwise places the selected immutable `Person` in the returned `CommandResult`. It does not modify the model or storage data.
+
+`MainWindow` reads the optional selected person from `CommandResult` and creates a `PersonDetailsPanel` in the right-hand side of the split layout. The panel shows the student's complete academic, contact, scheduling, tag, and note information. A later successful non-view command restores the prompt, preventing an edited or deleted student's old record from remaining visible.
+### Lesson priority and ordering
+
+The following class diagram shows the model and logic classes involved in the `sort` and `upcoming` commands.
+Only members relevant to lesson priority are shown.
+
+<puml src="diagrams/LessonPriorityClassDiagram.puml" alt="Classes and relationships for lesson priority and ordering" width="760" />
+
+* `SortCommand` passes `Person.COMPARATOR_BY_NEXT_LESSON` to `Model.sortPersons(...)`, then resets the filter to show all students.
+  The comparator orders students by their next lesson's start time, placing students without a next lesson last.
+  `ModelManager` delegates sorting to the address book; the storage-list classes are omitted from this focused diagram.
+* `UpcomingCommand` reads all students through `Model.getAddressBook()`, compares each future next lesson with the
+  next occurrence of each recurring lesson, and shows students whose earliest lesson starts at the overall minimum.
+  If none exists, it reports an error.
+* `Person` may reference one `NextLesson` and one `RecurringLesson`. `NextLesson.getDateTime()` supplies the one-off
+  start time; `RecurringLesson.getNextOccurrence(...)` supplies the next weekly start. `SortCommand` still sorts by
+  next lessons only.
+
+### Upcoming lesson selection
+
+`UpcomingCommand` takes one local-time snapshot from its clock. `RecurringLesson#getNextOccurrence(...)` uses the
+next matching weekday, including today, and advances one week if that start has passed. The command searches all
+student records, not just those currently displayed. A student appears only once when both lesson types represent
+the same occurrence. Selection changes only the displayed-list filter, not student records or their saved order.
+The filter keeps the same time snapshot until another command changes it; rerun `upcoming` to refresh the selection.
+A supplied `Clock` allows deterministic boundary tests.
+
 ### Timetable-clash detection
+
+Clash checks return an immutable `LessonClash<T>` containing the conflicting student and the exact next or
+recurring lesson selected during validation. Commands obtain the date or weekday, time, and duration from that
+result, rather than retrieving the lesson from the student again. The result carries existing immutable objects
+without copying records. Next-lesson conflicts retain precedence over recurring conflicts, and feedback wording
+and rejected-command state remain unchanged.
+
+`DatedLessonInterval` and `WeeklyLessonInterval` are immutable value objects responsible for overlap arithmetic.
+Both use half-open intervals: a start is included, while an end is excluded, so adjacent lessons do not clash.
+Dated comparisons use start-time gaps rather than calculating end dates, avoiding overflow at extreme dates.
+A dated interval can be projected onto its weekday and time for comparison against a weekly interval. Weekly
+comparisons account for occurrences on either side of the Sunday/Monday boundary. `TimetableClashChecker` retains
+student identity checks, replacement exclusions, and the same-student occurrence exception.
 
 Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
 
 The lesson being replaced is excluded. When comparing a next lesson with the same student's recurring schedule, an exact weekday and start-time match represents the same occurrence and is allowed, even if the topic or duration differs. Other overlapping times are rejected.
+
+When loading saved next lessons, `JsonAdaptedNextLesson` compares the end of the occupied interval with the current local time. It retains ongoing lessons and discards lessons whose end time has been reached. `NextLesson.fromStoredValues` validates saved details without rejecting a past start; the normal constructor continues to reject past starts for new bookings. This keeps clash detection consistent across a restart during a lesson.
 
 The activity diagram below follows parsing, validation, clash rejection, and model updates for both scheduling commands. A rejected command leaves the student records and displayed list unchanged. The diagram ends when the command returns successfully; `LogicManager` then saves the address book through the normal Storage flow. Storage errors are outside this diagram's scope.
 
@@ -177,21 +230,21 @@ The activity diagram below follows parsing, validation, clash rejection, and mod
 
 ### Recurring lesson feature
 
-The `recurringlesson` command records a weekly lesson comprising a day, time, and topic for a student. Its implementation spans the Model, Logic, Storage, and UI components while keeping the recurring schedule separate from the student's one-off next lesson.
+The `recurringlesson` command records a weekly lesson comprising a day, time, duration, and topic for a student. Its implementation spans the Model, Logic, Storage, and UI components while keeping the recurring schedule separate from the student's one-off next lesson.
 
 #### Model representation
 
-`RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, and a topic. Its constructor requires all three values and trims and rejects a blank topic. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
+`RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, a topic, and a `LessonDuration`. Its constructor requires all four values and trims and rejects a blank topic. `LessonDuration` validates a whole number from 1 to 1440 minutes. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
 
-Student records are replaced rather than mutated. When a recurring lesson is set, `RecurringLessonCommand` creates a new `Person` containing the new recurring lesson while preserving the student's name, contact details, academic information, note, next lesson, and tags.
+Student records are replaced rather than mutated. `Person.withNote(...)`, `withNextLesson(...)`, and `withRecurringLesson(...)` return a new `Person` with only the specified value changed, preserving every other field. The note and lesson setting/clearing commands use these methods; an empty `Optional` explicitly clears a lesson, while null arguments are rejected.
 
 #### Command execution
 
-`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser rejects missing or duplicate `day/`, `time/`, and `topic/` prefixes, parses the displayed student index, accepts a case-insensitive day of the week, and requires time to use the `HH:mm` format. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
+`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser rejects missing or duplicate `day/`, `time/`, `dur/`, and `topic/` prefixes, parses the displayed student index, and accepts a case-insensitive day of the week. Time must be a valid 24-hour time in the exact `HH:mm` format, and `dur/` must supply a whole number from 1 to 1440 minutes. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
 
-When executed, `RecurringLessonCommand` obtains the currently displayed student list and checks that the specified index exists. It passes the original and replacement `Person` objects to `Model#setPerson(...)`, then resets the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. If parsing fails, a `ParseException` is thrown; if the displayed index is invalid, a `CommandException` is thrown. In either case, the model is not changed and the address book is not saved.
+When executed, `RecurringLessonCommand` obtains the currently displayed student list and checks that the specified index exists. It uses `TimetableClashChecker` to check the proposed lesson against all students' next lessons and recurring schedules, using their durations as described in the timetable clash detection section above. Once these checks pass, it passes the original and replacement `Person` objects to `Model#setPerson(...)`, then resets the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. If parsing fails, a `ParseException` is thrown; if the displayed index is invalid or the lesson clashes, a `CommandException` is thrown. In these cases, the model is not changed and the address book is not saved.
 
-The following sequence diagram shows the successful execution of `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra`.
+The following sequence diagram shows the successful execution of `recurringlesson 1 day/MONDAY time/16:30 dur/60 topic/Algebra`, assuming the displayed index is valid and the lesson does not clash with the existing timetable.
 
 <puml src="diagrams/RecurringLessonSequenceDiagram.puml" alt="Sequence diagram for setting a recurring lesson" />
 
@@ -209,7 +262,7 @@ Both diagrams treat the Model and Storage components as black boxes. They omit l
 
 #### Storage and UI updates
 
-After either command completes successfully, `LogicManager` passes the address book to the `Storage` component. This normal save also occurs when `clearrecurringlesson` finds no recurring lesson and leaves the model unchanged. `JsonAdaptedPerson` represents the optional recurring lesson using `JsonAdaptedRecurringLesson`, which stores its day, time, and topic as JSON-compatible strings. When the data is loaded again, the adapter validates those strings before reconstructing the `RecurringLesson` model object.
+After either command completes successfully, `LogicManager` passes the address book to the `Storage` component. This normal save also occurs when `clearrecurringlesson` finds no recurring lesson and leaves the model unchanged. `JsonAdaptedPerson` represents the optional recurring lesson using `JsonAdaptedRecurringLesson`, which stores its day, time, and topic as JSON-compatible strings and its duration as an integer `durationMinutes` field. When the data is loaded again, the adapter validates the stored values before reconstructing the `RecurringLesson` model object. For compatibility with older data, a missing or null duration defaults to 60 minutes and a stored duration above 1440 is capped at 1440 minutes; zero or negative durations are rejected.
 
 `PersonListPanel` displays the `ObservableList<Person>` exposed by Logic and backed by the model's filtered list. Replacing the `Person` in the model updates this list, after which `PersonCard` obtains and formats the student's recurring lesson for display.
 
@@ -456,6 +509,22 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * 3a1. TutorTrack displays an invalid-index error.
   * 3a2. Use case resumes at step 3.
 
+#### Use case: UC05 — View a student's complete record
+
+**MSS**
+
+1. Tutor requests to view a student using an index from the displayed list.
+2. TutorTrack validates the supplied index.
+3. TutorTrack displays the student's complete record in the right-hand panel.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The selected index does not refer to a student in the displayed list.
+  * 2a1. TutorTrack displays an invalid-index error.
+  * 2a2. Use case resumes at step 1.
+
 ### Non-Functional Requirements
 
 1. TutorTrack should work on any _mainstream OS_ with Java `25` or later installed.
@@ -558,8 +627,68 @@ To test resetting the displayed list:
 
 ### Saving data
 
-1. Dealing with missing/corrupted data files
+Use a separate writable test folder containing `TutorTrack.jar` and disposable data. Open a terminal in that
+folder and launch with `java -jar "TutorTrack.jar"`, using Java 25 and the Mac Java installation described in the
+User Guide where applicable. Use the same working directory on every launch: the relative path
+`data/addressbook.json` must refer to the same file. Do not use real student records.
 
-   1. _{Explain how to simulate missing or corrupted data files and state the expected behavior.}_
+#### Prepare a known saved record
 
-1. _{ more test cases … }_
+1. Launch the app and run these commands. `clear` removes the sample students from this test copy.
+
+   ```text
+   clear
+   add n/Persistence Check p/90000001 e/persistence@example.com a/Block One l/Secondary 4 s/Mathematics t/persistcheck
+   note 1 note/Keep this note after restart
+   ```
+
+1. Close the app using the window's close button and relaunch from the same folder.<br>
+   Expected: Exactly one student, Persistence Check, appears with the academic fields, tag, and note unchanged.
+1. Close the app. Copy `data/addressbook.json` to `addressbook.backup.json` in the test folder, outside `data`.<br>
+   Expected: The backup contains the known record. Keep this backup unchanged throughout the checks below.
+
+#### Missing data file
+
+1. With the app closed, move `data/addressbook.json` to `addressbook.missing-test.json` in the test folder.
+1. Relaunch the app.<br>
+   Expected: Sample students appear instead of Persistence Check. A missing file causes sample data to be loaded;
+   the backup is not restored automatically.
+1. Before entering any command, inspect the `data` folder.<br>
+   Expected: `addressbook.json` is still absent. Loading sample data alone does not save it.
+1. Run `list`.<br>
+   Expected: Sample students are listed and `data/addressbook.json` is created containing those students.
+   Successful commands save the current records, including commands such as `list` that do not modify them.
+1. Close the app, copy `addressbook.backup.json` over `data/addressbook.json`, and relaunch.<br>
+   Expected: Only Persistence Check appears, with the original academic fields, tag, and note.
+
+#### Corrupted data file
+
+1. Close the app and confirm that the unchanged backup still exists.
+1. Open `data/addressbook.json` in a plain-text editor. Replace its entire contents with this invalid JSON and save:
+
+   ```text
+   { invalid json
+   ```
+
+1. Relaunch the app.<br>
+   Expected: An empty student list appears, rather than sample students or a partially recovered record. The
+   application log records the loading failure; the current implementation does not require a GUI error dialog.
+1. Before entering any command, inspect the file.<br>
+   Expected: Its invalid contents remain. Loading an empty list does not itself repair the file.
+1. Run `list`.<br>
+   Expected: No students are listed. The file is overwritten with valid JSON containing an empty `persons` array.
+   Even a read-only command can overwrite unreadable data, so the backup must be made before testing. The `exit`
+   command also saves data: use the window's close button when inspecting the file before any command has run.
+1. Close the app, copy the backup over `data/addressbook.json`, and relaunch.<br>
+   Expected: Persistence Check and all its saved details return.
+
+#### Valid JSON containing an invalid student
+
+1. Close the app and restore the known-good file from the backup.
+1. Edit the student's `phone` value in `data/addressbook.json` to `"abc"`, keeping valid JSON syntax.
+1. Relaunch without entering a command.<br>
+   Expected: An empty list appears because the student fails phone validation. The invalid file remains unchanged
+   until a command saves the empty list. Valid JSON syntax does not make invalid student values acceptable.
+1. Close the app using the window's close button, restore the backup over the invalid file, and relaunch.<br>
+   Expected: The known student and all saved details return. Close the app before removing the disposable test
+   folder. Retain the backup if further testing is planned.

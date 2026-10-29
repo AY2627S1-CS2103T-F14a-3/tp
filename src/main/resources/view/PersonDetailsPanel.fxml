@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <content>
+    <VBox spacing="12" styleClass="detail-panel">
+      <padding>
+        <Insets top="18" right="18" bottom="18" left="18" />
+      </padding>
+
+      <Label fx:id="name" styleClass="detail-name" wrapText="true" />
+      <FlowPane fx:id="tags" />
+
+      <VBox spacing="6" styleClass="student-information-box">
+        <Label text="Academic Information" styleClass="student-section-title" />
+        <Label fx:id="schoolLevel" styleClass="detail-value" wrapText="true" />
+        <Label fx:id="subject" styleClass="detail-value" wrapText="true" />
+      </VBox>
+
+      <VBox spacing="6" styleClass="student-information-box">
+        <Label text="Contact Details" styleClass="student-section-title" />
+        <Label fx:id="phone" styleClass="detail-value" wrapText="true" />
+        <Label fx:id="email" styleClass="detail-value" wrapText="true" />
+        <Label fx:id="address" styleClass="detail-value" wrapText="true" />
+      </VBox>
+
+      <VBox spacing="8" styleClass="student-information-box">
+        <Label text="Tutoring Information" styleClass="student-section-title" />
+        <VBox spacing="3" styleClass="lesson-information-box">
+          <Label text="Next Lesson" styleClass="lesson-section-title" />
+          <Label fx:id="nextLesson" styleClass="detail-value" wrapText="true" />
+          <Label fx:id="nextLessonTopic" styleClass="detail-value" wrapText="true" />
+        </VBox>
+        <VBox spacing="3" styleClass="lesson-information-box">
+          <Label text="Recurring Lesson" styleClass="lesson-section-title" />
+          <Label fx:id="recurringLesson" styleClass="detail-value" wrapText="true" />
+          <Label fx:id="recurringLessonTopic" styleClass="detail-value" wrapText="true" />
+        </VBox>
+        <Label fx:id="note" styleClass="detail-value" wrapText="true" />
+      </VBox>
+    </VBox>
+  </content>
+</ScrollPane>

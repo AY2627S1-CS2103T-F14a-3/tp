@@ -31,9 +31,19 @@ public class SubjectTest {
     }
 
     @Test
-    public void constructor_validValue_trimsWhitespace() {
+    public void constructor_validValue_stripsWhitespace() {
         Subject subject = new Subject("  Mathematics  ");
         assertEquals("Mathematics", subject.value);
+        assertEquals("Mathematics", new Subject("\u2003Mathematics\u3000").value);
+    }
+
+    @Test
+    public void constructor_unicodeWhitespace_throwsIllegalArgumentException() {
+        for (String blank : new String[] {"\u2003", "\u3000", " \t\u2003\u3000 "}) {
+            assertFalse(Subject.isValidSubject(blank));
+            Assert.assertThrows(IllegalArgumentException.class, Subject.MESSAGE_CONSTRAINTS, () ->
+                    new Subject(blank));
+        }
     }
 
     @Test

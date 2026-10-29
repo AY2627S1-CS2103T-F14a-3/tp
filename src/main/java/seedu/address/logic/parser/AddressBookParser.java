@@ -1,8 +1,10 @@
 package seedu.address.logic.parser;
 
+import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 
+import java.time.Clock;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +27,7 @@ import seedu.address.logic.commands.NoteCommand;
 import seedu.address.logic.commands.RecurringLessonCommand;
 import seedu.address.logic.commands.SortCommand;
 import seedu.address.logic.commands.UpcomingCommand;
+import seedu.address.logic.commands.ViewCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
 /**
@@ -37,6 +40,22 @@ public class AddressBookParser {
      */
     private static final Pattern BASIC_COMMAND_FORMAT = Pattern.compile("(?<commandWord>\\S+)(?<arguments>.*)");
     private static final Logger logger = LogsCenter.getLogger(AddressBookParser.class);
+
+    private final Clock clock;
+
+    /**
+     * Creates a parser using the computer's local time zone.
+     */
+    public AddressBookParser() {
+        this(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Shares the supplied clock with time-dependent parsers and commands.
+     */
+    public AddressBookParser(Clock clock) {
+        this.clock = requireNonNull(clock);
+    }
 
     /**
      * Parses user input into command for execution.
@@ -73,9 +92,10 @@ public class AddressBookParser {
             case ExitCommand.COMMAND_WORD -> new ExitCommand();
             case HelpCommand.COMMAND_WORD -> new HelpCommand();
             case NoteCommand.COMMAND_WORD -> new NoteCommandParser().parse(arguments);
-            case NextLessonCommand.COMMAND_WORD -> new NextLessonCommandParser().parse(arguments);
+            case NextLessonCommand.COMMAND_WORD -> new NextLessonCommandParser(clock).parse(arguments);
             case SortCommand.COMMAND_WORD -> new SortCommand();
-            case UpcomingCommand.COMMAND_WORD -> new UpcomingCommand();
+            case ViewCommand.COMMAND_WORD -> new ViewCommandParser().parse(arguments);
+            case UpcomingCommand.COMMAND_WORD -> new UpcomingCommand(clock);
             case RecurringLessonCommand.COMMAND_WORD -> new RecurringLessonCommandParser().parse(arguments);
             default -> {
                 logger.finer("This user input caused a ParseException: " + userInput);

@@ -34,6 +34,7 @@ import seedu.address.logic.commands.NoteCommand;
 import seedu.address.logic.commands.RecurringLessonCommand;
 import seedu.address.logic.commands.SortCommand;
 import seedu.address.logic.commands.UpcomingCommand;
+import seedu.address.logic.commands.ViewCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
@@ -52,6 +53,21 @@ import seedu.address.testutil.PersonUtil;
 public class AddressBookParserTest {
 
     private final AddressBookParser parser = new AddressBookParser();
+
+    @Test
+    public void parseCommand_unicodeWhitespaceAcademicFields_throwsParseException() {
+        for (String blank : List.of("\u2003", "\u3000", " \t\u2003\u3000 ")) {
+            for (String command : List.of(
+                    "add n/Alpha p/90000001 e/alpha@example.com a/Block One",
+                    "edit 1", "filter")) {
+                assertThrows(ParseException.class, SchoolLevel.MESSAGE_CONSTRAINTS, () ->
+                        parser.parseCommand(command + " l/" + blank));
+                assertThrows(ParseException.class, Subject.MESSAGE_CONSTRAINTS, () ->
+                        parser.parseCommand(command + " s/" + blank));
+            }
+        }
+    }
+
 
     @Test
     public void parseCommand_add() throws Exception {
@@ -137,6 +153,13 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_upcoming() throws Exception {
         assertTrue(parser.parseCommand(UpcomingCommand.COMMAND_WORD) instanceof UpcomingCommand);
+    }
+
+    @Test
+    public void parseCommand_view() throws Exception {
+        ViewCommand command = (ViewCommand) parser.parseCommand(
+                ViewCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
+        assertEquals(new ViewCommand(INDEX_FIRST_PERSON), command);
     }
 
     @Test

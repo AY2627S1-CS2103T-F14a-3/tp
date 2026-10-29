@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.RecurringLesson;
+import seedu.address.model.person.SchoolLevel;
 import seedu.address.model.person.StudentNote;
 import seedu.address.model.person.Subject;
 
@@ -71,6 +72,57 @@ final class PersonCardFormatter {
     static String formatSubject(Subject subject) {
         requireNonNull(subject);
         return "Subject: " + subject.value;
+    }
+
+    /**
+     * Formats the available school level and subject for a compact student summary.
+     */
+    static Optional<String> formatSummaryAcademicInfo(SchoolLevel schoolLevel, Subject subject) {
+        requireNonNull(schoolLevel);
+        requireNonNull(subject);
+
+        Optional<String> levelText = SchoolLevel.DEFAULT_VALUE.equals(schoolLevel.value)
+                ? Optional.empty()
+                : Optional.of(abbreviateSchoolLevel(schoolLevel.value));
+        Optional<String> subjectText = Subject.DEFAULT_VALUE.equals(subject.value)
+                ? Optional.empty()
+                : Optional.of(subject.value);
+
+        if (levelText.isPresent() && subjectText.isPresent()) {
+            return Optional.of(levelText.get() + " " + subjectText.get());
+        }
+        return levelText.or(() -> subjectText);
+    }
+
+    /**
+     * Formats the next lesson for a compact student summary, if one exists.
+     */
+    static Optional<String> formatNextLessonSummary(Optional<NextLesson> nextLesson) {
+        requireNonNull(nextLesson);
+        return nextLesson.map(lesson -> "Next: "
+                + formatNextLesson(Optional.of(lesson)).lessonText());
+    }
+
+    /**
+     * Formats the recurring lesson for a compact student summary, if one exists.
+     */
+    static Optional<String> formatRecurringLessonSummary(Optional<RecurringLesson> recurringLesson) {
+        requireNonNull(recurringLesson);
+        return recurringLesson.map(lesson -> "Recurring: "
+                + formatRecurringLesson(Optional.of(lesson)).lessonText());
+    }
+
+    private static String abbreviateSchoolLevel(String schoolLevel) {
+        if (schoolLevel.startsWith("Secondary ")) {
+            return "Sec " + schoolLevel.substring("Secondary ".length());
+        }
+        if (schoolLevel.startsWith("Primary ")) {
+            return "Pri " + schoolLevel.substring("Primary ".length());
+        }
+        if (schoolLevel.startsWith("Junior College ")) {
+            return "JC " + schoolLevel.substring("Junior College ".length());
+        }
+        return schoolLevel;
     }
 
     /**

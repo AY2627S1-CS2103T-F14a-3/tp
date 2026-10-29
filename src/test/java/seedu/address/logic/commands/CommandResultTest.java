@@ -5,7 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
+
+import seedu.address.model.person.Person;
+import seedu.address.testutil.PersonBuilder;
 
 public class CommandResultTest {
     @Test
@@ -33,6 +38,10 @@ public class CommandResultTest {
 
         // different exit value -> returns false
         assertFalse(commandResult.equals(new CommandResult("feedback", false, true)));
+
+        // different personToView value -> returns false
+        Person person = new PersonBuilder().build();
+        assertFalse(commandResult.equals(new CommandResult("feedback", person)));
     }
 
     @Test
@@ -50,6 +59,10 @@ public class CommandResultTest {
 
         // different exit value -> returns different hashcode
         assertNotEquals(commandResult.hashCode(), new CommandResult("feedback", false, true).hashCode());
+
+        // different personToView value -> returns different hashcode
+        Person person = new PersonBuilder().build();
+        assertNotEquals(commandResult.hashCode(), new CommandResult("feedback", person).hashCode());
     }
 
     @Test
@@ -57,7 +70,15 @@ public class CommandResultTest {
         CommandResult commandResult = new CommandResult("feedback");
         String expected = CommandResult.class.getCanonicalName() + "{feedbackToUser="
                 + commandResult.getFeedbackToUser() + ", showHelp=" + commandResult.isShowHelp()
-                + ", exit=" + commandResult.isExit() + "}";
+                + ", exit=" + commandResult.isExit() + ", personToView=" + Optional.empty() + "}";
         assertEquals(expected, commandResult.toString());
+    }
+
+    @Test
+    public void personToView() {
+        Person person = new PersonBuilder().build();
+        CommandResult commandResult = new CommandResult("feedback", person);
+
+        assertEquals(Optional.of(person), commandResult.getPersonToView());
     }
 }

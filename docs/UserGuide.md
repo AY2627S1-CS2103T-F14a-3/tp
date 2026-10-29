@@ -22,7 +22,7 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
 1. Copy the file to the folder you want to use as the _home folder_ for TutorTrack.
 
-1. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar addressbook.jar`.<br>
+1. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar "TutorTrack.jar"`.<br>
    A GUI similar to the one below should appear in a few seconds. Note how the app contains some sample data.<br>
    ![Ui](images/Ui.png)
 
@@ -31,6 +31,8 @@ TutorTrack is a desktop contact-management application for private tutors who ma
    Some example commands you can try:
 
    * `list` : Lists all students.
+
+   * `view 1` : Shows the complete record of the 1st student in the current list.
 
    * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a student named `John Doe` to TutorTrack.
 
@@ -59,8 +61,9 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 * Items followed by `...` can appear zero or more times.<br>
   For example, `[t/TAG]... ` may be omitted, or written as `t/friend` or `t/friend t/family`.
 
-* Parameters can be in any order.<br>
+* Parameters can generally be in any order unless a command specifies otherwise.<br>
   For example, if the command specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.
+  For `nextlesson` and `recurringlesson`, `topic/TOPIC` must be the final parameter.
 
 * Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
@@ -72,9 +75,8 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
 Shows a message explaining how to access the help page.
 
-![help message](images/helpMessage.png)
-
-<!-- Replace this screenshot after the Help window uses the TutorTrack User Guide URL. -->
+The Help window shows the [TutorTrack User Guide](https://ay2627s1-cs2103t-f14a-3.github.io/tp/UserGuide.html)
+address and lets you copy it.
 
 Format: `help`
 
@@ -90,7 +92,7 @@ Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT
 **Tip:** A student can have any number of tags, including zero.
 </box>
 
-* The school level and subject are optional. If either is omitted, TutorTrack records it as `Not specified`.
+* The school level and subject are optional. If either is omitted, TutorTrack records it as `Not specified`. To return an existing student's academic fields to this state, use `edit` as described under [Editing a student](#editing-a-student-edit).
 
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
@@ -102,21 +104,40 @@ Shows a list of all students in TutorTrack.
 
 Format: `list`
 
-Each student card groups information into the following sections:
+Each student is shown as a concise summary containing:
 
-* **Academic Information** — the student's school level and subject
-* **Contact Details** — the student's phone number, email address, and home address
-* **Tutoring Information** — the student's next lesson and note
+* the student's name
+* school level and subject, when specified
+* phone number
+* next lesson, when scheduled
+* recurring lesson, when scheduled
 
-Student tags are displayed below the student's name. If a student does not have a scheduled lesson, the card displays `Next lesson: Not scheduled`. Empty notes and optional lesson topics are not displayed.
+Unspecified academic fields and unscheduled lessons are omitted from the summary instead of being shown as `Not specified` or `Not scheduled`.
+
+### Viewing a student's complete record: `view`
+
+Shows the complete record of a student in the right-hand panel.
+
+Format: `view INDEX`
+
+* The index refers to the index number shown in the current displayed list, including results from `find`, `filter`, `sort`, and `upcoming`.
+* The index must be a positive integer identifying a student in that list.
+* The complete record includes academic information, contact details, tags, next and recurring lessons, lesson topics, and the student's note.
+* Running another successful command clears the detail panel to avoid showing information that may no longer be current.
+
+Example: `view 1` displays the complete record of the first student in the current list.
+
+![result for 'view 1'](images/viewAlex.png)
 
 ### Viewing the earliest upcoming lesson: `upcoming`
 
-Shows the student with the earliest upcoming next lesson.
+Shows the student or students with the earliest upcoming lesson, including weekly recurring lessons.
 
 Format: `upcoming`
 
-* Only scheduled next lessons that have not yet started are considered, across all students.
+* Searches all students, including those hidden by `find` or `filter`, and compares one-off next lessons with the next occurrence of each weekly recurring lesson.
+* Only lesson starts at or after the current local time are considered. A recurring lesson whose start has passed is considered at its next occurrence one week later, even if today's lesson is still ongoing.
+* Each matching student is shown once, including when their next lesson and recurring occurrence start at the same time.
 * If several students share the earliest lesson time, all of them are shown.
 * If no upcoming lesson is scheduled, an error message is shown. Use `list` to show all students again.
 
@@ -138,6 +159,8 @@ Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [l/SCHOOL_LEVEL] [s
 * Edits the student at the specified `INDEX`. The index refers to the index number shown in the displayed student list. The index **must be a positive integer** 1, 2, 3, ...
 * At least one of the optional fields must be provided.
 * Existing values will be updated to the input values.
+* Omitting `l/` or `s/` when editing keeps the existing school level or subject unchanged. To reset either field, explicitly enter `l/Not specified` or `s/Not specified`, using that exact capitalisation.
+* Empty academic values such as `edit 1 l/` and `edit 1 s/` are rejected with `School level must not be blank.` and `Subject must not be blank.` respectively. Unlike `t/`, an empty academic prefix does not clear the field.
 * When editing tags, all of the student's existing tags are removed; adding tags is not cumulative.
 * To remove all of a student's tags, enter `t/` without a tag after it.
 
@@ -146,6 +169,9 @@ Examples:
 *  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd student to be `Betsy Crower` and clears all existing tags.
 *  `edit 1 l/Junior College 1` Updates the school level of the 1st student.
 *  `edit 1 s/Physics` Updates the subject of the 1st student.
+*  `edit 1 s/Not specified` Resets only the subject of the 1st student, keeping the school level and other details unchanged.
+*  `edit 1 l/Not specified` Resets only the school level of the 1st student, keeping the subject and other details unchanged.
+*  `edit 1 l/Not specified s/Not specified` Resets both academic fields of the 1st student without deleting or recreating the student record.
 
 ### Locating students by name: `find`
 
@@ -203,11 +229,13 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 
 * The date must be a valid date in `YYYY-MM-DD` format and the time a valid 24-hour time in `HH:mm` format.
 * The lesson must not be in the past, and the topic must not be blank.
+* `topic/TOPIC` must be the final parameter. All remaining text after `topic/` is saved as the topic, so the topic may include text resembling a command prefix, such as `time/ complexity`.
 * The duration is required and must be a whole number from 1 to 1440 minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
 * A next lesson cannot overlap another student's next lesson or a recurring lesson occurrence, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
 * If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
 * Replacing a student's next lesson ignores that student's old next lesson. The student's own recurring lesson is still checked: an exact weekday and start-time match is allowed as the same occurrence, even if the topic or duration differs; other overlapping times are rejected.
 * The lesson is saved with the student and displayed on the student card. Updating it preserves the student's other details, including notes and tags.
+* Restarting keeps lessons that are still ongoing, so their remaining time cannot be double-booked. Saved lessons are cleared on loading only when their end time has been reached. This does not allow creating new lessons with a past start time.
 
 Example: `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra` schedules a 90-minute algebra lesson for the first displayed student.
 
@@ -235,6 +263,7 @@ Format: `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`
 * The day must be a valid day of the week, such as `MONDAY`. Day names are not case-sensitive.
 * The duration is required and must be a whole number from 1 to 1440 minutes.
 * The time must be a valid 24-hour time in `HH:mm` format, and the topic must not be blank.
+* `topic/TOPIC` must be the final parameter. All remaining text after `topic/` is saved as the topic, so the topic may include text resembling a command prefix, such as `time/ complexity`.
 * Each student can have one recurring lesson. Setting another recurring lesson replaces the existing one.
 * TutorTrack checks the proposed schedule against all students' next lessons and other students' recurring schedules, even when those students are hidden by a filter. Replacing a recurring lesson ignores that student's old recurring schedule.
 * An exact weekday and start-time match with the same student's next lesson is allowed as the same occurrence, even if the topic or duration differs. Other partial overlaps with that student's next lesson are rejected.
@@ -287,6 +316,8 @@ Format: `exit`
 
 TutorTrack automatically saves data after every command. You do not need to save manually.
 
+If saving fails, TutorTrack displays an error and restores the student records, their order, and the displayed list to their state before the command. Resolve the reported file-access problem before retrying the command.
+
 ### Editing the data file
 
 TutorTrack data is saved automatically as a JSON file `data/addressbook.json`, located inside the folder you launch TutorTrack from (its current working directory). `preferences.json` and the log file are created there too. To keep using the same data, always start TutorTrack from the same folder. Advanced users are welcome to update data directly by editing that data file.
@@ -296,6 +327,8 @@ TutorTrack data is saved automatically as a JSON file `data/addressbook.json`, l
 **Caution:**
 If your changes make the data file invalid, TutorTrack starts with an empty student list at the next run. The invalid file remains on disk until you run a command (TutorTrack saves after every command). Still, we recommend backing up the file before editing it.<br>
 Furthermore, certain edits can cause TutorTrack to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
+
+Student names that differ only in capitalization, repeated spaces, or surrounding spaces are considered duplicates. After upgrading TutorTrack, a data file containing such records cannot be loaded. If TutorTrack starts with an empty student list after an upgrade, close it without running a command, back up `data/addressbook.json`, and remove or rename the duplicate records in the JSON file before restarting TutorTrack. Running a command while the student list is empty may overwrite the invalid data file.
 </box>
 
 --------------------------------------------------------------------------------------------------------------------
@@ -318,19 +351,19 @@ Furthermore, certain edits can cause TutorTrack to behave in unexpected ways (e.
 
 Action     | Format and Examples
 -----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-**Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]... ` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
+**Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]... ` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
 **Clear**  | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
-**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... `<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
+**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]... `<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **Filter** | `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`<br> e.g., `filter l/Secondary 4 s/Mathematics t/weekday`
 **List**   | `list`
+**View**   | `view INDEX`<br> e.g., `view 2`
 **Upcoming** | `upcoming`
 **Sort**   | `sort`
 **Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra`
 **Clear next lesson** | `clearlesson INDEX`<br> e.g., `clearlesson 1`
 **Recurring lesson** | `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `recurringlesson 1 day/MONDAY time/16:30 dur/90 topic/Algebra`
-**Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
 **Clear recurring lesson** | `clearrecurringlesson INDEX`<br> e.g., `clearrecurringlesson 1`
 **Note**   | `note INDEX note/NOTE`<br> e.g., `note 1 note/Needs extra time for algebra`
 **Help**   | `help`
