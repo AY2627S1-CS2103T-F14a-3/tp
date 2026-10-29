@@ -5,9 +5,12 @@ import static seedu.address.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORM
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 
+import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -143,6 +146,46 @@ public class JsonAdaptedPersonTest {
                 LocalDate.now().minusDays(1).toString(), "14:30", "Algebra", 90);
         JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
                 VALID_SCHOOL_LEVEL, null, expiredLesson, VALID_TAGS);
+
+        assertEquals(Optional.empty(), adapted.toModelType().getNextLesson());
+    }
+
+    @Test
+    public void toModelType_ongoingNextLesson_keepsOccupiedInterval() throws Exception {
+        LocalDateTime started = LocalDateTime.now().minusMinutes(10);
+        JsonAdaptedNextLesson ongoing = new JsonAdaptedNextLesson(started.toLocalDate().toString(),
+                started.toLocalTime().toString(), "Algebra", 60);
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, ongoing, VALID_TAGS);
+
+        NextLesson lesson = adapted.toModelType().getNextLesson().orElseThrow();
+
+        assertEquals(started, lesson.getDateTime());
+        assertEquals(started.plusMinutes(60), lesson.getEndDateTime());
+    }
+
+    @Test
+    public void toModelType_nextLessonEndBoundary_keepsBeforeEndAndDiscardsAtEnd() throws Exception {
+        LocalDateTime start = LocalDateTime.of(2030, 6, 17, 9, 0);
+        LocalDateTime end = start.plusMinutes(60);
+        JsonAdaptedNextLesson stored = new JsonAdaptedNextLesson(
+                start.toLocalDate().toString(), start.toLocalTime().toString(), "Algebra", 60);
+        NextLesson expected = NextLesson.fromStoredValues(start.toLocalDate(), start.toLocalTime(),
+                "Algebra", new LessonDuration("60"));
+        Clock justBeforeEnd = Clock.fixed(end.minusNanos(1).toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+        Clock exactlyAtEnd = Clock.fixed(end.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+
+        assertEquals(Optional.of(expected), stored.toModelType(justBeforeEnd));
+        assertEquals(Optional.empty(), stored.toModelType(exactlyAtEnd));
+    }
+
+    @Test
+    public void toModelType_completedTodayNextLesson_clearsLesson() throws Exception {
+        LocalDateTime started = LocalDateTime.now().minusMinutes(90);
+        JsonAdaptedNextLesson completed = new JsonAdaptedNextLesson(started.toLocalDate().toString(),
+                started.toLocalTime().toString(), "Algebra", 60);
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_SCHOOL_LEVEL, null, completed, VALID_TAGS);
 
         assertEquals(Optional.empty(), adapted.toModelType().getNextLesson());
     }

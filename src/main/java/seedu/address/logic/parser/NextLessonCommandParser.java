@@ -7,6 +7,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DURATION;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TIME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TOPIC;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -23,14 +24,28 @@ import seedu.address.model.person.NextLesson;
 public class NextLessonCommandParser implements Parser<NextLessonCommand> {
 
     private static final String MESSAGE_INVALID_DATE = "Lesson date must be a valid date in YYYY-MM-DD format.";
-    private static final String MESSAGE_INVALID_TIME = "Lesson time must be a valid time in HH:mm format.";
+
+    private final Clock clock;
+
+    /**
+     * Creates a parser using the computer's local time zone.
+     */
+    public NextLessonCommandParser() {
+        this(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates a parser that validates new bookings against the supplied clock.
+     */
+    public NextLessonCommandParser(Clock clock) {
+        this.clock = requireNonNull(clock);
+    }
 
     @Override
     public NextLessonCommand parse(String args) throws ParseException {
         requireNonNull(args);
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_LESSON_DATE, PREFIX_LESSON_TIME,
-                PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTerminalPrefix(args, PREFIX_LESSON_TOPIC,
+                PREFIX_LESSON_DATE, PREFIX_LESSON_TIME, PREFIX_LESSON_DURATION);
         argMultimap.verifyNoDuplicatePrefixesFor(
                 PREFIX_LESSON_DATE, PREFIX_LESSON_TIME,
                 PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
@@ -51,12 +66,12 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
         }
 
         LocalDate date = parseDate(argMultimap.getValue(PREFIX_LESSON_DATE).orElseThrow());
-        LocalTime time = parseTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
+        LocalTime time = ParserUtil.parseLessonTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
         LessonDuration duration = ParserUtil.parseLessonDuration(
                 argMultimap.getValue(PREFIX_LESSON_DURATION).orElseThrow());
         try {
             return new NextLessonCommand(index, new NextLesson(date, time,
-                    argMultimap.getValue(PREFIX_LESSON_TOPIC).orElseThrow(), duration));
+                    argMultimap.getValue(PREFIX_LESSON_TOPIC).orElseThrow(), duration, clock));
         } catch (IllegalArgumentException e) {
             throw new ParseException(e.getMessage(), e);
         }
@@ -70,17 +85,6 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
             return LocalDate.parse(date);
         } catch (DateTimeParseException e) {
             throw new ParseException(MESSAGE_INVALID_DATE, e);
-        }
-    }
-
-    private LocalTime parseTime(String time) throws ParseException {
-        if (!time.matches("\\d{2}:\\d{2}")) {
-            throw new ParseException(MESSAGE_INVALID_TIME);
-        }
-        try {
-            return LocalTime.parse(time);
-        } catch (DateTimeParseException e) {
-            throw new ParseException(MESSAGE_INVALID_TIME, e);
         }
     }
 }

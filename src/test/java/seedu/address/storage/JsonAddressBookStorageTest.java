@@ -3,7 +3,9 @@ package seedu.address.storage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static seedu.address.testutil.Assert.assertThrows;
+import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.ALICE;
+import static seedu.address.testutil.TypicalPersons.BENSON;
 import static seedu.address.testutil.TypicalPersons.HOON;
 import static seedu.address.testutil.TypicalPersons.IDA;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
@@ -12,14 +14,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.exceptions.DataLoadingException;
+import seedu.address.logic.commands.NextLessonCommand;
+import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
+import seedu.address.model.Model;
+import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.UserPrefs;
+import seedu.address.model.person.LessonDuration;
+import seedu.address.model.person.NextLesson;
 import seedu.address.testutil.PersonBuilder;
 
 public class JsonAddressBookStorageTest {
@@ -94,6 +104,26 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
+    public void readAddressBook_jsonNull_throwsDataLoadingExceptionWithoutChangingFile() throws Exception {
+        Path filePath = testFolder.resolve("nullAddressBook.json");
+        String contents = " \n null \n ";
+        Files.writeString(filePath, contents);
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+        assertEquals(contents, Files.readString(filePath));
+    }
+
+    @Test
+    public void readAddressBook_validEmptyAddressBook_returnsPresentEmptyBook() throws Exception {
+        Path filePath = testFolder.resolve("emptyAddressBook.json");
+        Files.writeString(filePath, "{\"persons\": []}");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        assertEquals(new AddressBook(), new AddressBook(storage.readAddressBook().orElseThrow()));
+    }
+
+    @Test
     public void read_notJsonFormat_exceptionThrown() {
         assertThrows(DataLoadingException.class, () -> readAddressBook("notJsonFormatAddressBook.json"));
     }
@@ -155,6 +185,31 @@ public class JsonAddressBookStorageTest {
             assertEquals(book, reloaded);
             assertEquals(note, reloaded.getPersonList().getFirst().getNote().value);
         }
+    }
+
+    @Test
+    public void readAddressBook_ongoingLesson_preservesClashAfterRestart() throws Exception {
+        Path file = testFolder.resolve("OngoingLesson.json");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(file);
+        AddressBook original = new AddressBook();
+        LocalDateTime start = LocalDateTime.now().minusMinutes(10);
+        NextLesson ongoing = NextLesson.fromStoredValues(start.toLocalDate(), start.toLocalTime(),
+                "Algebra", new LessonDuration("60"));
+        original.addPerson(new PersonBuilder(ALICE).withNextLesson(ongoing).build());
+        original.addPerson(BENSON);
+        storage.saveAddressBook(original);
+
+        AddressBook reloaded = new AddressBook(storage.readAddressBook().orElseThrow());
+        LocalDateTime overlappingStart = LocalDateTime.now().plusMinutes(10);
+        NextLesson overlapping = new NextLesson(overlappingStart.toLocalDate(), overlappingStart.toLocalTime(),
+                "Geometry", new LessonDuration("30"));
+        Model model = new ModelManager(reloaded, new UserPrefs());
+
+        assertEquals(original, reloaded);
+        assertEquals(ongoing, reloaded.getPersonList().getFirst().getNextLesson().orElseThrow());
+        assertThrows(CommandException.class, () ->
+                new NextLessonCommand(INDEX_SECOND_PERSON, overlapping).execute(model));
+        assertEquals(reloaded, model.getAddressBook());
     }
 
     /**
