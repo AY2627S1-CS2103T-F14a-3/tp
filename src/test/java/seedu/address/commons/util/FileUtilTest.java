@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,18 @@ public class FileUtilTest {
 
     @Test
     public void writeToFileAtomically_relativePath_createsMissingParentsAndFile() throws Exception {
-        Path file = testFolder.resolve("new folder/data/students.json");
-        Path relative = Path.of("").toAbsolutePath().relativize(file.toAbsolutePath());
-        FileUtil.writeToFileAtomically(relative, "new data");
-        assertEquals("new data", Files.readString(file));
-        assertOnlyDestinationRemains(file);
+        Path workingDirectory = Path.of("").toAbsolutePath();
+        Path localTempRoot = Files.createDirectories(workingDirectory.resolve("build/tmp"));
+        Path localTestFolder = Files.createTempDirectory(localTempRoot, "file-util-test-");
+        try {
+            Path file = localTestFolder.resolve("new folder/data/students.json");
+            Path relative = workingDirectory.relativize(file);
+            FileUtil.writeToFileAtomically(relative, "new data");
+            assertEquals("new data", Files.readString(file));
+            assertOnlyDestinationRemains(file);
+        } finally {
+            deleteRecursively(localTestFolder);
+        }
     }
 
     @Test
@@ -127,6 +135,14 @@ public class FileUtilTest {
     private void assertOnlyDestinationRemains(Path destination) throws IOException {
         try (var files = Files.list(destination.getParent())) {
             assertEquals(List.of(destination.getFileName()), files.map(Path::getFileName).toList());
+        }
+    }
+
+    private static void deleteRecursively(Path root) throws IOException {
+        try (var paths = Files.walk(root)) {
+            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(path);
+            }
         }
     }
 }
