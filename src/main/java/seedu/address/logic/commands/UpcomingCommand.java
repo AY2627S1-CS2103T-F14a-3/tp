@@ -29,11 +29,16 @@ public class UpcomingCommand extends Command {
 
     private final Clock clock;
 
+    /**
+     * Creates a command using the computer's local time zone.
+     */
     public UpcomingCommand() {
         this(Clock.systemDefaultZone());
     }
 
-    /** Creates a command using the given clock for consistent lesson-start comparisons. */
+    /**
+     * Creates a command whose upcoming-lesson boundary uses the supplied clock.
+     */
     public UpcomingCommand(Clock clock) {
         this.clock = requireNonNull(clock);
     }
@@ -54,6 +59,7 @@ public class UpcomingCommand extends Command {
         model.updateFilteredPersonList(startsAtEarliest);
         return new CommandResult(String.format(MESSAGE_SUCCESS, earliest.toLocalDate() + " " + earliest.toLocalTime()));
     }
+
     /** Compares a student's one-off lesson with their next weekly occurrence. */
     private Optional<LocalDateTime> getEarliestStart(Person person, LocalDateTime now) {
         Optional<LocalDateTime> nextLesson = person.getNextLesson()

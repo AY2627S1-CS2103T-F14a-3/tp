@@ -10,6 +10,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -29,6 +30,31 @@ public class UpcomingCommandTest {
     private static final LocalDate DATE = LocalDate.now().plusDays(10);
 
     private final Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
+
+    @Test
+    public void execute_fixedClockAtStartBoundary_includesOnlyUnstartedLessons() throws Exception {
+        LocalDateTime start = LocalDateTime.of(2000, 1, 1, 10, 0);
+        ZoneId zone = ZoneId.of("Asia/Singapore");
+        Clock bookingClock = Clock.fixed(start.minusDays(1).atZone(zone).toInstant(), zone);
+        NextLesson lesson = new NextLesson(start.toLocalDate(), start.toLocalTime(), "Algebra",
+                new LessonDuration("60"), bookingClock);
+        Person original = model.getFilteredPersonList().getFirst();
+        Person student = new PersonBuilder(original).withNextLesson(lesson).build();
+        model.setPerson(original, student);
+
+        for (LocalDateTime now : new LocalDateTime[]{start.minusNanos(1), start}) {
+            new UpcomingCommand(Clock.fixed(now.atZone(zone).toInstant(), zone)).execute(model);
+            assertEquals(List.of(student), model.getFilteredPersonList());
+        }
+
+        Clock afterStart = Clock.fixed(start.plusNanos(1).atZone(zone).toInstant(), zone);
+        assertCommandFailure(new UpcomingCommand(afterStart), model, UpcomingCommand.MESSAGE_NO_UPCOMING_LESSON);
+    }
+
+    @Test
+    public void constructor_nullClock_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> new UpcomingCommand(null));
+    }
 
     @Test
     public void execute_noLessons_throwsCommandException() {
@@ -135,11 +161,6 @@ public class UpcomingCommandTest {
         model.updateFilteredPersonList(person -> person.equals(student));
         assertCommandFailure(at("2030-06-17T09:00:01"), model, UpcomingCommand.MESSAGE_NO_UPCOMING_LESSON);
         assertEquals(List.of(student), model.getFilteredPersonList());
-    }
-
-    @Test
-    public void constructor_nullClock_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> new UpcomingCommand(null));
     }
 
     private static UpcomingCommand at(String now) {

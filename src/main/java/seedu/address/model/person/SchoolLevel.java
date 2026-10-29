@@ -22,14 +22,14 @@ public class SchoolLevel {
         if (!isValidSchoolLevel(level)) {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
-        value = level.trim();
+        value = level.strip();
     }
 
     /**
      * Returns true if a given string is a valid school level.
      */
     public static boolean isValidSchoolLevel(String test) {
-        return test != null && !test.trim().isEmpty();
+        return test != null && !test.trim().isBlank();
     }
 
     @Override

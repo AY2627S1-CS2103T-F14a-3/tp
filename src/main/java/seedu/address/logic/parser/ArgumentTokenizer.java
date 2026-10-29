@@ -29,6 +29,30 @@ public class ArgumentTokenizer {
     }
 
     /**
+     * Tokenizes an arguments string while treating {@code terminalPrefix} as the start of a final free-text argument.
+     * Any text after the first occurrence of {@code terminalPrefix} is stored verbatim as that argument's value, apart
+     * from leading and trailing whitespace. Prefix-like text within the terminal argument is therefore not tokenized.
+     *
+     * @param argsString Arguments string to tokenize
+     * @param terminalPrefix Prefix that starts the final free-text argument
+     * @param prefixes Prefixes to recognize before the terminal argument
+     * @return ArgumentMultimap containing the parsed arguments
+     */
+    public static ArgumentMultimap tokenizeWithTerminalPrefix(String argsString, Prefix terminalPrefix,
+                                                               Prefix... prefixes) {
+        int terminalPrefixPosition = findPrefixPosition(argsString, terminalPrefix.getPrefix(), 0);
+        if (terminalPrefixPosition == -1) {
+            return tokenize(argsString, prefixes);
+        }
+
+        String argsBeforeTerminalPrefix = argsString.substring(0, terminalPrefixPosition);
+        ArgumentMultimap argMultimap = tokenize(argsBeforeTerminalPrefix, prefixes);
+        int terminalValueStart = terminalPrefixPosition + terminalPrefix.getPrefix().length();
+        argMultimap.put(terminalPrefix, argsString.substring(terminalValueStart).trim());
+        return argMultimap;
+    }
+
+    /**
      * Finds all zero-based prefix positions in the given arguments string.
      *
      * @param argsString Arguments string of the form: {@code preamble <prefix>value <prefix>value ...}

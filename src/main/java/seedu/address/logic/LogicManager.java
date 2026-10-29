@@ -2,6 +2,8 @@ package seedu.address.logic;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.time.Clock;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
@@ -12,6 +14,7 @@ import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.person.Person;
 import seedu.address.storage.Storage;
@@ -35,9 +38,16 @@ public class LogicManager implements Logic {
      * Constructs a {@code LogicManager} with the given {@code Model} and {@code Storage}.
      */
     public LogicManager(Model model, Storage storage) {
+        this(model, storage, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates logic whose booking validation and upcoming selection share the supplied clock.
+     */
+    public LogicManager(Model model, Storage storage, Clock clock) {
         this.model = model;
         this.storage = storage;
-        addressBookParser = new AddressBookParser();
+        addressBookParser = new AddressBookParser(clock);
     }
 
     @Override
@@ -46,17 +56,28 @@ public class LogicManager implements Logic {
 
         CommandResult commandResult;
         Command command = addressBookParser.parseCommand(commandText);
+        AddressBook previousAddressBook = new AddressBook(model.getAddressBook());
+        Predicate<Person> previousFilter = model.getPersonListFilter();
         commandResult = command.execute(model);
 
         try {
             storage.saveAddressBook(model.getAddressBook());
         } catch (AccessDeniedException e) {
+            restoreModel(previousAddressBook, previousFilter);
             throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
         } catch (IOException ioe) {
+            restoreModel(previousAddressBook, previousFilter);
             throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
         }
 
         return commandResult;
+    }
+
+    /** Restores the pre-command records, order and filter after a failed save. */
+    private void restoreModel(AddressBook previousAddressBook, Predicate<Person> previousFilter) {
+        model.setAddressBook(previousAddressBook);
+        model.updateFilteredPersonList(previousFilter);
+        logger.warning("Saving failed; restored the student records and displayed filter.");
     }
 
     @Override
