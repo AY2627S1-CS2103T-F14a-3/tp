@@ -31,9 +31,10 @@ public class SchoolLevelTest {
     }
 
     @Test
-    public void constructor_validValue_trimsWhitespace() {
+    public void constructor_validValue_stripsWhitespace() {
         SchoolLevel schoolLevel = new SchoolLevel("  Secondary 4  ");
         assertEquals("Secondary 4", schoolLevel.value);
+        assertEquals("Secondary 4", new SchoolLevel("\u2003Secondary 4\u3000").value);
     }
 
     @Test

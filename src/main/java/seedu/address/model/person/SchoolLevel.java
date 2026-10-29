@@ -22,7 +22,7 @@ public class SchoolLevel {
         if (!isValidSchoolLevel(level)) {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
-        value = level.trim();
+        value = level.strip();
     }
 
     /**

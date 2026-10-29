@@ -31,9 +31,10 @@ public class SubjectTest {
     }
 
     @Test
-    public void constructor_validValue_trimsWhitespace() {
+    public void constructor_validValue_stripsWhitespace() {
         Subject subject = new Subject("  Mathematics  ");
         assertEquals("Mathematics", subject.value);
+        assertEquals("Mathematics", new Subject("\u2003Mathematics\u3000").value);
     }
 
     @Test

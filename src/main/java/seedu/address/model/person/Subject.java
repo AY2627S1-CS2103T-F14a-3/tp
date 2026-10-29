@@ -22,7 +22,7 @@ public class Subject {
         if (!isValidSubject(subject)) {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
-        value = subject.trim();
+        value = subject.strip();
     }
 
     /**
