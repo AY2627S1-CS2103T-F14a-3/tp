@@ -77,7 +77,7 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
 * Successful `add`, `edit`, `note`, `nextlesson`, `clearlesson`, `recurringlesson`, and `clearrecurringlesson` commands show all students again. Check the displayed indexes before your next index-based command. `delete` keeps the active search or filter, while `sort` shows all students in the saved sorted order.
 
-* Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
+* Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, `clear`, `sort`, and `upcoming`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
 * Field length limits: name 100 characters, phone 3 to 20 digits, email 254, address 200, school level and subject 50 each, tag 30, note 1000, and lesson topic 200. Longer input is rejected with an error stating the limit.
@@ -96,6 +96,7 @@ Parameter | Rule
 `SCHOOL_LEVEL`, `SUBJECT` | Any text, but not blank. Shown as `Not specified` when omitted during `add`; omitting them during `edit` keeps their existing values.
 `TAG` | Letters and digits only, with no spaces.
 `INDEX` | A positive whole number that appears beside a student in the displayed list.
+`MINUTES` | Lesson duration (`dur/`) for `nextlesson` and `recurringlesson`: a whole number from 1 to 1440 minutes.
 
 ### Viewing help: `help`
 
@@ -122,7 +123,7 @@ Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT
 
 <box type="warning" seamless>
 
-**Caution:** Any word in the input that starts a parameter prefix (`n/`, `p/`, `e/`, `a/`, `l/`, `s/`, `t/`) is treated as that parameter, even inside a name or address. For example, `n/Ravi s/o Kumar` is read as the name `Ravi` with the subject `o Kumar`. Avoid writing `s/o` or `d/o` in a name or address; write `son of` or `daughter of` instead, and check the success message after adding.
+**Caution:** Any word in the input that starts a parameter prefix of the command you are using (`n/`, `p/`, `e/`, `a/`, `l/`, `s/`, `t/` for `add`, `edit` and `filter`; `note/` for `note`; `date/`, `time/`, `dur/`, `topic/` for `nextlesson`; `day/`, `time/`, `dur/`, `topic/` for `recurringlesson`) is treated as that parameter, even inside a name or address. For example, `n/Ravi s/o Kumar` is read as the name `Ravi` with the subject `o Kumar`. Avoid writing `s/o` or `d/o` in a name or address; write `son of` or `daughter of` instead, and check the success message after adding.
 </box>
 
 Examples:
@@ -264,6 +265,7 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 * The lesson must not be in the past, and the topic must not be blank.
 * `topic/TOPIC` must be the final parameter. All remaining text after `topic/` is saved as the topic, so the topic may include text resembling a command prefix, such as `time/ complexity`.
 * The duration is required and must be a whole number from 1 to 1440 minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
+* After a successful `nextlesson`, the displayed list is reset to show all students.
 * A next lesson cannot overlap another student's next lesson or a recurring lesson occurrence, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
 * If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
 * Replacing a student's next lesson ignores that student's old next lesson. The student's own recurring lesson is still checked: an exact weekday and start-time match is allowed as the same occurrence, even if the topic or duration differs; other overlapping times are rejected.
@@ -281,7 +283,7 @@ Clears the scheduled next lesson for a student. The index refers to the current 
 Format: `clearlesson INDEX`
 
 * The index must be a positive integer identifying a student in the displayed list.
-* If the student has no scheduled lesson, TutorTrack reports that no lesson is scheduled.
+* If the student has no scheduled lesson, TutorTrack reports that no lesson is scheduled. In either case, the displayed list is reset to show all students.
 * Clearing a lesson preserves the student's other details, including academic information, notes, and tags.
 
 Example: `clearlesson 1` clears the next lesson for the first displayed student.
