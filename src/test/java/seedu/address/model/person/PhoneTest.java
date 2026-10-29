@@ -57,4 +57,11 @@ public class PhoneTest {
         // different values -> returns false
         assertFalse(phone.equals(new Phone("995")));
     }
+
+    @Test
+    public void isValidPhone_lengthLimit() {
+        assertTrue(Phone.isValidPhone("9".repeat(Phone.MAX_LENGTH)));
+        assertFalse(Phone.isValidPhone("9".repeat(Phone.MAX_LENGTH + 1)));
+        assertFalse(Phone.isValidPhone("9".repeat(300)));
+    }
 }

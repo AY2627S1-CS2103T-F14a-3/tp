@@ -7,7 +7,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class Subject {
 
-    public static final String MESSAGE_CONSTRAINTS = "Subject must not be blank.";
+    public static final int MAX_LENGTH = 50;
+    public static final String MESSAGE_CONSTRAINTS = "Subject must not be blank and can be at most "
+            + MAX_LENGTH + " characters long.";
     public static final String DEFAULT_VALUE = "Not specified";
 
     public final String value;
@@ -29,7 +31,7 @@ public class Subject {
      * Returns true if a given string is a valid subject.
      */
     public static boolean isValidSubject(String test) {
-        return test != null && !test.trim().isBlank();
+        return test != null && !test.trim().isBlank() && test.trim().length() <= MAX_LENGTH;
     }
 
     @Override

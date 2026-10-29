@@ -13,7 +13,7 @@ import java.util.Objects;
  * Guarantees: details are present and not null, and the topic is not blank.
  */
 public class RecurringLesson {
-    public static final String MESSAGE_TOPIC_CONSTRAINTS = "Lesson topic must not be blank.";
+    public static final String MESSAGE_TOPIC_CONSTRAINTS = NextLesson.MESSAGE_TOPIC_CONSTRAINTS;
 
     private final DayOfWeek day;
     private final LocalTime time;
@@ -33,7 +33,7 @@ public class RecurringLesson {
         requireNonNull(time);
         requireNonNull(topic);
         requireNonNull(duration);
-        if (topic.trim().isBlank()) {
+        if (topic.trim().isBlank() || topic.trim().length() > NextLesson.MAX_TOPIC_LENGTH) {
             throw new IllegalArgumentException(MESSAGE_TOPIC_CONSTRAINTS);
         }
         this.day = day;

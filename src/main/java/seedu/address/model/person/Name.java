@@ -11,10 +11,11 @@ import java.util.Locale;
  */
 public class Name {
 
+    public static final int MAX_LENGTH = 100;
     public static final String MESSAGE_CONSTRAINTS =
             "Names should only contain alphanumeric characters, spaces, hyphens, and apostrophes, "
                     + "should not be blank, and should use hyphens and apostrophes only between "
-                    + "alphanumeric characters";
+                    + "alphanumeric characters. Names can be at most " + MAX_LENGTH + " characters long";
 
     /*
      * Each hyphen or apostrophe must join two alphanumeric name segments. Spaces may separate name segments,
@@ -40,7 +41,7 @@ public class Name {
      * Returns true if a given string is a valid name.
      */
     public static boolean isValidName(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return test.length() <= MAX_LENGTH && test.matches(VALIDATION_REGEX);
     }
 
     /**

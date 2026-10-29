@@ -7,6 +7,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class StudentNote {
 
+    public static final int MAX_LENGTH = 1000;
+    public static final String MESSAGE_CONSTRAINTS = "Notes can be at most " + MAX_LENGTH + " characters long.";
+
     public final String value;
 
     /**
@@ -16,7 +19,17 @@ public class StudentNote {
      */
     public StudentNote(String value) {
         requireNonNull(value);
+        if (!isValidNote(value)) {
+            throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
+        }
         this.value = value;
+    }
+
+    /**
+     * Returns true if a given string is a valid note.
+     */
+    public static boolean isValidNote(String test) {
+        return test != null && test.length() <= MAX_LENGTH;
     }
 
     @Override

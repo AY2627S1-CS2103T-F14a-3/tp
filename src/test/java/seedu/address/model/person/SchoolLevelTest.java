@@ -55,4 +55,10 @@ public class SchoolLevelTest {
         assertFalse(level.equals(null));
         assertFalse(level.equals("Secondary 4"));
     }
+
+    @Test
+    public void isValidSchoolLevel_lengthLimit() {
+        assertTrue(SchoolLevel.isValidSchoolLevel("l".repeat(SchoolLevel.MAX_LENGTH)));
+        assertFalse(SchoolLevel.isValidSchoolLevel("l".repeat(SchoolLevel.MAX_LENGTH + 1)));
+    }
 }

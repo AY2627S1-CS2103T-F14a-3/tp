@@ -85,4 +85,12 @@ public class EmailTest {
         // different values -> returns false
         assertFalse(email.equals(new Email("other.valid@email")));
     }
+
+    @Test
+    public void isValidEmail_lengthLimit() {
+        String domain = "@example.com";
+        assertTrue(Email.isValidEmail("a".repeat(Email.MAX_LENGTH - domain.length()) + domain));
+        assertFalse(Email.isValidEmail("a".repeat(Email.MAX_LENGTH - domain.length() + 1) + domain));
+        assertFalse(Email.isValidEmail("a".repeat(300) + "@x.com"));
+    }
 }

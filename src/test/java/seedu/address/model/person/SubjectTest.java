@@ -55,4 +55,10 @@ public class SubjectTest {
         assertFalse(subject.equals(null));
         assertFalse(subject.equals("Mathematics"));
     }
+
+    @Test
+    public void isValidSubject_lengthLimit() {
+        assertTrue(Subject.isValidSubject("s".repeat(Subject.MAX_LENGTH)));
+        assertFalse(Subject.isValidSubject("s".repeat(Subject.MAX_LENGTH + 1)));
+    }
 }
