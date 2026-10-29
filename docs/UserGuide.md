@@ -59,8 +59,9 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 * Items followed by `...` can appear zero or more times.<br>
   For example, `[t/TAG]... ` may be omitted, or written as `t/friend` or `t/friend t/family`.
 
-* Parameters can be in any order.<br>
+* Parameters can generally be in any order unless a command specifies otherwise.<br>
   For example, if the command specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.
+  For `nextlesson` and `recurringlesson`, `topic/TOPIC` must be the final parameter.
 
 * Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
@@ -203,6 +204,7 @@ Format: `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`
 
 * The date must be a valid date in `YYYY-MM-DD` format and the time a valid 24-hour time in `HH:mm` format.
 * The lesson must not be in the past, and the topic must not be blank.
+* `topic/TOPIC` must be the final parameter. All remaining text after `topic/` is saved as the topic, so the topic may include text resembling a command prefix, such as `time/ complexity`.
 * The duration is required and must be a whole number from 1 to 1440 minutes. Times use the computer's local date and time. A 90-minute lesson starting at 23:30 ends at 01:00 the following day.
 * A next lesson cannot overlap another student's next lesson or a recurring lesson occurrence, including students hidden by `find` or `filter`. Back-to-back lessons are allowed: 14:00–15:00 and 15:00–16:00 do not clash.
 * If a clash is detected, TutorTrack identifies the conflicting student and their lesson's date, start time, and duration. The command leaves all student records and the displayed list unchanged.
@@ -236,6 +238,7 @@ Format: `recurringlesson INDEX day/DAY time/HH:mm dur/MINUTES topic/TOPIC`
 * The day must be a valid day of the week, such as `MONDAY`. Day names are not case-sensitive.
 * The duration is required and must be a whole number from 1 to 1440 minutes.
 * The time must be a valid 24-hour time in `HH:mm` format, and the topic must not be blank.
+* `topic/TOPIC` must be the final parameter. All remaining text after `topic/` is saved as the topic, so the topic may include text resembling a command prefix, such as `time/ complexity`.
 * Each student can have one recurring lesson. Setting another recurring lesson replaces the existing one.
 * TutorTrack checks the proposed schedule against all students' next lessons and other students' recurring schedules, even when those students are hidden by a filter. Replacing a recurring lesson ignores that student's old recurring schedule.
 * An exact weekday and start-time match with the same student's next lesson is allowed as the same occurrence, even if the topic or duration differs. Other partial overlaps with that student's next lesson are rejected.
