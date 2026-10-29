@@ -2,11 +2,13 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
@@ -27,6 +29,9 @@ public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
     public static final String MESSAGE_INVALID_LESSON_TIME = "Lesson time must be a valid time in HH:mm format.";
+    public static final String MESSAGE_INVALID_LESSON_DATE = "Lesson date must be a valid date in YYYY-MM-DD format.";
+
+    private static final Pattern LESSON_DATE_FORMAT = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -172,6 +177,25 @@ public class ParserUtil {
             return LocalTime.parse(time);
         } catch (DateTimeParseException e) {
             throw new ParseException(MESSAGE_INVALID_LESSON_TIME, e);
+        }
+    }
+
+    /**
+     * Parses a lesson date into a {@code LocalDate} using the exact {@code YYYY-MM-DD} format.
+     * Whitespace is not trimmed; command parsers receive trimmed values from the argument tokenizer.
+     *
+     * @throws NullPointerException if {@code date} is null.
+     * @throws ParseException if {@code date} has an invalid format or is not a real calendar date.
+     */
+    public static LocalDate parseLessonDate(String date) throws ParseException {
+        requireNonNull(date);
+        if (!LESSON_DATE_FORMAT.matcher(date).matches()) {
+            throw new ParseException(MESSAGE_INVALID_LESSON_DATE);
+        }
+        try {
+            return LocalDate.parse(date);
+        } catch (DateTimeParseException e) {
+            throw new ParseException(MESSAGE_INVALID_LESSON_DATE, e);
         }
     }
 

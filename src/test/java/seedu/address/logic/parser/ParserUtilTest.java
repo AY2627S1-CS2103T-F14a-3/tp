@@ -3,10 +3,12 @@ package seedu.address.logic.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
+import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_LESSON_DATE;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_LESSON_TIME;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
@@ -240,6 +242,40 @@ public class ParserUtilTest {
     public void parseLessonTime_whitespace_throwsParseException() {
         for (String time : List.of(" 09:05", "09:05 ", "09 :05", "09: 05", "\t09:05", "09:05\n")) {
             assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_TIME, () -> ParserUtil.parseLessonTime(time));
+        }
+    }
+
+    @Test
+    public void parseLessonDate_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseLessonDate(null));
+    }
+
+    @Test
+    public void parseLessonDate_validValues_returnsDate() throws Exception {
+        assertEquals(LocalDate.of(2030, 1, 1), ParserUtil.parseLessonDate("2030-01-01"));
+        assertEquals(LocalDate.of(2028, 2, 29), ParserUtil.parseLessonDate("2028-02-29"));
+        assertEquals(LocalDate.of(2030, 12, 31), ParserUtil.parseLessonDate("2030-12-31"));
+    }
+
+    @Test
+    public void parseLessonDate_invalidFormat_throwsParseException() {
+        for (String date : List.of("", " ", "2030-1-01", "2030-01-1", "30-01-01", "01-01-2030", "2030/01/01",
+                "20300101", "2030-01-01T10:00", "tomorrow", "２０３０-01-01")) {
+            assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_DATE, () -> ParserUtil.parseLessonDate(date));
+        }
+    }
+
+    @Test
+    public void parseLessonDate_notARealDate_throwsParseException() {
+        for (String date : List.of("2030-02-30", "2029-02-29", "2030-13-01", "2030-00-10", "2030-04-31")) {
+            assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_DATE, () -> ParserUtil.parseLessonDate(date));
+        }
+    }
+
+    @Test
+    public void parseLessonDate_whitespace_throwsParseException() {
+        for (String date : List.of(" 2030-01-01", "2030-01-01 ", "2030- 01-01", "2030-01-01\n")) {
+            assertThrows(ParseException.class, MESSAGE_INVALID_LESSON_DATE, () -> ParserUtil.parseLessonDate(date));
         }
     }
 
