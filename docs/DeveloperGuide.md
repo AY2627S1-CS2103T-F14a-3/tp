@@ -627,8 +627,68 @@ To test resetting the displayed list:
 
 ### Saving data
 
-1. Dealing with missing/corrupted data files
+Use a separate writable test folder containing `TutorTrack.jar` and disposable data. Open a terminal in that
+folder and launch with `java -jar "TutorTrack.jar"`, using Java 25 and the Mac Java installation described in the
+User Guide where applicable. Use the same working directory on every launch: the relative path
+`data/addressbook.json` must refer to the same file. Do not use real student records.
 
-   1. _{Explain how to simulate missing or corrupted data files and state the expected behavior.}_
+#### Prepare a known saved record
 
-1. _{ more test cases … }_
+1. Launch the app and run these commands. `clear` removes the sample students from this test copy.
+
+   ```text
+   clear
+   add n/Persistence Check p/90000001 e/persistence@example.com a/Block One l/Secondary 4 s/Mathematics t/persistcheck
+   note 1 note/Keep this note after restart
+   ```
+
+1. Close the app using the window's close button and relaunch from the same folder.<br>
+   Expected: Exactly one student, Persistence Check, appears with the academic fields, tag, and note unchanged.
+1. Close the app. Copy `data/addressbook.json` to `addressbook.backup.json` in the test folder, outside `data`.<br>
+   Expected: The backup contains the known record. Keep this backup unchanged throughout the checks below.
+
+#### Missing data file
+
+1. With the app closed, move `data/addressbook.json` to `addressbook.missing-test.json` in the test folder.
+1. Relaunch the app.<br>
+   Expected: Sample students appear instead of Persistence Check. A missing file causes sample data to be loaded;
+   the backup is not restored automatically.
+1. Before entering any command, inspect the `data` folder.<br>
+   Expected: `addressbook.json` is still absent. Loading sample data alone does not save it.
+1. Run `list`.<br>
+   Expected: Sample students are listed and `data/addressbook.json` is created containing those students.
+   Successful commands save the current records, including commands such as `list` that do not modify them.
+1. Close the app, copy `addressbook.backup.json` over `data/addressbook.json`, and relaunch.<br>
+   Expected: Only Persistence Check appears, with the original academic fields, tag, and note.
+
+#### Corrupted data file
+
+1. Close the app and confirm that the unchanged backup still exists.
+1. Open `data/addressbook.json` in a plain-text editor. Replace its entire contents with this invalid JSON and save:
+
+   ```text
+   { invalid json
+   ```
+
+1. Relaunch the app.<br>
+   Expected: An empty student list appears, rather than sample students or a partially recovered record. The
+   application log records the loading failure; the current implementation does not require a GUI error dialog.
+1. Before entering any command, inspect the file.<br>
+   Expected: Its invalid contents remain. Loading an empty list does not itself repair the file.
+1. Run `list`.<br>
+   Expected: No students are listed. The file is overwritten with valid JSON containing an empty `persons` array.
+   Even a read-only command can overwrite unreadable data, so the backup must be made before testing. The `exit`
+   command also saves data: use the window's close button when inspecting the file before any command has run.
+1. Close the app, copy the backup over `data/addressbook.json`, and relaunch.<br>
+   Expected: Persistence Check and all its saved details return.
+
+#### Valid JSON containing an invalid student
+
+1. Close the app and restore the known-good file from the backup.
+1. Edit the student's `phone` value in `data/addressbook.json` to `"abc"`, keeping valid JSON syntax.
+1. Relaunch without entering a command.<br>
+   Expected: An empty list appears because the student fails phone validation. The invalid file remains unchanged
+   until a command saves the empty list. Valid JSON syntax does not make invalid student values acceptable.
+1. Close the app using the window's close button, restore the backup over the invalid file, and relaunch.<br>
+   Expected: The known student and all saved details return. Close the app before removing the disposable test
+   folder. Retain the backup if further testing is planned.
