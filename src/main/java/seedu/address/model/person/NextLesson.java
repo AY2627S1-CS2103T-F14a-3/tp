@@ -54,7 +54,7 @@ public class NextLesson {
         if (isNewBooking && isDateTimeInPast(date, time, clock)) {
             throw new IllegalArgumentException(MESSAGE_DATE_TIME_CONSTRAINTS);
         }
-        if (topic.isBlank() || topic.trim().length() > MAX_TOPIC_LENGTH) {
+        if (topic.isBlank() || topic.trim().codePointCount(0, topic.trim().length()) > MAX_TOPIC_LENGTH) {
             throw new IllegalArgumentException(MESSAGE_TOPIC_CONSTRAINTS);
         }
         this.date = date;

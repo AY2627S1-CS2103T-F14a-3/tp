@@ -24,5 +24,7 @@ public class StudentNoteTest {
         assertTrue(StudentNote.isValidNote("y".repeat(StudentNote.MAX_LENGTH)));
         assertFalse(StudentNote.isValidNote("y".repeat(StudentNote.MAX_LENGTH + 1)));
         assertThrows(IllegalArgumentException.class, () -> new StudentNote("y".repeat(200000)));
+        assertTrue(StudentNote.isValidNote("\uD83D\uDE00".repeat(StudentNote.MAX_LENGTH))); // emoji count once
+        assertFalse(StudentNote.isValidNote("\uD83D\uDE00".repeat(StudentNote.MAX_LENGTH + 1)));
     }
 }

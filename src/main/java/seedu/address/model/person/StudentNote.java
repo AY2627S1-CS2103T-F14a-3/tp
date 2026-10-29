@@ -29,7 +29,7 @@ public class StudentNote {
      * Returns true if a given string is a valid note.
      */
     public static boolean isValidNote(String test) {
-        return test != null && test.length() <= MAX_LENGTH;
+        return test != null && test.codePointCount(0, test.length()) <= MAX_LENGTH;
     }
 
     @Override

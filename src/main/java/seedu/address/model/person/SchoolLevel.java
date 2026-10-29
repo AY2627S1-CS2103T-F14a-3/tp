@@ -31,7 +31,8 @@ public class SchoolLevel {
      * Returns true if a given string is a valid school level.
      */
     public static boolean isValidSchoolLevel(String test) {
-        return test != null && !test.trim().isBlank() && test.trim().length() <= MAX_LENGTH;
+        return test != null && !test.trim().isBlank()
+                && test.trim().codePointCount(0, test.trim().length()) <= MAX_LENGTH;
     }
 
     @Override

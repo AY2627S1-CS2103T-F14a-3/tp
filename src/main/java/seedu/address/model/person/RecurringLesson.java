@@ -33,7 +33,8 @@ public class RecurringLesson {
         requireNonNull(time);
         requireNonNull(topic);
         requireNonNull(duration);
-        if (topic.trim().isBlank() || topic.trim().length() > NextLesson.MAX_TOPIC_LENGTH) {
+        if (topic.trim().isBlank()
+                || topic.trim().codePointCount(0, topic.trim().length()) > NextLesson.MAX_TOPIC_LENGTH) {
             throw new IllegalArgumentException(MESSAGE_TOPIC_CONSTRAINTS);
         }
         this.day = day;
