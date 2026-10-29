@@ -44,6 +44,16 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
 1. Refer to the [Features](#features) section below for details of each command.
 
+<box type="warning" seamless>
+
+**Setup notes:**
+
+* **Launch from a terminal.** Double-clicking the JAR file may not work on some systems (for example, when it opens in an archive tool or with the wrong Java version). If nothing happens, use the `java -jar "TutorTrack.jar"` command above.
+* **Use a writable folder.** TutorTrack saves its data, preferences and log next to where you launch it. If the folder is write-protected (for example `Program Files` or a read-only drive), the app cannot save, and commands that change data will show a saving error. Move the JAR to a folder you own, such as your Documents folder.
+* **Always launch from the same folder** to keep using the same student data. See [Editing the data file](#editing-the-data-file).
+* **macOS fullscreen:** secondary windows such as the Help window may behave unexpectedly when the main window is in fullscreen mode. Exit fullscreen before opening the Help window.
+</box>
+
 --------------------------------------------------------------------------------------------------------------------
 
 ## Features
@@ -71,6 +81,18 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 </box>
 
+**Rules for student details:**
+
+Parameter | Rule
+----------|-----
+`NAME` | Letters (including accented and non-English letters) and digits, separated by spaces. Hyphens and apostrophes are allowed only between letters or digits, as in `Mary-Jane O'Neil`. Other symbols (such as `/` or `.`) are not allowed. Names that differ only in capitalisation or spacing are duplicates.
+`PHONE_NUMBER` | Digits only, at least 3 digits long.
+`EMAIL` | Of the form `local-part@domain`, for example `johnd@example.com`.
+`ADDRESS` | Any text, but not blank.
+`SCHOOL_LEVEL`, `SUBJECT` | Any text, but not blank. Shown as `Not specified` when omitted.
+`TAG` | Letters and digits only, with no spaces.
+`INDEX` | A positive whole number that appears beside a student in the displayed list.
+
 ### Viewing help: `help`
 
 Shows a message explaining how to access the help page.
@@ -93,6 +115,11 @@ Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [l/SCHOOL_LEVEL] [s/SUBJECT
 </box>
 
 * The school level and subject are optional. If either is omitted, TutorTrack records it as `Not specified`. To return an existing student's academic fields to this state, use `edit` as described under [Editing a student](#editing-a-student-edit).
+
+<box type="warning" seamless>
+
+**Caution:** Any word in the input that starts a parameter prefix (`n/`, `p/`, `e/`, `a/`, `l/`, `s/`, `t/`) is treated as that parameter, even inside a name or address. For example, `n/Ravi s/o Kumar` is read as the name `Ravi` with the subject `o Kumar`. Avoid writing `s/o` or `d/o` in a name or address; write `son of` or `daughter of` instead, and check the success message after adding.
+</box>
 
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
@@ -344,7 +371,8 @@ Student names that differ only in capitalization, repeated spaces, or surroundin
 
 1. **When using multiple screens**, if you move the application to a secondary screen, and later switch to using only the primary screen, the GUI will open off-screen. The remedy is to delete the `preferences.json` file created by the application before running the application again.
 2. **If you minimize the Help Window** and then run the `help` command (or use the `Help` menu, or the keyboard shortcut `F1`) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
-
+3. **On macOS, using fullscreen mode** may cause the Help Window to behave unexpectedly. The remedy is to exit fullscreen before opening the Help Window.
+4. **Text that looks like a parameter prefix** (such as `s/o` in a name or address) is read as a parameter. See the caution under [`add`](#adding-a-student-add).
 --------------------------------------------------------------------------------------------------------------------
 
 ## Command summary

@@ -4,7 +4,7 @@
   pageNav: 3
 ---
 
-# AB-3 Developer Guide
+# TutorTrack Developer Guide
 
 <!-- * Table of Contents -->
 <page-nav-print />
@@ -13,7 +13,11 @@
 
 ## **Acknowledgements**
 
-* _{List the sources of reused or adapted ideas, code, documentation, and third-party libraries here, with links to the originals.}_
+* TutorTrack is adapted from [AddressBook-Level3 (AB3)](https://github.com/se-edu/addressbook-level3) by the [SE-EDU initiative](https://se-education.org/). The overall architecture (`UI`, `Logic`, `Model`, `Storage`), the command-parsing framework, the JSON storage layer, the GUI skeleton, the build setup, and the structure of the User and Developer Guides come from AB3. Student fields, lesson scheduling, filtering, sorting, and the student detail panel are TutorTrack's own work.
+* The undo/redo design under _Proposed implementation_ is adapted from the [AB3 Developer Guide](https://se-education.org/addressbook-level3/DeveloperGuide.html#proposed-undoredo-feature). It is not implemented.
+* The [PlantUML](https://plantuml.com/) diagrams use the AB3 diagram styles in `docs/diagrams/style.puml`.
+* Libraries used: [JavaFX](https://openjfx.io/), [Jackson](https://github.com/FasterXML/jackson), [JUnit 5](https://github.com/junit-team/junit5), and [Checkstyle](https://checkstyle.sourceforge.io/).
+* Documentation is built with [MarkBind](https://markbind.org/).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +39,7 @@ The following provides a quick overview of the main components and their interac
 
 **Main components of the architecture**
 
-**`Main`** (consisting of classes [`Main`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
+**`Main`** (consisting of classes [`Main`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
 * At app launch, it initializes the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
 
@@ -67,13 +71,13 @@ The sections below give more details of each component.
 
 ### UI component
 
-The **API** of this component is specified in [`Ui.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/Ui.java)
+The **API** of this component is specified in [`Ui.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/ui/Ui.java)
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
 The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, `PersonDetailsPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
-The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
+The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
 
 The `UI` component,
 
@@ -84,7 +88,7 @@ The `UI` component,
 
 ### Logic component
 
-**API** : [`Logic.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/logic/Logic.java)
+**API** : [`Logic.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/logic/Logic.java)
 
 Here's a (partial) class diagram of the `Logic` component:
 
@@ -123,29 +127,23 @@ How the parsing works:
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/model/Model.java)
 
-
+<puml src="diagrams/ModelClassDiagram.puml" width="600" alt="Structure of the Model component" />
 
 The `Model` component,
 
-* stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
+* stores the student data, i.e., all `Person` objects (which are contained in a `UniquePersonList` object). A `Person` represents one student; the class name is inherited from AB3.
 * stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
+* treats `Person` as an immutable value: commands replace a student with an updated copy (for example `Person#withNote(...)`) rather than mutating it. `AddressBook` rejects duplicates by comparing normalised names.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
-
-<box type="info" seamless>
-
-**Note:** The alternative, arguably more object-oriented, design below keeps a unique list of tags in `AddressBook`, and each `Person` references tags from that list. This lets `AddressBook` maintain one `Tag` object per unique tag instead of each `Person` holding its own `Tag` objects.<br>
-
-<puml src="diagrams/BetterModelClassDiagram.puml" width="450" />
-</box>
 
 
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/storage/Storage.java)
 
 <puml src="diagrams/StorageClassDiagram.puml" width="550" />
 
@@ -177,6 +175,7 @@ The student list uses `PersonCard` to show a concise summary containing the stud
 The `view INDEX` command parses an index relative to the current filtered list. `ViewCommand` rejects an index outside that list and otherwise places the selected immutable `Person` in the returned `CommandResult`. It does not modify the model or storage data.
 
 `MainWindow` reads the optional selected person from `CommandResult` and creates a `PersonDetailsPanel` in the right-hand side of the split layout. The panel shows the student's complete academic, contact, scheduling, tag, and note information. A later successful non-view command restores the prompt, preventing an edited or deleted student's old record from remaining visible.
+
 ### Lesson priority and ordering
 
 The following class diagram shows the model and logic classes involved in the `sort` and `upcoming` commands.
@@ -280,6 +279,11 @@ After either command completes successfully, `LogicManager` passes the address b
 
 ### \[Proposed\] Undo/redo feature
 
+<box type="info" seamless>
+
+**Note:** This feature is a design proposal only. TutorTrack does not currently have `undo` or `redo` commands, and the class and method names below do not exist in the code base.
+</box>
+
 #### Proposed Implementation
 
 The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It extends `AddressBook` with an undo/redo history, stored internally as an `addressBookStateList` and `currentStatePointer`. Additionally, it implements the following operations:
@@ -365,13 +369,6 @@ The following activity diagram summarizes what happens when a user executes a ne
   * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
   * Cons: We must ensure that the implementation of each individual command is correct.
 
-_{more aspects and alternatives to be added}_
-
-### \[Proposed\] Data archiving
-
-_{Explain here how the data archiving feature will be implemented}_
-
-
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Documentation, logging, testing, dev-ops**
@@ -402,16 +399,18 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `* * *`  | private tutor | add a student with contact details and academic information            | keep the information needed for tutoring in one place         |
 | `* * *`  | private tutor | list all students                                                      | see the students currently under my care                      |
 | `* * *`  | private tutor | find students by name                                                  | retrieve a student's record quickly                           |
+| `* * *`  | private tutor | filter students by school level, subject, or tag                       | focus on one group of students                                |
 | `* * *`  | private tutor | view a student's complete record                                       | prepare for a lesson efficiently                              |
 | `* * *`  | private tutor | edit a student's details                                               | keep the student record accurate                              |
-| `* * *`  | private tutor | record the date, time, and topic of a student's next lesson            | know when the lesson is scheduled and what to prepare         |
+| `* * *`  | private tutor | record the date, time, duration, and topic of a student's next lesson  | know when the lesson is scheduled and what to prepare         |
 | `* * *`  | private tutor | delete a student                                                       | remove an obsolete, incorrect, or duplicate record            |
 | `* *`    | private tutor | add free-form notes to a student's record                              | remember student-specific information that has no fixed field |
 | `* *`    | private tutor | tag students using meaningful categories                               | group students by attributes such as subject or school level  |
 | `* *`    | private tutor | view my earliest upcoming lesson across all students                   | know which lesson to prepare for first                        |
 | `* *`    | private tutor | set a recurring lesson schedule for a student                          | avoid entering the same lesson details repeatedly             |
+| `* *`    | private tutor | clear a student's next or recurring lesson                             | remove lessons that were cancelled or are no longer needed    |
+| `* *`    | private tutor | be told when a lesson overlaps another student's lesson                | avoid arranging overlapping lessons                           |
 | `*`      | private tutor | sort students by their next lesson                                     | prioritise lesson preparation                                 |
-| `*`      | private tutor | identify timetable clashes                                             | avoid arranging overlapping lessons                           |
 | `*`      | private tutor | view a student's lesson history and learning-progress summary          | understand the student's progress over time                   |
 
 ### Use cases
@@ -434,7 +433,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 2a. One or more required fields are missing or invalid.
   * 2a1. TutorTrack displays an error describing the expected input.
   * 2a2. Use case resumes at step 1.
-* 2b. Another student has the same name.
+* 2b. Another student has the same name, ignoring capitalisation and extra spaces.
   * 2b1. TutorTrack informs the tutor that the student already exists.
   * 2b2. Use case resumes at step 1.
 
@@ -469,7 +468,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 1. Tutor searches for the student by name.
 2. TutorTrack displays all matching students.
-3. Tutor selects the student and enters the next lesson's date, time, and topic.
+3. Tutor selects the student and enters the next lesson's date, time, duration, and topic.
 4. TutorTrack validates the lesson information.
 5. TutorTrack records the next lesson in the student's record.
 6. TutorTrack displays the updated student record.
@@ -484,9 +483,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 3a. The selected index does not refer to a student in the displayed list.
   * 3a1. TutorTrack displays an invalid-index error.
   * 3a2. Use case resumes at step 3.
-* 4a. The lesson date, time, or topic is invalid.
+* 4a. The lesson date, time, duration, or topic is invalid, or the lesson starts in the past.
   * 4a1. TutorTrack displays an error describing the expected input.
   * 4a2. Use case resumes at step 3.
+* 4b. The lesson overlaps another student's lesson.
+  * 4b1. TutorTrack identifies the conflicting student and lesson, and leaves all records unchanged.
+  * 4b2. Use case resumes at step 3.
 
 #### Use case: UC04 — Delete a student
 
@@ -525,7 +527,49 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * 2a1. TutorTrack displays an invalid-index error.
   * 2a2. Use case resumes at step 1.
 
-### Non-Functional Requirements
+#### Use case: UC06 — Set a student's recurring weekly lesson
+
+**MSS**
+
+1. Tutor enters the index of a student with a weekday, time, duration, and topic.
+2. TutorTrack validates the lesson information.
+3. TutorTrack checks the lesson against all students' next and recurring lessons.
+4. TutorTrack replaces the student's recurring lesson and displays the updated record.
+
+   Use case ends.
+
+**Extensions**
+
+* 1a. The index does not refer to a student in the displayed list.
+  * 1a1. TutorTrack displays an invalid-index error.
+  * 1a2. Use case resumes at step 1.
+* 2a. The weekday, time, duration, or topic is invalid.
+  * 2a1. TutorTrack displays an error describing the expected input.
+  * 2a2. Use case resumes at step 1.
+* 3a. The weekly lesson overlaps another student's lesson, including across midnight or from Sunday into Monday.
+  * 3a1. TutorTrack identifies the conflicting student and lesson, and leaves all records unchanged.
+  * 3a2. Use case resumes at step 1.
+
+#### Use case: UC07 — Filter students and find the earliest lesson
+
+**MSS**
+
+1. Tutor filters students by school level, subject, and/or tags.
+2. TutorTrack displays only the students matching every criterion.
+3. Tutor requests the earliest upcoming lesson.
+4. TutorTrack displays the students whose lesson starts earliest, searching all students.
+
+   Use case ends.
+
+**Extensions**
+
+* 1a. No criterion is given, or a criterion is blank or invalid.
+  * 1a1. TutorTrack displays an error describing the expected input.
+  * 1a2. Use case resumes at step 1.
+* 2a. No student matches.
+  * 2a1. TutorTrack shows an empty list. Use case resumes at step 1.
+* 4a. No lesson is scheduled.
+  * 4a1. TutorTrack displays an error. Use case ends.
 
 1. TutorTrack should work on any _mainstream OS_ with Java `25` or later installed.
 2. TutorTrack should respond to a command within 1 second when managing up to 1,000 student records under normal operating conditions.
@@ -540,7 +584,9 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * **Academic information**: Tutoring-related information about a student, such as the student's subject and school level.
 * **Displayed student list**: The numbered list of students currently shown in TutorTrack. It may contain every student or only the results of the latest search.
 * **Mainstream OS**: A currently supported version of Windows, Linux, or macOS that can run Java `25` or later.
-* **Next lesson**: The nearest future lesson recorded for a student, including its date, time, and topic.
+* **Next lesson**: A one-off lesson recorded for a student, with a date, start time, duration, and topic. A student has at most one.
+* **Recurring lesson**: A weekly lesson recorded for a student, with a weekday, start time, duration, and topic. A student has at most one.
+* **Timetable clash**: Two lessons, across any students, whose time ranges overlap. Lessons that end exactly when another starts do not clash.
 * **Private tutor**: A person who independently provides lessons to one or more students and manages the corresponding student information and schedules.
 * **Student index**: The positive integer displayed beside a student in the current displayed student list. It is not a permanent identifier and may change when the displayed list changes.
 * **Student record**: The collection of contact details, academic information, notes, tags, and lesson information that TutorTrack stores for one student.
@@ -562,36 +608,67 @@ testers are expected to do more *exploratory* testing.
 
 1. Initial launch
 
-   1. Download the JAR file and copy it into an empty folder.
+   1. Download `TutorTrack.jar` and copy it into an empty, writable folder.
 
-   1. Double-click the JAR file.<br>
-      Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
+   1. Open a terminal in that folder and run `java -jar "TutorTrack.jar"` (Java 25).<br>
+      Expected: The GUI opens with sample students. The window size may not be optimal.
 
 1. Saving window preferences
 
-   1. Resize the window to an optimal size. Move the window to a different location. Close the window.
+   1. Resize the window and move it to a different location. Close the window.
 
-   1. Relaunch the app by double-clicking the JAR file.<br>
-       Expected: The most recent window size and location are retained.
+   1. Relaunch from the same folder with `java -jar "TutorTrack.jar"`.<br>
+      Expected: The most recent window size and location are retained.
 
-1. _{ more test cases … }_
+1. Exit
 
-### Deleting a person
+   1. Enter `exit`.<br>
+      Expected: The application closes. Closing with the window's close button behaves the same way.
 
-1. Deleting a person while all persons are being shown
+### Walkthrough of all features
 
-   1. Prerequisites: List all persons using the `list` command, with multiple persons in the list.
+Use a separate test folder. Start with `clear` so that the data is known, then run the commands in order.
+Lesson dates must be in the future, so the examples use 2099.
+
+| Step | Command | Expected result |
+| --- | --- | --- |
+| 1 | `help` | The help window opens, showing a link to the User Guide. |
+| 2 | `clear` | All students are removed and the list is empty. |
+| 3 | `add n/Tester One p/91234567 e/one@example.com a/Block 1 l/Secondary 4 s/Mathematics t/walk` | Student 1 is added and appears in the list. |
+| 4 | `add n/Tester Two p/92345678 e/two@example.com a/Block 2 l/Primary 6 s/Science t/walk` | Student 2 is added. |
+| 5 | `add n/tester  ONE p/93456789 e/dup@example.com a/Block 3` | Rejected as a duplicate name (capitalisation and spaces are ignored). |
+| 6 | `list` | Both students are displayed. |
+| 7 | `view 1` | The details panel shows Tester One. |
+| 8 | `edit 1 p/90000000 t/walk t/edited` | Phone and tags of student 1 are updated. |
+| 9 | `find tester` | Both students are displayed. |
+| 10 | `filter s/Science` | Only Tester Two is displayed. |
+| 11 | `list` | Both students are displayed again. |
+| 12 | `note 1 note/Needs extra practice` | The note appears on student 1. |
+| 13 | `nextlesson 1 date/2099-01-05 time/14:00 dur/60 topic/Algebra` | The lesson is saved for student 1. |
+| 14 | `nextlesson 2 date/2099-01-05 time/14:30 dur/60 topic/Cells` | Rejected with a message naming the clashing student. |
+| 15 | `nextlesson 2 date/2099-01-05 time/15:00 dur/60 topic/Cells` | Accepted, because back-to-back lessons are allowed. |
+| 16 | `recurringlesson 1 day/MONDAY time/16:30 dur/90 topic/Revision` | The recurring lesson is saved for student 1. |
+| 17 | `upcoming` | Tester One's lesson is reported as the earliest. |
+| 18 | `sort` | Students with lessons are listed in lesson order. |
+| 19 | `clearlesson 1` | Student 1's next lesson is cleared. |
+| 20 | `clearrecurringlesson 1` | Student 1's recurring lesson is cleared. |
+| 21 | `delete 2` | Tester Two is deleted. |
+| 22 | `clear` | All students are removed. |
+
+### Deleting a student
+
+1. Deleting a student while all students are being shown
+
+   1. Prerequisites: Run `list` with multiple students in the list.
 
    1. Test case: `delete 1`<br>
-      Expected: The first contact is deleted from the list. The status message shows the deleted contact's details.
+      Expected: The first student is deleted from the list. The result message shows the deleted student's details.
 
    1. Test case: `delete 0`<br>
-      Expected: No person is deleted. The status message shows error details.
+      Expected: No student is deleted. An invalid-command-format error is shown.
 
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
-      Expected: Similar to previous.
-
-1. _{ more test cases … }_
+   1. Other incorrect delete commands to try: `delete`, `delete x`, `delete 999` (larger than the list size)<br>
+      Expected: Similar to previous; no student is deleted.
 
 ### Filtering students
 
