@@ -169,16 +169,42 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
-    public void readAddressBook_integerAndMissingRecurringLessonDuration_success() throws Exception {
+    public void readAddressBook_integerRecurringLessonDuration_loadsStoredDuration() throws Exception {
         Path filePath = testFolder.resolve("integerDuration.json");
         Files.writeString(filePath, personJson("\"recurringLesson\": {\"day\": \"MONDAY\", \"time\": \"10:00\", "
                 + "\"topic\": \"Algebra\", \"durationMinutes\": 90}"));
-        assertEquals(1, new JsonAddressBookStorage(filePath).readAddressBook().get().getPersonList().size());
 
-        Path legacyPath = testFolder.resolve("legacyDuration.json");
-        Files.writeString(legacyPath, personJson("\"recurringLesson\": {\"day\": \"MONDAY\", \"time\": \"10:00\", "
+        var student = new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow()
+                .getPersonList().getFirst();
+
+        assertEquals(90, student.getRecurringLesson().orElseThrow().getDuration().getDurationMinutes());
+    }
+
+    @Test
+    public void readAddressBook_missingRecurringLessonDuration_loadsDefaultDuration() throws Exception {
+        Path filePath = testFolder.resolve("legacyDuration.json");
+        Files.writeString(filePath, personJson("\"recurringLesson\": {\"day\": \"MONDAY\", \"time\": \"10:00\", "
                 + "\"topic\": \"Algebra\"}"));
-        assertEquals(1, new JsonAddressBookStorage(legacyPath).readAddressBook().get().getPersonList().size());
+
+        var student = new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow()
+                .getPersonList().getFirst();
+
+        assertEquals(LessonDuration.DEFAULT_DURATION_MINUTES,
+                student.getRecurringLesson().orElseThrow().getDuration().getDurationMinutes());
+    }
+
+    @Test
+    public void readAddressBook_nonNumericOrNonPositiveLessonDuration_throwsDataLoadingException()
+            throws Exception {
+        for (String lessonField : List.of("nextLesson", "recurringLesson")) {
+            for (String duration : List.of("0", "-5", "\"abc\"")) {
+                Path filePath = testFolder.resolve("invalidDuration.json");
+                Files.writeString(filePath, studentWithLessonJson(lessonField, duration));
+                JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+                assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+            }
+        }
     }
 
     private static String personJson(String lessonField) {
