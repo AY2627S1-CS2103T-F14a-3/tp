@@ -180,6 +180,8 @@ Format: `sort`
 
 * Students without a scheduled next lesson are placed after all scheduled students, keeping their existing order.
 * The new order is saved and all students are shown after sorting.
+* Sorting uses each student's one-off next lesson only. Recurring lessons are not considered, so a student with only a recurring lesson is listed with the students who have no scheduled lesson.
+* A one-off lesson whose time has passed is removed when TutorTrack is next started. Until then, such a lesson may still be listed first. Use `upcoming` to see the earliest lesson that has not yet started.
 
 ### Editing a student: `edit`
 
