@@ -81,9 +81,7 @@ public class NextLessonCommand extends Command {
                     conflictingStudent.getName().fullName, lesson.getDay(), lesson.getTime(),
                     lesson.getDuration().getDurationMinutes()));
         }
-        Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
-                student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
-                Optional.of(nextLesson), student.getRecurringLesson(), student.getTags());
+        Person updatedStudent = student.withNextLesson(Optional.of(nextLesson));
         model.setPerson(student, updatedStudent);
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
 

@@ -205,7 +205,7 @@ The `recurringlesson` command records a weekly lesson comprising a day, time, an
 
 `RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, and a topic. Its constructor requires all three values and trims and rejects a blank topic. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
 
-Student records are replaced rather than mutated. When a recurring lesson is set, `RecurringLessonCommand` creates a new `Person` containing the new recurring lesson while preserving the student's name, contact details, academic information, note, next lesson, and tags.
+Student records are replaced rather than mutated. `Person.withNote(...)`, `withNextLesson(...)`, and `withRecurringLesson(...)` return a new `Person` with only the specified value changed, preserving every other field. The note and lesson setting/clearing commands use these methods; an empty `Optional` explicitly clears a lesson, while null arguments are rejected.
 
 #### Command execution
 

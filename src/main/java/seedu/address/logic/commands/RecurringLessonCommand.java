@@ -76,9 +76,7 @@ public class RecurringLessonCommand extends Command {
                     conflictingStudent.getName().fullName, lesson.getDay(), lesson.getTime(),
                     lesson.getDuration().getDurationMinutes()));
         }
-        Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
-                student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
-                student.getNextLesson(), Optional.of(recurringLesson), student.getTags());
+        Person updatedStudent = student.withRecurringLesson(Optional.of(recurringLesson));
         model.setPerson(student, updatedStudent);
         model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
 
