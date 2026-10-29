@@ -7,7 +7,6 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -71,45 +70,35 @@ class JsonAdaptedNextLesson {
     Optional<NextLesson> toModelType(Clock clock) throws IllegalValueException {
         requireNonNull(clock);
         Clock loadClock = Clock.fixed(clock.instant(), clock.getZone());
-        if (date == null) {
-            throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "date"));
-        }
-        if (time == null) {
-            throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "time"));
-        }
-        if (topic == null) {
-            throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "topic"));
-        }
+        requireField(date, "date");
+        requireField(time, "time");
+        requireField(topic, "topic");
         if (topic.isBlank()) {
             throw new IllegalValueException(NextLesson.MESSAGE_TOPIC_CONSTRAINTS);
         }
 
-        final LocalDate modelDate;
-        final LocalTime modelTime;
-        final LessonDuration modelDuration;
         try {
-            modelDate = LocalDate.parse(date);
-            modelTime = LocalTime.parse(time);
-            int storedDuration = durationMinutes == null
-                    ? LessonDuration.DEFAULT_DURATION_MINUTES : durationMinutes;
-            modelDuration = LessonDuration.fromStoredValue(storedDuration);
-        } catch (DateTimeParseException exception) {
-            throw new IllegalValueException(MESSAGE_INVALID_DATE_TIME, exception);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalValueException(exception.getMessage(), exception);
-        }
-
-        try {
-            NextLesson lesson = NextLesson.fromStoredValues(modelDate, modelTime, topic, modelDuration);
-            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now(loadClock))) {
-                // A completed lesson no longer occupies its timetable interval.
-                return Optional.empty();
-            }
-            return Optional.of(lesson);
+            NextLesson lesson = NextLesson.fromStoredValues(LocalDate.parse(date), LocalTime.parse(time),
+                    topic, parseDuration());
+            boolean isCompleted = !lesson.getEndDateTime().isAfter(LocalDateTime.now(loadClock));
+            // A completed lesson no longer occupies its timetable interval.
+            return isCompleted ? Optional.empty() : Optional.of(lesson);
         } catch (DateTimeException exception) {
             throw new IllegalValueException(MESSAGE_INVALID_DATE_TIME, exception);
         } catch (IllegalArgumentException exception) {
             throw new IllegalValueException(exception.getMessage(), exception);
         }
+    }
+
+    private static void requireField(String value, String fieldName) throws IllegalValueException {
+        if (value == null) {
+            throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, fieldName));
+        }
+    }
+
+    private LessonDuration parseDuration() {
+        int storedDuration = durationMinutes == null
+                ? LessonDuration.DEFAULT_DURATION_MINUTES : durationMinutes;
+        return LessonDuration.fromStoredValue(storedDuration);
     }
 }
