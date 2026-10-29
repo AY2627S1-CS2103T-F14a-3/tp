@@ -54,7 +54,7 @@ public class NextLessonCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        Person student = getStudent(model);
+        Person student = getDisplayedStudent(model, index);
         List<Person> allStudents = model.getAddressBook().getPersonList();
         validateNoNextLessonClash(student, allStudents);
         validateNoRecurringLessonClash(student, allStudents);
@@ -68,14 +68,6 @@ public class NextLessonCommand extends Command {
                 Messages.formatLessonDuration(nextLesson.duration.getDurationMinutes()), nextLesson.topic));
     }
 
-    /** Returns the student at the displayed index, or rejects an index outside the displayed list. */
-    private Person getStudent(Model model) throws CommandException {
-        List<Person> displayedStudents = model.getFilteredPersonList();
-        if (index.getZeroBased() >= displayedStudents.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
-        }
-        return displayedStudents.get(index.getZeroBased());
-    }
 
     /** Rejects a clash with any student's next lesson, excluding the lesson being replaced. */
     private void validateNoNextLessonClash(Person student, List<Person> allStudents) throws CommandException {

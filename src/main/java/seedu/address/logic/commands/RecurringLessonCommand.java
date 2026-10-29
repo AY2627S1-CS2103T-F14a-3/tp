@@ -51,7 +51,7 @@ public class RecurringLessonCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        Person student = getStudent(model);
+        Person student = getDisplayedStudent(model, index);
         List<Person> allStudents = model.getAddressBook().getPersonList();
         validateNoNextLessonClash(student, allStudents);
         validateNoRecurringLessonClash(student, allStudents);
@@ -66,14 +66,6 @@ public class RecurringLessonCommand extends Command {
                 recurringLesson.getTopic()));
     }
 
-    /** Returns the student at the displayed index, or rejects an index outside the displayed list. */
-    private Person getStudent(Model model) throws CommandException {
-        List<Person> displayedStudents = model.getFilteredPersonList();
-        if (index.getZeroBased() >= displayedStudents.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
-        }
-        return displayedStudents.get(index.getZeroBased());
-    }
 
     /** Rejects a next-lesson clash unless it is an exact occurrence of this student's proposed schedule. */
     private void validateNoNextLessonClash(Person student, List<Person> allStudents) throws CommandException {
