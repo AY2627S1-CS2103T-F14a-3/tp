@@ -2,6 +2,7 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -25,10 +26,26 @@ public class UpcomingCommand extends Command {
     public static final String MESSAGE_SUCCESS = "Showing student(s) with the earliest upcoming lesson at %1$s.";
     public static final String MESSAGE_NO_UPCOMING_LESSON = "No upcoming lessons are scheduled.";
 
+    private final Clock clock;
+
+    /**
+     * Creates a command using the computer's local time zone.
+     */
+    public UpcomingCommand() {
+        this(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates a command whose upcoming-lesson boundary uses the supplied clock.
+     */
+    public UpcomingCommand(Clock clock) {
+        this.clock = requireNonNull(clock);
+    }
+
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(clock);
         LocalDateTime earliest = model.getAddressBook().getPersonList().stream()
                 .map(Person::getNextLesson)
                 .flatMap(Optional::stream)

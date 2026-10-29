@@ -1,5 +1,8 @@
 package seedu.address.storage;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +31,7 @@ import seedu.address.model.tag.Tag;
  */
 class JsonAdaptedPerson {
 
-    public static final String MISSING_FIELD_MESSAGE_FORMAT = "Person's %s field is missing!";
+    public static final String MISSING_FIELD_MESSAGE_FORMAT = "Student's %s field is missing!";
 
     private final String name;
     private final String phone;
@@ -113,6 +116,14 @@ class JsonAdaptedPerson {
      * @throws IllegalValueException if there were any data constraints violated in the adapted person.
      */
     public Person toModelType() throws IllegalValueException {
+        return toModelType(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Restores a student, evaluating saved lessons against the supplied clock.
+     */
+    public Person toModelType(Clock clock) throws IllegalValueException {
+        requireNonNull(clock);
         final List<Tag> personTags = new ArrayList<>();
         for (JsonAdaptedTag tag : tags) {
             personTags.add(tag.toModelType());
@@ -169,7 +180,7 @@ class JsonAdaptedPerson {
         }
 
         StudentNote modelNote = new StudentNote(note == null ? "" : note);
-        Optional<NextLesson> modelNextLesson = nextLesson == null ? Optional.empty() : nextLesson.toModelType();
+        Optional<NextLesson> modelNextLesson = nextLesson == null ? Optional.empty() : nextLesson.toModelType(clock);
         Optional<RecurringLesson> modelRecurringLesson = recurringLesson == null
                 ? Optional.empty()
                 : Optional.of(recurringLesson.toModelType());
