@@ -190,6 +190,9 @@ Only members relevant to lesson priority are shown.
 * `UpcomingCommand` reads all students through `Model.getAddressBook()`, compares each future next lesson with the
   next occurrence of each recurring lesson, and shows students whose earliest lesson starts at the overall minimum.
   If none exists, it reports an error.
+  The earliest start is the minimum over every student's future one-off lesson and next recurring occurrence, and
+  all students tied at that minimum are shown together. The search covers all students, not only the currently
+  displayed list.
 * `Person` may reference one `NextLesson` and one `RecurringLesson`. `NextLesson.getDateTime()` supplies the one-off
   start time; `RecurringLesson.getNextOccurrence(...)` supplies the next weekly start. `SortCommand` still sorts by
   next lessons only.
