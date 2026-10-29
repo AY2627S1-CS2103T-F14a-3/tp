@@ -11,6 +11,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_PHONE_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_SCHOOL_LEVEL_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.testutil.Assert.assertThrows;
+import static seedu.address.testutil.LessonUtil.futureLesson;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
 
@@ -135,8 +136,7 @@ public class PersonTest {
 
     @Test
     public void getNextLesson_lessonScheduled_returnsLesson() {
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
-                new LessonDuration("60"));
+        NextLesson lesson = futureLesson(1, 14, 30, 60);
         Person person = new PersonBuilder().withNextLesson(lesson).build();
 
         assertEquals(Optional.of(lesson), person.getNextLesson());
@@ -239,9 +239,7 @@ public class PersonTest {
         assertFalse(ALICE.equals(editedAlice));
 
         // different next lesson -> returns false
-        editedAlice = new PersonBuilder(ALICE).withNextLesson(
-                new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
-                        new LessonDuration("60"))).build();
+        editedAlice = new PersonBuilder(ALICE).withNextLesson(futureLesson(1, 14, 30, 60)).build();
         assertFalse(ALICE.equals(editedAlice));
 
         editedAlice = new PersonBuilder(ALICE).withRecurringLesson(

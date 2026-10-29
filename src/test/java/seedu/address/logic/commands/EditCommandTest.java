@@ -12,12 +12,10 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
+import static seedu.address.testutil.LessonUtil.futureLesson;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +26,6 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
@@ -79,8 +76,7 @@ public class EditCommandTest {
     @Test
     public void execute_editPersonWithNextLesson_preservesNextLesson() {
         Person original = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
-                new LessonDuration("60"));
+        NextLesson lesson = futureLesson(1, 14, 30, 60);
         Person originalWithLesson = new PersonBuilder(original).withNextLesson(lesson).build();
         model.setPerson(original, originalWithLesson);
 

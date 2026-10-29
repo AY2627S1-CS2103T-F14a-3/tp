@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
+import static seedu.address.testutil.LessonUtil.futureLesson;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
@@ -149,8 +150,7 @@ public class NextLessonCommandTest {
     @Test
     public void execute_validIndexWithoutExistingLesson_setsNextLesson() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        NextLesson lesson = new NextLesson(
-                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra", DURATION);
+        NextLesson lesson = futureLesson(1, 14, 30, 90);
         Person updatedStudent = new PersonBuilder(student).withNextLesson(lesson).build();
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(student, updatedStudent);
@@ -166,8 +166,7 @@ public class NextLessonCommandTest {
     public void execute_validIndexInFilteredList_updatesCorrectStudentAndResetsFilter() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
         Person student = model.getFilteredPersonList().get(0);
-        NextLesson lesson = new NextLesson(
-                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra", DURATION);
+        NextLesson lesson = futureLesson(1, 14, 30, 90);
         Person updatedStudent = new PersonBuilder(student).withNextLesson(lesson).build();
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(student, updatedStudent);
@@ -182,8 +181,7 @@ public class NextLessonCommandTest {
     @Test
     public void execute_invalidIndex_throwsCommandException() {
         Index invalidIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
-        NextLesson lesson = new NextLesson(
-                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra", DURATION);
+        NextLesson lesson = futureLesson(1, 14, 30, 90);
         assertCommandFailure(new NextLessonCommand(invalidIndex, lesson), model,
                 Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
@@ -192,16 +190,14 @@ public class NextLessonCommandTest {
     public void execute_invalidIndexInFilteredList_throwsCommandException() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
         assertTrue(INDEX_SECOND_PERSON.getZeroBased() < model.getAddressBook().getPersonList().size());
-        NextLesson lesson = new NextLesson(
-                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra", DURATION);
+        NextLesson lesson = futureLesson(1, 14, 30, 90);
         assertCommandFailure(new NextLessonCommand(INDEX_SECOND_PERSON, lesson), model,
                 Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
 
     @Test
     public void equals() {
-        NextLesson lesson = new NextLesson(
-                LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra", DURATION);
+        NextLesson lesson = futureLesson(1, 14, 30, 90);
         NextLessonCommand command = new NextLessonCommand(INDEX_FIRST_PERSON, lesson);
 
         assertTrue(command.equals(command));
@@ -209,7 +205,6 @@ public class NextLessonCommandTest {
         assertFalse(command.equals(null));
         assertFalse(command.equals(new ClearCommand()));
         assertFalse(command.equals(new NextLessonCommand(INDEX_SECOND_PERSON, lesson)));
-        assertFalse(command.equals(new NextLessonCommand(INDEX_FIRST_PERSON,
-                new NextLesson(LocalDate.now().plusDays(2), LocalTime.of(14, 30), "Algebra", DURATION))));
+        assertFalse(command.equals(new NextLessonCommand(INDEX_FIRST_PERSON, futureLesson(2, 14, 30, 90))));
     }
 }

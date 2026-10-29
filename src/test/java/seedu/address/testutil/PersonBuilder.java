@@ -141,6 +141,14 @@ public class PersonBuilder {
     }
 
     /**
+     * Clears the next lesson of the {@code Person} that we are building.
+     */
+    public PersonBuilder withoutNextLesson() {
+        this.nextLesson = Optional.empty();
+        return this;
+    }
+
+    /**
      * Sets the recurring lesson of the {@code Person} that we are building.
      */
     public PersonBuilder withRecurringLesson(RecurringLesson recurringLesson) {

@@ -3,6 +3,8 @@ package seedu.address.storage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static seedu.address.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORMAT;
 import static seedu.address.testutil.Assert.assertThrows;
+import static seedu.address.testutil.LessonUtil.futureLesson;
+import static seedu.address.testutil.LessonUtil.withLesson;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 
 import java.time.Clock;
@@ -114,9 +116,8 @@ public class JsonAdaptedPersonTest {
 
     @Test
     public void toModelType_nextLessonIsPreserved() throws Exception {
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
-                new LessonDuration("90"));
-        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).withNextLesson(lesson).build());
+        NextLesson lesson = futureLesson(1, 14, 30, 90);
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(withLesson(BENSON, lesson));
         String json = JsonUtil.toJsonString(adapted);
         JsonAdaptedPerson reloaded = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
 

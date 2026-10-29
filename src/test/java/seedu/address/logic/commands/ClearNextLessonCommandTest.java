@@ -5,13 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
+import static seedu.address.testutil.LessonUtil.futureLesson;
+import static seedu.address.testutil.LessonUtil.withLesson;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +18,6 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
@@ -32,16 +29,12 @@ public class ClearNextLessonCommandTest {
     @Test
     public void execute_validIndex_clearsNextLessonAndPreservesStudentDetails() {
         Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
-                new LessonDuration("60"));
+        NextLesson lesson = futureLesson(1, 14, 30, 60);
         Person studentWithDetails = new PersonBuilder(student).withSchoolLevel("Secondary 4").withSubject("Biology")
                 .withNote("Needs extra practice").withTags("priority").withNextLesson(lesson).build();
         model.setPerson(student, studentWithDetails);
 
-        Person updatedStudent = new Person(studentWithDetails.getName(), studentWithDetails.getPhone(),
-                studentWithDetails.getEmail(), studentWithDetails.getAddress(), studentWithDetails.getSchoolLevel(),
-                studentWithDetails.getSubject(), studentWithDetails.getNote(), Optional.empty(),
-                studentWithDetails.getTags());
+        Person updatedStudent = new PersonBuilder(studentWithDetails).withoutNextLesson().build();
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(studentWithDetails, updatedStudent);
 
@@ -65,15 +58,10 @@ public class ClearNextLessonCommandTest {
     public void execute_validIndexInFilteredList_clearsCorrectStudentAndResetsFilter() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
         Person student = model.getFilteredPersonList().get(0);
-        NextLesson lesson = new NextLesson(LocalDate.now().plusDays(1), LocalTime.of(14, 30), "Algebra",
-                new LessonDuration("60"));
-        Person studentWithLesson = new PersonBuilder(student).withNextLesson(lesson).build();
+        Person studentWithLesson = withLesson(student, futureLesson(1, 14, 30, 60));
         model.setPerson(student, studentWithLesson);
 
-        Person updatedStudent = new Person(studentWithLesson.getName(), studentWithLesson.getPhone(),
-                studentWithLesson.getEmail(), studentWithLesson.getAddress(), studentWithLesson.getSchoolLevel(),
-                studentWithLesson.getSubject(), studentWithLesson.getNote(), Optional.empty(),
-                studentWithLesson.getTags());
+        Person updatedStudent = new PersonBuilder(studentWithLesson).withoutNextLesson().build();
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(studentWithLesson, updatedStudent);
 
