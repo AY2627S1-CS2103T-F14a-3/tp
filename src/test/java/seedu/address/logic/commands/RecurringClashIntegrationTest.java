@@ -114,6 +114,22 @@ public class RecurringClashIntegrationTest {
                         next.date, next.time, next.duration.getDurationMinutes()));
     }
 
+    @Test
+    public void bothConflictTypes_nextLessonErrorTakesPrecedenceForBothCommands() {
+        Person nextStudent = model.getFilteredPersonList().get(1);
+        Person recurringStudent = model.getFilteredPersonList().get(2);
+        NextLesson next = new NextLesson(MONDAY, LocalTime.of(14, 0), "Geometry", DURATION);
+        RecurringLesson rule = new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(14, 0), "Algebra", DURATION);
+        model.setPerson(nextStudent, new PersonBuilder(nextStudent).withNextLesson(next).build());
+        model.setPerson(recurringStudent, new PersonBuilder(recurringStudent).withRecurringLesson(rule).build());
+        showPersonAtIndex(model, INDEX_FIRST_PERSON);
+        String expected = String.format(Messages.MESSAGE_LESSON_CLASH,
+                nextStudent.getName().fullName, next.date, next.time, next.duration.getDurationMinutes());
+
+        assertCommandFailure(new NextLessonCommand(INDEX_FIRST_PERSON, next), model, expected);
+        assertCommandFailure(new RecurringLessonCommand(INDEX_FIRST_PERSON, rule), model, expected);
+    }
+
     private String recurringError(Person student, RecurringLesson rule) {
         return String.format(Messages.MESSAGE_RECURRING_LESSON_CLASH, student.getName().fullName,
                 rule.getDay(), rule.getTime(), rule.getDuration().getDurationMinutes());

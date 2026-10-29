@@ -198,6 +198,12 @@ A supplied `Clock` allows deterministic boundary tests.
 
 ### Timetable-clash detection
 
+Clash checks return an immutable `LessonClash<T>` containing the conflicting student and the exact next or
+recurring lesson selected during validation. Commands obtain the date or weekday, time, and duration from that
+result, rather than retrieving the lesson from the student again. The result carries existing immutable objects
+without copying records. Next-lesson conflicts retain precedence over recurring conflicts, and feedback wording
+and rejected-command state remain unchanged.
+
 `DatedLessonInterval` and `WeeklyLessonInterval` are immutable value objects responsible for overlap arithmetic.
 Both use half-open intervals: a start is included, while an end is excluded, so adjacent lessons do not clash.
 Dated comparisons use start-time gaps rather than calculating end dates, avoiding overflow at extreme dates.
