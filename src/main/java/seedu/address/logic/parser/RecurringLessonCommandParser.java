@@ -26,9 +26,8 @@ public class RecurringLessonCommandParser implements Parser<RecurringLessonComma
     @Override
     public RecurringLessonCommand parse(String args) throws ParseException {
         requireNonNull(args);
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_LESSON_DAY, PREFIX_LESSON_TIME,
-                PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTerminalPrefix(args, PREFIX_LESSON_TOPIC,
+                PREFIX_LESSON_DAY, PREFIX_LESSON_TIME, PREFIX_LESSON_DURATION);
         argMultimap.verifyNoDuplicatePrefixesFor(
                 PREFIX_LESSON_DAY, PREFIX_LESSON_TIME,
                 PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);

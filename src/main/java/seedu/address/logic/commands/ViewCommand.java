@@ -27,6 +27,7 @@ public class ViewCommand extends Command {
 
     private final Index targetIndex;
 
+    /** Creates a command to view the student at the given displayed index. */
     public ViewCommand(Index targetIndex) {
         requireNonNull(targetIndex);
 

@@ -50,9 +50,7 @@ public class NoteCommand extends Command {
         }
 
         Person student = displayedStudents.get(index.getZeroBased());
-        Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
-                student.getAddress(), student.getSchoolLevel(), student.getSubject(), note,
-                student.getNextLesson(), student.getRecurringLesson(), student.getTags());
+        Person updatedStudent = student.withNote(note);
 
         model.setPerson(student, updatedStudent);
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);

@@ -154,6 +154,12 @@ The `Storage` component,
 * is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
 
+JSON saving serializes the complete data before writing a temporary file in the destination directory. The file is
+then moved over the destination atomically where supported. If atomic moves are unsupported, saving falls back to
+a regular replacement move; this fallback does not guarantee atomicity. Temporary files are removed after handled
+write or move failures. This protects existing data from incomplete temporary writes, but is not a guarantee against
+power loss or all filesystem failures. The same saving path is used for student records and user preferences.
+
 ### Common classes
 
 Classes used by multiple components are in the `seedu.address.commons` package.
@@ -181,12 +187,36 @@ Only members relevant to lesson priority are shown.
 * `SortCommand` passes `Person.COMPARATOR_BY_NEXT_LESSON` to `Model.sortPersons(...)`, then resets the filter to show all students.
   The comparator orders students by their next lesson's start time, placing students without a next lesson last.
   `ModelManager` delegates sorting to the address book; the storage-list classes are omitted from this focused diagram.
-* `UpcomingCommand` reads all students through `Model.getAddressBook()`, finds the earliest next lesson at or after the current time,
-  and updates the filter to show every student whose lesson starts at that time. If none exists, it reports an error.
-* `Person` may reference one `NextLesson`. `NextLesson.getDateTime()` supplies the start time used by both commands.
-  Recurring schedules do not participate directly in these priority calculations.
+* `UpcomingCommand` reads all students through `Model.getAddressBook()`, compares each future next lesson with the
+  next occurrence of each recurring lesson, and shows students whose earliest lesson starts at the overall minimum.
+  If none exists, it reports an error.
+* `Person` may reference one `NextLesson` and one `RecurringLesson`. `NextLesson.getDateTime()` supplies the one-off
+  start time; `RecurringLesson.getNextOccurrence(...)` supplies the next weekly start. `SortCommand` still sorts by
+  next lessons only.
+
+### Upcoming lesson selection
+
+`UpcomingCommand` takes one local-time snapshot from its clock. `RecurringLesson#getNextOccurrence(...)` uses the
+next matching weekday, including today, and advances one week if that start has passed. The command searches all
+student records, not just those currently displayed. A student appears only once when both lesson types represent
+the same occurrence. Selection changes only the displayed-list filter, not student records or their saved order.
+The filter keeps the same time snapshot until another command changes it; rerun `upcoming` to refresh the selection.
+A supplied `Clock` allows deterministic boundary tests.
 
 ### Timetable-clash detection
+
+Clash checks return an immutable `LessonClash<T>` containing the conflicting student and the exact next or
+recurring lesson selected during validation. Commands obtain the date or weekday, time, and duration from that
+result, rather than retrieving the lesson from the student again. The result carries existing immutable objects
+without copying records. Next-lesson conflicts retain precedence over recurring conflicts, and feedback wording
+and rejected-command state remain unchanged.
+
+`DatedLessonInterval` and `WeeklyLessonInterval` are immutable value objects responsible for overlap arithmetic.
+Both use half-open intervals: a start is included, while an end is excluded, so adjacent lessons do not clash.
+Dated comparisons use start-time gaps rather than calculating end dates, avoiding overflow at extreme dates.
+A dated interval can be projected onto its weekday and time for comparison against a weekly interval. Weekly
+comparisons account for occurrences on either side of the Sunday/Monday boundary. `TimetableClashChecker` retains
+student identity checks, replacement exclusions, and the same-student occurrence exception.
 
 Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
 
@@ -206,7 +236,7 @@ The `recurringlesson` command records a weekly lesson comprising a day, time, an
 
 `RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, and a topic. Its constructor requires all three values and trims and rejects a blank topic. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
 
-Student records are replaced rather than mutated. When a recurring lesson is set, `RecurringLessonCommand` creates a new `Person` containing the new recurring lesson while preserving the student's name, contact details, academic information, note, next lesson, and tags.
+Student records are replaced rather than mutated. `Person.withNote(...)`, `withNextLesson(...)`, and `withRecurringLesson(...)` return a new `Person` with only the specified value changed, preserving every other field. The note and lesson setting/clearing commands use these methods; an empty `Optional` explicitly clears a lesson, while null arguments are rejected.
 
 #### Command execution
 

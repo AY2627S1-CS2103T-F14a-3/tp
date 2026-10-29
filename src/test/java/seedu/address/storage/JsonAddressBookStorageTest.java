@@ -11,9 +11,11 @@ import static seedu.address.testutil.TypicalPersons.IDA;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -54,6 +56,71 @@ public class JsonAddressBookStorageTest {
     @Test
     public void read_missingFile_emptyResult() throws Exception {
         assertFalse(readAddressBook("NonExistentFile.json").isPresent());
+    }
+
+    @Test
+    public void readAddressBook_fractionalLessonDuration_throwsDataLoadingException() throws Exception {
+        for (String lessonField : List.of("nextLesson", "recurringLesson")) {
+            for (String duration : List.of("1.9", "0.9", "60.5", "6.05e1")) {
+                Path filePath = testFolder.resolve("fractionalDuration.json");
+                String contents = studentWithLessonJson(lessonField, duration);
+                Files.writeString(filePath, contents);
+                JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+                assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+                assertEquals(contents, Files.readString(filePath));
+            }
+        }
+    }
+
+    @Test
+    public void readAddressBook_integerAndLegacyLessonDurations_preservesLoadingRules() throws Exception {
+        for (String lessonField : List.of("nextLesson", "recurringLesson")) {
+            String[] durations = {"1", "90", "1440", null, "1500"};
+            int[] expectedMinutes = {1, 90, 1440, 60, 1440};
+            for (int i = 0; i < durations.length; i++) {
+                Path filePath = testFolder.resolve("validDuration.json");
+                Files.writeString(filePath, studentWithLessonJson(lessonField, durations[i]));
+                JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+                var student = storage.readAddressBook().orElseThrow().getPersonList().getFirst();
+                int actualMinutes = lessonField.equals("nextLesson")
+                        ? student.getNextLesson().orElseThrow().duration.getDurationMinutes()
+                        : student.getRecurringLesson().orElseThrow().getDuration().getDurationMinutes();
+                assertEquals(expectedMinutes[i], actualMinutes, lessonField + ": " + durations[i]);
+            }
+        }
+    }
+
+    private static String studentWithLessonJson(String lessonField, String duration) {
+        String schedule = lessonField.equals("nextLesson") ? "\"date\": \"2099-06-15\""
+                : "\"day\": \"MONDAY\"";
+        String durationField = duration == null ? "" : ", \"durationMinutes\": " + duration;
+        return """
+                {"persons": [{"name": "Alpha", "phone": "90000001", "email": "alpha@example.com",
+                  "address": "Block One", "tags": [], "%s": {
+                    %s, "time": "10:00", "topic": "Algebra"%s
+                  }}]}
+                """.formatted(lessonField, schedule, durationField);
+    }
+
+    @Test
+    public void readAddressBook_jsonNull_throwsDataLoadingExceptionWithoutChangingFile() throws Exception {
+        Path filePath = testFolder.resolve("nullAddressBook.json");
+        String contents = " \n null \n ";
+        Files.writeString(filePath, contents);
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+        assertEquals(contents, Files.readString(filePath));
+    }
+
+    @Test
+    public void readAddressBook_validEmptyAddressBook_returnsPresentEmptyBook() throws Exception {
+        Path filePath = testFolder.resolve("emptyAddressBook.json");
+        Files.writeString(filePath, "{\"persons\": []}");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        assertEquals(new AddressBook(), new AddressBook(storage.readAddressBook().orElseThrow()));
     }
 
     @Test

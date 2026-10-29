@@ -28,11 +28,12 @@ public class JsonUtil {
     private static ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules()
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, false)
             .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
     static <T> void serializeObjectToJsonFile(Path jsonFile, T objectToSerialize) throws IOException {
-        FileUtil.writeToFile(jsonFile, toJsonString(objectToSerialize));
+        FileUtil.writeToFileAtomically(jsonFile, toJsonString(objectToSerialize));
     }
 
     static <T> T deserializeObjectFromJsonFile(Path jsonFile, Class<T> classOfObjectToDeserialize)
@@ -46,7 +47,7 @@ public class JsonUtil {
      *
      * @param filePath cannot be null.
      * @param classOfObjectToDeserialize JSON file has to correspond to the structure in the class given here.
-     * @throws DataLoadingException if loading of the JSON file failed.
+     * @throws DataLoadingException if loading fails or the file contains JSON {@code null}.
      */
     public static <T> Optional<T> readJsonFile(
             Path filePath, Class<T> classOfObjectToDeserialize) throws DataLoadingException {
@@ -61,6 +62,9 @@ public class JsonUtil {
 
         try {
             jsonFile = deserializeObjectFromJsonFile(filePath, classOfObjectToDeserialize);
+            if (jsonFile == null) {
+                throw new IOException("JSON file must contain a non-null value: " + filePath);
+            }
         } catch (IOException e) {
             logger.warning("Error reading from jsonFile file " + filePath + ": " + e);
             throw new DataLoadingException(e);

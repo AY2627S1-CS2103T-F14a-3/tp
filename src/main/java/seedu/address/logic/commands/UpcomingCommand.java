@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
@@ -47,18 +48,26 @@ public class UpcomingCommand extends Command {
         requireNonNull(model);
         LocalDateTime now = LocalDateTime.now(clock);
         LocalDateTime earliest = model.getAddressBook().getPersonList().stream()
-                .map(Person::getNextLesson)
+                .map(person -> getEarliestStart(person, now))
                 .flatMap(Optional::stream)
-                .map(NextLesson::getDateTime)
-                .filter(dateTime -> !dateTime.isBefore(now))
                 .min(LocalDateTime::compareTo)
                 .orElseThrow(() -> new CommandException(MESSAGE_NO_UPCOMING_LESSON));
 
-        Predicate<Person> startsAtEarliest = person -> person.getNextLesson()
-                .map(NextLesson::getDateTime)
+        Predicate<Person> startsAtEarliest = person -> getEarliestStart(person, now)
                 .filter(earliest::equals)
                 .isPresent();
         model.updateFilteredPersonList(startsAtEarliest);
         return new CommandResult(String.format(MESSAGE_SUCCESS, earliest.toLocalDate() + " " + earliest.toLocalTime()));
     }
+
+    /** Compares a student's one-off lesson with their next weekly occurrence. */
+    private Optional<LocalDateTime> getEarliestStart(Person person, LocalDateTime now) {
+        Optional<LocalDateTime> nextLesson = person.getNextLesson()
+                .map(NextLesson::getDateTime)
+                .filter(start -> !start.isBefore(now));
+        Optional<LocalDateTime> recurringLesson = person.getRecurringLesson()
+                .map(lesson -> lesson.getNextOccurrence(now));
+        return Stream.concat(nextLesson.stream(), recurringLesson.stream()).min(LocalDateTime::compareTo);
+    }
+
 }

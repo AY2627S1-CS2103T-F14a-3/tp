@@ -48,9 +48,7 @@ public class ClearNextLessonCommand extends Command {
         Person student = displayedStudents.get(index.getZeroBased());
         boolean hasNextLesson = student.getNextLesson().isPresent();
         if (hasNextLesson) {
-            Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
-                    student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
-                    Optional.empty(), student.getRecurringLesson(), student.getTags());
+            Person updatedStudent = student.withNextLesson(Optional.empty());
             model.setPerson(student, updatedStudent);
         }
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);

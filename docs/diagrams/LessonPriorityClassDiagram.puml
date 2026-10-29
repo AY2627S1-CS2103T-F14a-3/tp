@@ -47,9 +47,13 @@ package "Model" as ModelComponent <<model>> {
     class Person <<model>> {
         {static} + COMPARATOR_BY_NEXT_LESSON
         + getNextLesson() : Optional<NextLesson>
+        + getRecurringLesson() : Optional<RecurringLesson>
     }
     class NextLesson <<model>> {
         + getDateTime() : LocalDateTime
+    }
+    class RecurringLesson <<model>> {
+        + getNextOccurrence(now) : LocalDateTime
     }
 }
 
@@ -58,14 +62,16 @@ show UpcomingCommand methods
 show Model methods
 show Person members
 show NextLesson methods
+show RecurringLesson methods
 
 SortCommand ..> Model : uses
 UpcomingCommand ..> Model : uses
 ModelManager -up-|> Model
 ModelManager -right-> "*" Person : filteredPersons
 Person -down-> "0..1" NextLesson : nextLesson
+Person -down-> "0..1" RecurringLesson : recurringLesson
 SortCommand .[norank].> Person : uses comparator
-UpcomingCommand .[norank].> Person : reads next lessons
+UpcomingCommand .[norank].> Person : reads lesson starts
 
 ' Layout-only constraints keep the two commands aligned above the model.
 SortCommand -[hidden]right-> UpcomingCommand
