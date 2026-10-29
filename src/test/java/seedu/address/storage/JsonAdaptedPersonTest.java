@@ -133,8 +133,8 @@ public class JsonAdaptedPersonTest {
     }
 
     @Test
-    public void toModelType_clearedNextLesson_roundTripsAsEmpty() throws Exception {
-        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).build());
+    public void toModelType_personWithoutNextLesson_roundTripsAsEmpty() throws Exception {
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(new PersonBuilder(BENSON).withoutNextLesson().build());
         String json = JsonUtil.toJsonString(adapted);
         JsonAdaptedPerson reloaded = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
 
@@ -178,6 +178,19 @@ public class JsonAdaptedPersonTest {
 
         assertEquals(Optional.of(expected), stored.toModelType(justBeforeEnd));
         assertEquals(Optional.empty(), stored.toModelType(exactlyAtEnd));
+    }
+
+    @Test
+    public void toModelType_fixedClockDuringLesson_keepsLesson() throws Exception {
+        LocalDateTime start = LocalDateTime.of(2030, 6, 17, 9, 0);
+        JsonAdaptedNextLesson stored = new JsonAdaptedNextLesson(
+                start.toLocalDate().toString(), start.toLocalTime().toString(), "Algebra", 60);
+        Clock tenMinutesIn = Clock.fixed(start.plusMinutes(10).toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+
+        NextLesson lesson = stored.toModelType(tenMinutesIn).orElseThrow();
+
+        assertEquals(start, lesson.getDateTime());
+        assertEquals(start.plusMinutes(60), lesson.getEndDateTime());
     }
 
     @Test
@@ -231,12 +244,14 @@ public class JsonAdaptedPersonTest {
     }
 
     @Test
-    public void toModelType_invalidNextLessonDuration_throwsIllegalValueException() {
-        JsonAdaptedNextLesson invalidLesson = new JsonAdaptedNextLesson(
-                LocalDate.now().plusDays(1).toString(), "14:30", "Algebra", 0);
+    public void toModelType_nonPositiveNextLessonDuration_throwsIllegalValueException() {
+        for (int duration : new int[] {0, -5}) {
+            JsonAdaptedNextLesson invalidLesson = new JsonAdaptedNextLesson(
+                    LocalDate.now().plusDays(1).toString(), "14:30", "Algebra", duration);
 
-        assertThrows(IllegalValueException.class, LessonDuration.MESSAGE_CONSTRAINTS,
-                invalidLesson::toModelType);
+            assertThrows(IllegalValueException.class, LessonDuration.MESSAGE_CONSTRAINTS,
+                    invalidLesson::toModelType);
+        }
     }
 
     @Test
