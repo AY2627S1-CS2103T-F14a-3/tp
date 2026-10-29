@@ -31,8 +31,6 @@ public class NextLessonCommand extends Command {
             + " 1 date/2026-12-11 time/14:30 dur/90 topic/Algebra";
     public static final String MESSAGE_NEXT_LESSON_UPDATED =
             "Updated next lesson for %1$s to %2$s at %3$s for %4$s: %5$s";
-    public static final String MESSAGE_LESSON_CLASH = "Cannot schedule lesson: conflicts with %1$s's next lesson "
-            + "on %2$s at %3$s for %4$d minutes.";
 
     private static final Logger logger = LogsCenter.getLogger(NextLessonCommand.class);
 
@@ -55,24 +53,47 @@ public class NextLessonCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        Person student = getStudent(model);
+        List<Person> allStudents = model.getAddressBook().getPersonList();
+        validateNoNextLessonClash(student, allStudents);
+        validateNoRecurringLessonClash(student, allStudents);
+
+        Person updatedStudent = student.withNextLesson(Optional.of(nextLesson));
+        model.setPerson(student, updatedStudent);
+        model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+
+        return new CommandResult(String.format(MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
+                nextLesson.date, nextLesson.time,
+                Messages.formatLessonDuration(nextLesson.duration.getDurationMinutes()), nextLesson.topic));
+    }
+
+    /** Returns the student at the displayed index, or rejects an index outside the displayed list. */
+    private Person getStudent(Model model) throws CommandException {
         List<Person> displayedStudents = model.getFilteredPersonList();
         if (index.getZeroBased() >= displayedStudents.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
         }
+        return displayedStudents.get(index.getZeroBased());
+    }
 
-        Person student = displayedStudents.get(index.getZeroBased());
-        Optional<Person> conflict = TimetableClashChecker.findNextLessonClash(student, nextLesson,
-                model.getAddressBook().getPersonList());
+    /** Rejects a clash with any student's next lesson, excluding the lesson being replaced. */
+    private void validateNoNextLessonClash(Person student, List<Person> allStudents) throws CommandException {
+        Optional<Person> conflict = TimetableClashChecker.findNextLessonClash(student, nextLesson, allStudents);
         if (conflict.isPresent()) {
             Person conflictingStudent = conflict.orElseThrow();
             NextLesson conflictingLesson = conflictingStudent.getNextLesson().orElseThrow();
             logger.info("Rejected next lesson: timetable overlap detected; student data unchanged.");
             throw new CommandException(String.format(Messages.MESSAGE_LESSON_CLASH,
-                    conflictingStudent.getName().fullName, conflictingLesson.date, conflictingLesson.time,
+                    conflictingStudent.getName().fullName,
+                    conflictingLesson.date, conflictingLesson.time,
                     conflictingLesson.duration.getDurationMinutes()));
         }
+    }
+
+    /** Rejects a recurring clash unless the proposed lesson is an exact occurrence for the same student. */
+    private void validateNoRecurringLessonClash(Person student, List<Person> allStudents) throws CommandException {
         Optional<Person> recurringConflict = TimetableClashChecker.findRecurringLessonClash(student, nextLesson,
-                model.getAddressBook().getPersonList());
+                allStudents);
         if (recurringConflict.isPresent()) {
             Person conflictingStudent = recurringConflict.orElseThrow();
             RecurringLesson lesson = conflictingStudent.getRecurringLesson().orElseThrow();
@@ -81,13 +102,6 @@ public class NextLessonCommand extends Command {
                     conflictingStudent.getName().fullName, lesson.getDay(), lesson.getTime(),
                     lesson.getDuration().getDurationMinutes()));
         }
-        Person updatedStudent = student.withNextLesson(Optional.of(nextLesson));
-        model.setPerson(student, updatedStudent);
-        model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
-
-        return new CommandResult(String.format(MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
-                nextLesson.date, nextLesson.time,
-                Messages.formatLessonDuration(nextLesson.duration.getDurationMinutes()), nextLesson.topic));
     }
 
     @Override
