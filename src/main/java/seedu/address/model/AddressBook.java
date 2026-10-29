@@ -88,6 +88,7 @@ public class AddressBook implements ReadOnlyAddressBook {
      * Sorts the persons in the address book using {@code comparator}.
      */
     public void sortPersons(Comparator<Person> comparator) {
+        requireNonNull(comparator);
         persons.sort(comparator);
     }
 

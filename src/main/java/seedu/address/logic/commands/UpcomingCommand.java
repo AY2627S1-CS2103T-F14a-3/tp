@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -26,6 +27,8 @@ public class UpcomingCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "Showing student(s) with the earliest upcoming lesson at %1$s.";
     public static final String MESSAGE_NO_UPCOMING_LESSON = "No upcoming lessons are scheduled.";
+
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private final Clock clock;
 
@@ -57,7 +60,7 @@ public class UpcomingCommand extends Command {
                 .filter(earliest::equals)
                 .isPresent();
         model.updateFilteredPersonList(startsAtEarliest);
-        return new CommandResult(String.format(MESSAGE_SUCCESS, earliest.toLocalDate() + " " + earliest.toLocalTime()));
+        return new CommandResult(String.format(MESSAGE_SUCCESS, earliest.format(DATE_TIME_FORMAT)));
     }
 
     /** Compares a student's one-off lesson with their next weekly occurrence. */

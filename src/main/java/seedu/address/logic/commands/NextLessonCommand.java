@@ -4,11 +4,13 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
+import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
@@ -107,5 +109,18 @@ public class NextLessonCommand extends Command {
             return false;
         }
         return index.equals(otherNextLessonCommand.index) && nextLesson.equals(otherNextLessonCommand.nextLesson);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, nextLesson);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .add("index", index)
+                .add("nextLesson", nextLesson)
+                .toString();
     }
 }
