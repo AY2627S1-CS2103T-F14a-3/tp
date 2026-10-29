@@ -3,7 +3,9 @@ package seedu.address.model.person;
 import static java.util.Objects.requireNonNull;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 
 /**
@@ -46,6 +48,13 @@ public class RecurringLesson {
 
     public LocalTime getTime() {
         return time;
+    }
+
+    /** Returns the first weekly start at or after {@code now}, using local wall-clock time. */
+    public LocalDateTime getNextOccurrence(LocalDateTime now) {
+        requireNonNull(now);
+        LocalDateTime occurrence = now.toLocalDate().with(TemporalAdjusters.nextOrSame(day)).atTime(time);
+        return occurrence.isBefore(now) ? occurrence.plusWeeks(1) : occurrence;
     }
 
     public LessonDuration getDuration() {

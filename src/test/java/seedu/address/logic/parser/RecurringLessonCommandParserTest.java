@@ -5,7 +5,6 @@ import static seedu.address.logic.Messages.getErrorMessageForDuplicatePrefixes;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DAY;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DURATION;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TIME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TOPIC;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
@@ -38,6 +37,17 @@ public class RecurringLessonCommandParserTest {
     }
 
     @Test
+    public void parse_topicContainsCommandPrefixes_success() {
+        String topic = "Compare day/ values, time/ notation, dur/ values, and topic/ labels";
+
+        assertParseSuccess(parser, "1 day/MONDAY time/" + VALID_TIME
+                        + " dur/" + VALID_DURATION + " topic/" + topic,
+                new RecurringLessonCommand(INDEX_FIRST_PERSON,
+                        new RecurringLesson(DayOfWeek.MONDAY, LocalTime.of(16, 30), topic,
+                                new LessonDuration(VALID_DURATION))));
+    }
+
+    @Test
     public void parse_lowercaseDay_success() {
         assertParseSuccess(parser, "1 day/monday time/" + VALID_TIME
                         + " dur/" + VALID_DURATION + " topic/" + VALID_TOPIC,
@@ -59,6 +69,13 @@ public class RecurringLessonCommandParserTest {
         assertParseFailure(parser, "1 day/MONDAY dur/90 topic/Algebra", expectedMessage);
         assertParseFailure(parser, "1 day/MONDAY time/16:30 dur/90", expectedMessage);
         assertParseFailure(parser, "1 day/MONDAY time/16:30 topic/Algebra", expectedMessage);
+    }
+
+    @Test
+    public void parse_topicBeforeRequiredPrefix_failure() {
+        String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, RecurringLessonCommand.MESSAGE_USAGE);
+
+        assertParseFailure(parser, "1 day/MONDAY time/16:30 topic/Algebra dur/90", expectedMessage);
     }
 
     @Test
@@ -104,8 +121,6 @@ public class RecurringLessonCommandParserTest {
                 getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_DAY));
         assertParseFailure(parser, "1 day/MONDAY time/16:30 time/17:30 dur/90 topic/Algebra",
                 getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_TIME));
-        assertParseFailure(parser, "1 day/MONDAY time/16:30 dur/90 topic/Algebra topic/Geometry",
-                getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_TOPIC));
         assertParseFailure(parser, "1 day/MONDAY time/16:30 dur/60 dur/90 topic/Algebra",
                 getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_DURATION));
     }

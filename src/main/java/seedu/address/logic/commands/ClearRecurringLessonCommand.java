@@ -48,9 +48,7 @@ public class ClearRecurringLessonCommand extends Command {
         Person student = displayedStudents.get(index.getZeroBased());
         boolean hasRecurringLesson = student.getRecurringLesson().isPresent();
         if (hasRecurringLesson) {
-            Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
-                    student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
-                    student.getNextLesson(), Optional.empty(), student.getTags());
+            Person updatedStudent = student.withRecurringLesson(Optional.empty());
             model.setPerson(student, updatedStudent);
         }
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);

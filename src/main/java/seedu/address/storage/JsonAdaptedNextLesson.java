@@ -1,6 +1,11 @@
 package seedu.address.storage;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.Clock;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
@@ -57,6 +62,15 @@ class JsonAdaptedNextLesson {
      * @throws IllegalValueException if the lesson details are malformed.
      */
     Optional<NextLesson> toModelType() throws IllegalValueException {
+        return toModelType(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Restores a saved lesson using the supplied clock to decide whether it has ended.
+     */
+    Optional<NextLesson> toModelType(Clock clock) throws IllegalValueException {
+        requireNonNull(clock);
+        Clock loadClock = Clock.fixed(clock.instant(), clock.getZone());
         if (date == null) {
             throw new IllegalValueException(String.format(MESSAGE_MISSING_FIELD_FORMAT, "date"));
         }
@@ -85,17 +99,16 @@ class JsonAdaptedNextLesson {
             throw new IllegalValueException(exception.getMessage(), exception);
         }
 
-        if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
-            // A past appointment is no longer the student's next lesson.
-            return Optional.empty();
-        }
-
         try {
-            return Optional.of(new NextLesson(modelDate, modelTime, topic, modelDuration));
-        } catch (IllegalArgumentException exception) {
-            if (NextLesson.isDateTimeInPast(modelDate, modelTime)) {
+            NextLesson lesson = NextLesson.fromStoredValues(modelDate, modelTime, topic, modelDuration);
+            if (!lesson.getEndDateTime().isAfter(LocalDateTime.now(loadClock))) {
+                // A completed lesson no longer occupies its timetable interval.
                 return Optional.empty();
             }
+            return Optional.of(lesson);
+        } catch (DateTimeException exception) {
+            throw new IllegalValueException(MESSAGE_INVALID_DATE_TIME, exception);
+        } catch (IllegalArgumentException exception) {
             throw new IllegalValueException(exception.getMessage(), exception);
         }
     }

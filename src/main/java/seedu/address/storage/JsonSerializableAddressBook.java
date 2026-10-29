@@ -1,5 +1,8 @@
 package seedu.address.storage;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +22,7 @@ import seedu.address.model.person.Person;
 @JsonRootName(value = "addressbook")
 class JsonSerializableAddressBook {
 
-    public static final String MESSAGE_DUPLICATE_PERSON = "Persons list contains duplicate person(s).";
+    public static final String MESSAGE_DUPLICATE_PERSON = "Student list contains duplicate students.";
 
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();
 
@@ -46,9 +49,18 @@ class JsonSerializableAddressBook {
      * @throws IllegalValueException if there were any data constraints violated.
      */
     public AddressBook toModelType() throws IllegalValueException {
+        return toModelType(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Restores all students against the same instant so loading cannot cross a time boundary midway.
+     */
+    public AddressBook toModelType(Clock clock) throws IllegalValueException {
+        requireNonNull(clock);
+        Clock loadClock = Clock.fixed(clock.instant(), clock.getZone());
         AddressBook addressBook = new AddressBook();
         for (JsonAdaptedPerson jsonAdaptedPerson : persons) {
-            Person person = jsonAdaptedPerson.toModelType();
+            Person person = jsonAdaptedPerson.toModelType(loadClock);
             if (addressBook.hasPerson(person)) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_PERSON);
             }

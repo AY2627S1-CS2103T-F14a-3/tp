@@ -28,7 +28,7 @@ public class RecurringLessonCommand extends Command {
             + "DAY must be a day of the week, such as MONDAY.\n"
             + "Example: " + COMMAND_WORD + " 1 day/MONDAY time/16:30 dur/90 topic/Algebra";
     public static final String MESSAGE_RECURRING_LESSON_UPDATED =
-            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$d minutes: %5$s";
+            "Updated recurring lesson for %1$s to every %2$s at %3$s for %4$s: %5$s";
 
     private static final Logger logger = LogsCenter.getLogger(RecurringLessonCommand.class);
 
@@ -51,24 +51,48 @@ public class RecurringLessonCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        Person student = getStudent(model);
+        List<Person> allStudents = model.getAddressBook().getPersonList();
+        validateNoNextLessonClash(student, allStudents);
+        validateNoRecurringLessonClash(student, allStudents);
+
+        Person updatedStudent = student.withRecurringLesson(Optional.of(recurringLesson));
+        model.setPerson(student, updatedStudent);
+        model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+
+        return new CommandResult(String.format(MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
+                recurringLesson.getDay(), recurringLesson.getTime(),
+                Messages.formatLessonDuration(recurringLesson.getDuration().getDurationMinutes()),
+                recurringLesson.getTopic()));
+    }
+
+    /** Returns the student at the displayed index, or rejects an index outside the displayed list. */
+    private Person getStudent(Model model) throws CommandException {
         List<Person> displayedStudents = model.getFilteredPersonList();
         if (index.getZeroBased() >= displayedStudents.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
         }
+        return displayedStudents.get(index.getZeroBased());
+    }
 
-        Person student = displayedStudents.get(index.getZeroBased());
-        Optional<LessonClash<NextLesson>> nextConflict = TimetableClashChecker.findNextLessonClash(
-                student, recurringLesson, model.getAddressBook().getPersonList());
+    /** Rejects a next-lesson clash unless it is an exact occurrence of this student's proposed schedule. */
+    private void validateNoNextLessonClash(Person student, List<Person> allStudents) throws CommandException {
+        Optional<LessonClash<NextLesson>> nextConflict = TimetableClashChecker.findNextLessonClash(student,
+                recurringLesson, allStudents);
         if (nextConflict.isPresent()) {
             LessonClash<NextLesson> clash = nextConflict.orElseThrow();
             NextLesson lesson = clash.lesson();
             logger.info("Rejected recurring lesson: next-lesson overlap detected; student data unchanged.");
-            throw new CommandException(String.format(NextLessonCommand.MESSAGE_LESSON_CLASH,
+            throw new CommandException(String.format(Messages.MESSAGE_LESSON_CLASH,
                     clash.student().getName().fullName, lesson.date, lesson.time,
                     lesson.duration.getDurationMinutes()));
         }
+    }
+
+    /** Rejects a clash with any student's recurring lesson, excluding the schedule being replaced. */
+    private void validateNoRecurringLessonClash(Person student, List<Person> allStudents) throws CommandException {
         Optional<LessonClash<RecurringLesson>> recurringConflict = TimetableClashChecker.findRecurringLessonClash(
-                student, recurringLesson, model.getAddressBook().getPersonList());
+                student, recurringLesson, allStudents);
         if (recurringConflict.isPresent()) {
             LessonClash<RecurringLesson> clash = recurringConflict.orElseThrow();
             RecurringLesson lesson = clash.lesson();
@@ -77,15 +101,6 @@ public class RecurringLessonCommand extends Command {
                     clash.student().getName().fullName, lesson.getDay(), lesson.getTime(),
                     lesson.getDuration().getDurationMinutes()));
         }
-        Person updatedStudent = new Person(student.getName(), student.getPhone(), student.getEmail(),
-                student.getAddress(), student.getSchoolLevel(), student.getSubject(), student.getNote(),
-                student.getNextLesson(), Optional.of(recurringLesson), student.getTags());
-        model.setPerson(student, updatedStudent);
-        model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
-
-        return new CommandResult(String.format(MESSAGE_RECURRING_LESSON_UPDATED, student.getName().fullName,
-                recurringLesson.getDay(), recurringLesson.getTime(),
-                recurringLesson.getDuration().getDurationMinutes(), recurringLesson.getTopic()));
     }
 
     @Override

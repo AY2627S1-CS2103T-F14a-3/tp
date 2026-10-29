@@ -9,7 +9,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TOPIC;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 import seedu.address.commons.core.index.Index;
@@ -23,14 +22,12 @@ import seedu.address.model.person.RecurringLesson;
  */
 public class RecurringLessonCommandParser implements Parser<RecurringLessonCommand> {
     private static final String MESSAGE_INVALID_DAY = "Lesson day must be a valid day of the week, such as MONDAY.";
-    private static final String MESSAGE_INVALID_TIME = "Lesson time must be a valid time in HH:mm format.";
 
     @Override
     public RecurringLessonCommand parse(String args) throws ParseException {
         requireNonNull(args);
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_LESSON_DAY, PREFIX_LESSON_TIME,
-                PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTerminalPrefix(args, PREFIX_LESSON_TOPIC,
+                PREFIX_LESSON_DAY, PREFIX_LESSON_TIME, PREFIX_LESSON_DURATION);
         argMultimap.verifyNoDuplicatePrefixesFor(
                 PREFIX_LESSON_DAY, PREFIX_LESSON_TIME,
                 PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC);
@@ -52,7 +49,7 @@ public class RecurringLessonCommandParser implements Parser<RecurringLessonComma
         }
 
         DayOfWeek day = parseDay(argMultimap.getValue(PREFIX_LESSON_DAY).orElseThrow());
-        LocalTime time = parseTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
+        LocalTime time = ParserUtil.parseLessonTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
         LessonDuration duration = ParserUtil.parseLessonDuration(
                 argMultimap.getValue(PREFIX_LESSON_DURATION).orElseThrow());
 
@@ -69,17 +66,6 @@ public class RecurringLessonCommandParser implements Parser<RecurringLessonComma
             return DayOfWeek.valueOf(day.trim().toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             throw new ParseException(MESSAGE_INVALID_DAY, e);
-        }
-    }
-
-    private LocalTime parseTime(String time) throws ParseException {
-        if (!time.matches("\\d{2}:\\d{2}")) {
-            throw new ParseException(MESSAGE_INVALID_TIME);
-        }
-        try {
-            return LocalTime.parse(time);
-        } catch (DateTimeParseException e) {
-            throw new ParseException(MESSAGE_INVALID_TIME, e);
         }
     }
 }
