@@ -198,6 +198,13 @@ A supplied `Clock` allows deterministic boundary tests.
 
 ### Timetable-clash detection
 
+`DatedLessonInterval` and `WeeklyLessonInterval` are immutable value objects responsible for overlap arithmetic.
+Both use half-open intervals: a start is included, while an end is excluded, so adjacent lessons do not clash.
+Dated comparisons use start-time gaps rather than calculating end dates, avoiding overflow at extreme dates.
+A dated interval can be projected onto its weekday and time for comparison against a weekly interval. Weekly
+comparisons account for occurrences on either side of the Sunday/Monday boundary. `TimetableClashChecker` retains
+student identity checks, replacement exclusions, and the same-student occurrence exception.
+
 Both `NextLessonCommand` and `RecurringLessonCommand` use `TimetableClashChecker` before replacing a student record. They check existing next lessons first, then recurring schedules, using all student records rather than only the displayed list. Each check uses the lesson's actual duration; adjacent lessons are allowed, and comparisons account for midnight and week boundaries.
 
 The lesson being replaced is excluded. When comparing a next lesson with the same student's recurring schedule, an exact weekday and start-time match represents the same occurrence and is allowed, even if the topic or duration differs. Other overlapping times are rejected.
