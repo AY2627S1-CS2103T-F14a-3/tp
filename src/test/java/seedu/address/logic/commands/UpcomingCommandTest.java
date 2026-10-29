@@ -3,6 +3,8 @@ package seedu.address.logic.commands;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
+import static seedu.address.testutil.LessonUtil.futureLesson;
+import static seedu.address.testutil.LessonUtil.withLesson;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.time.Clock;
@@ -64,10 +66,10 @@ public class UpcomingCommandTest {
     @Test
     public void execute_multipleLessons_showsOnlyEarliest() throws Exception {
         List<Person> students = List.copyOf(model.getAddressBook().getPersonList());
-        Person earliest = withLesson(students.get(2), DATE, 9);
-        model.setPerson(students.get(1), withLesson(students.get(1), DATE, 14));
+        Person earliest = withLesson(students.get(2), futureLesson(10, 9, 0, 60));
+        model.setPerson(students.get(1), withLesson(students.get(1), futureLesson(10, 14, 0, 60)));
         model.setPerson(students.get(2), earliest);
-        model.setPerson(students.get(4), withLesson(students.get(4), DATE.plusDays(1), 8));
+        model.setPerson(students.get(4), withLesson(students.get(4), futureLesson(11, 8, 0, 60)));
 
         CommandResult result = new UpcomingCommand().execute(model);
 
@@ -78,8 +80,8 @@ public class UpcomingCommandTest {
     @Test
     public void execute_tiedLessons_showsAllTiedStudents() throws Exception {
         List<Person> students = List.copyOf(model.getAddressBook().getPersonList());
-        Person first = withLesson(students.get(0), DATE, 9);
-        Person second = withLesson(students.get(3), DATE, 9);
+        Person first = withLesson(students.get(0), futureLesson(10, 9, 0, 60));
+        Person second = withLesson(students.get(3), futureLesson(10, 9, 0, 60));
         model.setPerson(students.get(0), first);
         model.setPerson(students.get(3), second);
 
@@ -91,7 +93,7 @@ public class UpcomingCommandTest {
     @Test
     public void execute_activeFilter_searchesWholeAddressBook() throws Exception {
         List<Person> students = List.copyOf(model.getAddressBook().getPersonList());
-        Person earliest = withLesson(students.get(0), DATE, 9);
+        Person earliest = withLesson(students.get(0), futureLesson(10, 9, 0, 60));
         model.setPerson(students.get(0), earliest);
         model.updateFilteredPersonList(person -> person.isSamePerson(students.get(1)));
 
@@ -130,7 +132,7 @@ public class UpcomingCommandTest {
     public void execute_mixedLessons_selectsEarliestAndIncludesHiddenRecurringStudent() throws Exception {
         List<Person> students = List.copyOf(model.getAddressBook().getPersonList());
         Person recurring = withRecurring(students.get(0), DayOfWeek.MONDAY, 9);
-        Person oneOff = withLesson(students.get(1), LocalDate.of(2030, 6, 18), 10);
+        Person oneOff = withLesson(students.get(1), lessonOn(LocalDate.of(2030, 6, 18), 10));
         model.setPerson(students.get(0), recurring);
         model.setPerson(students.get(1), oneOff);
         model.updateFilteredPersonList(person -> person.equals(oneOff));
@@ -143,7 +145,7 @@ public class UpcomingCommandTest {
     @Test
     public void execute_tiedLessonTypes_eachStudentAppearsOnceAndRecordsUnchanged() throws Exception {
         List<Person> students = List.copyOf(model.getAddressBook().getPersonList());
-        Person both = withRecurring(withLesson(students.get(0), LocalDate.of(2030, 6, 17), 9),
+        Person both = withRecurring(withLesson(students.get(0), lessonOn(LocalDate.of(2030, 6, 17), 9)),
                 DayOfWeek.MONDAY, 9);
         Person recurring = withRecurring(students.get(1), DayOfWeek.MONDAY, 9);
         model.setPerson(students.get(0), both);
@@ -156,7 +158,8 @@ public class UpcomingCommandTest {
 
     @Test
     public void execute_pastOneOffWithNoRecurrence_preservesFilterOnFailure() {
-        Person student = withLesson(model.getAddressBook().getPersonList().get(0), LocalDate.of(2030, 6, 17), 9);
+        Person student = withLesson(model.getAddressBook().getPersonList().get(0),
+                lessonOn(LocalDate.of(2030, 6, 17), 9));
         model.setPerson(model.getAddressBook().getPersonList().get(0), student);
         model.updateFilteredPersonList(person -> person.equals(student));
         assertCommandFailure(at("2030-06-17T09:00:01"), model, UpcomingCommand.MESSAGE_NO_UPCOMING_LESSON);
@@ -172,8 +175,7 @@ public class UpcomingCommandTest {
                 "Algebra", new LessonDuration("60"))).build();
     }
 
-    private static Person withLesson(Person person, LocalDate date, int hour) {
-        NextLesson lesson = new NextLesson(date, LocalTime.of(hour, 0), "Algebra", new LessonDuration("60"));
-        return new PersonBuilder(person).withNextLesson(lesson).build();
+    private static NextLesson lessonOn(LocalDate date, int hour) {
+        return new NextLesson(date, LocalTime.of(hour, 0), "Algebra", new LessonDuration("60"));
     }
 }

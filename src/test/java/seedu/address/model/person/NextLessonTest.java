@@ -48,6 +48,16 @@ public class NextLessonTest {
     }
 
     @Test
+    public void constructor_fixedClockOneMinuteAfterStart_rejectsPastBooking() {
+        LocalDateTime start = LocalDateTime.of(2000, 1, 1, 10, 0);
+        ZoneId zone = ZoneId.of("Asia/Singapore");
+        Clock clock = Clock.fixed(start.plusMinutes(1).atZone(zone).toInstant(), zone);
+
+        Assert.assertThrows(IllegalArgumentException.class, NextLesson.MESSAGE_DATE_TIME_CONSTRAINTS, () ->
+                new NextLesson(start.toLocalDate(), start.toLocalTime(), VALID_TOPIC, VALID_DURATION, clock));
+    }
+
+    @Test
     public void constructor_nullClock_throwsNullPointerException() {
         Assert.assertThrows(NullPointerException.class, () ->
                 new NextLesson(VALID_DATE, VALID_TIME, VALID_TOPIC, VALID_DURATION, null));

@@ -20,6 +20,8 @@ import seedu.address.model.person.NextLesson;
 public class NextLessonCommandParserTest {
 
     private final NextLessonCommandParser parser = new NextLessonCommandParser();
+    private final String futureDate = LocalDate.now().plusDays(1).toString();
+    private final String laterFutureDate = LocalDate.now().plusDays(2).toString();
 
     @Test
     public void parse_validInput_success() {
@@ -45,27 +47,25 @@ public class NextLessonCommandParserTest {
 
     @Test
     public void parse_missingRequiredPrefix_failure() {
-        assertParseFailure(parser, "1 date/2026-10-11 time/14:30 dur/90",
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/90",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
-        assertParseFailure(parser, "1 date/2026-10-11 dur/90 topic/Algebra",
+        assertParseFailure(parser, "1 date/" + futureDate + " dur/90 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
         assertParseFailure(parser, "1 time/14:30 dur/90 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
-        assertParseFailure(parser, "1 date/2026-10-11 time/14:30 topic/Algebra",
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
     }
 
     @Test
     public void parse_topicBeforeRequiredPrefix_failure() {
-        String futureDate = LocalDate.now().plusDays(1).toString();
-
         assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 topic/Algebra dur/90",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
     }
 
     @Test
     public void parse_invalidIndex_failure() {
-        assertParseFailure(parser, "zero date/2026-10-11 time/14:30 dur/90 topic/Algebra",
+        assertParseFailure(parser, "zero date/" + futureDate + " time/14:30 dur/90 topic/Algebra",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
     }
 
@@ -79,9 +79,9 @@ public class NextLessonCommandParserTest {
 
     @Test
     public void parse_invalidTime_failure() {
-        assertParseFailure(parser, "1 date/2026-10-11 time/2:30pm dur/90 topic/Algebra",
+        assertParseFailure(parser, "1 date/" + futureDate + " time/2:30pm dur/90 topic/Algebra",
                 "Lesson time must be a valid time in HH:mm format.");
-        assertParseFailure(parser, "1 date/2026-10-11 time/24:00 dur/90 topic/Algebra",
+        assertParseFailure(parser, "1 date/" + futureDate + " time/24:00 dur/90 topic/Algebra",
                 "Lesson time must be a valid time in HH:mm format.");
     }
 
@@ -100,7 +100,6 @@ public class NextLessonCommandParserTest {
 
     @Test
     public void parse_invalidDuration_failure() {
-        String futureDate = LocalDate.now().plusDays(1).toString();
         assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/0 topic/Algebra",
                 LessonDuration.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/ninety topic/Algebra",
@@ -109,9 +108,10 @@ public class NextLessonCommandParserTest {
 
     @Test
     public void parse_duplicatePrefix_failure() {
-        assertParseFailure(parser, "1 date/2026-10-11 date/2026-10-12 time/14:30 dur/90 topic/Algebra",
+        assertParseFailure(parser, "1 date/" + futureDate + " date/" + laterFutureDate
+                        + " time/14:30 dur/90 topic/Algebra",
                 getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_DATE));
-        assertParseFailure(parser, "1 date/2026-10-11 time/14:30 dur/60 dur/90 topic/Algebra",
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/60 dur/90 topic/Algebra",
                 getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_DURATION));
     }
 }
