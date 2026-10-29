@@ -4,6 +4,7 @@ import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.Messages.getErrorMessageForDuplicatePrefixes;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DATE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_DURATION;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TIME;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
@@ -104,6 +105,61 @@ public class NextLessonCommandParserTest {
                 LessonDuration.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/ninety topic/Algebra",
                 LessonDuration.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_nonPositiveOrNonNumericDuration_failure() {
+        for (String duration : new String[] {"0", "-5", "abc"}) {
+            assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/" + duration + " topic/Algebra",
+                    LessonDuration.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    @Test
+    public void parse_durationAboveMaximum_failure() {
+        int aboveMax = LessonDuration.MAX_DURATION_MINUTES + 1;
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/" + aboveMax + " topic/Algebra",
+                LessonDuration.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_missingOrNegativeIndex_failure() {
+        String invalidFormat = String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE);
+        assertParseFailure(parser, "date/" + futureDate + " time/14:30 dur/90 topic/Algebra", invalidFormat);
+        assertParseFailure(parser, "-1 date/" + futureDate + " time/14:30 dur/90 topic/Algebra", invalidFormat);
+    }
+
+    @Test
+    public void parse_emptyDate_failure() {
+        assertParseFailure(parser, "1 date/ time/14:30 dur/90 topic/Algebra",
+                "Lesson date must be a valid date in YYYY-MM-DD format.");
+    }
+
+    @Test
+    public void parse_emptyTime_failure() {
+        assertParseFailure(parser, "1 date/" + futureDate + " time/ dur/90 topic/Algebra",
+                "Lesson time must be a valid time in HH:mm format.");
+    }
+
+    @Test
+    public void parse_emptyTopic_failure() {
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 dur/90 topic/",
+                NextLesson.MESSAGE_TOPIC_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_duplicateTimePrefix_failure() {
+        assertParseFailure(parser, "1 date/" + futureDate + " time/14:30 time/15:30 dur/90 topic/Algebra",
+                getErrorMessageForDuplicatePrefixes(PREFIX_LESSON_TIME));
+    }
+
+    @Test
+    public void parse_duplicateTopicPrefix_treatedAsTopicText() {
+        LocalDate date = LocalDate.now().plusDays(1);
+        String topic = "Algebra topic/Geometry";
+        assertParseSuccess(parser, "1 date/" + date + " time/14:30 dur/90 topic/" + topic,
+                new NextLessonCommand(INDEX_FIRST_PERSON, new NextLesson(date, LocalTime.of(14, 30), topic,
+                        new LessonDuration("90"))));
     }
 
     @Test
