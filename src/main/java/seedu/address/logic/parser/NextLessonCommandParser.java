@@ -10,7 +10,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_LESSON_TOPIC;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
+import java.util.stream.Stream;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.NextLessonCommand;
@@ -22,8 +22,6 @@ import seedu.address.model.person.NextLesson;
  * Parses input arguments and creates a {@code NextLessonCommand} object.
  */
 public class NextLessonCommandParser implements Parser<NextLessonCommand> {
-
-    private static final String MESSAGE_INVALID_DATE = "Lesson date must be a valid date in YYYY-MM-DD format.";
 
     private final Clock clock;
 
@@ -58,14 +56,12 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
             throw new ParseException(message, pe);
         }
 
-        if (argMultimap.getValue(PREFIX_LESSON_DATE).isEmpty()
-                || argMultimap.getValue(PREFIX_LESSON_TIME).isEmpty()
-                || argMultimap.getValue(PREFIX_LESSON_DURATION).isEmpty()
-                || argMultimap.getValue(PREFIX_LESSON_TOPIC).isEmpty()) {
+        if (!arePrefixesPresent(argMultimap, PREFIX_LESSON_DATE, PREFIX_LESSON_TIME,
+                PREFIX_LESSON_DURATION, PREFIX_LESSON_TOPIC)) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, NextLessonCommand.MESSAGE_USAGE));
         }
 
-        LocalDate date = parseDate(argMultimap.getValue(PREFIX_LESSON_DATE).orElseThrow());
+        LocalDate date = ParserUtil.parseLessonDate(argMultimap.getValue(PREFIX_LESSON_DATE).orElseThrow());
         LocalTime time = ParserUtil.parseLessonTime(argMultimap.getValue(PREFIX_LESSON_TIME).orElseThrow());
         LessonDuration duration = ParserUtil.parseLessonDuration(
                 argMultimap.getValue(PREFIX_LESSON_DURATION).orElseThrow());
@@ -77,14 +73,11 @@ public class NextLessonCommandParser implements Parser<NextLessonCommand> {
         }
     }
 
-    private LocalDate parseDate(String date) throws ParseException {
-        if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new ParseException(MESSAGE_INVALID_DATE);
-        }
-        try {
-            return LocalDate.parse(date);
-        } catch (DateTimeParseException e) {
-            throw new ParseException(MESSAGE_INVALID_DATE, e);
-        }
+    /**
+     * Returns true if none of the prefixes contains empty {@code Optional} values in the given
+     * {@code ArgumentMultimap}.
+     */
+    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
+        return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
     }
 }
