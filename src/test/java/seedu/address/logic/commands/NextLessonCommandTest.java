@@ -22,6 +22,7 @@ import seedu.address.model.UserPrefs;
 import seedu.address.model.person.LessonDuration;
 import seedu.address.model.person.NextLesson;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.RecurringLesson;
 import seedu.address.testutil.PersonBuilder;
 
 public class NextLessonCommandTest {
@@ -59,6 +60,38 @@ public class NextLessonCommandTest {
                         proposed.date, proposed.time,
                         Messages.formatLessonDuration(proposed.duration.getDurationMinutes()), proposed.topic),
                 expectedModel);
+    }
+
+    @Test
+    public void execute_backToBackWithOtherStudentsLesson_succeeds() {
+        Person student = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person other = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        LocalDate date = LocalDate.now().plusDays(3);
+        NextLesson otherLesson = new NextLesson(date, LocalTime.of(14, 0), "Geometry", new LessonDuration("60"));
+        model.setPerson(other, new PersonBuilder(other).withNextLesson(otherLesson).build());
+        NextLesson proposed = new NextLesson(date, LocalTime.of(15, 0), "Algebra", DURATION);
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(student, new PersonBuilder(student).withNextLesson(proposed).build());
+
+        assertCommandSuccess(new NextLessonCommand(INDEX_FIRST_PERSON, proposed), model,
+                String.format(NextLessonCommand.MESSAGE_NEXT_LESSON_UPDATED, student.getName().fullName,
+                        proposed.date, proposed.time,
+                        Messages.formatLessonDuration(DURATION.getDurationMinutes()), proposed.topic),
+                expectedModel);
+    }
+
+    @Test
+    public void execute_overlapsOtherStudentsRecurringLesson_throwsCommandException() {
+        Person other = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        LocalDate date = LocalDate.now().plusDays(3);
+        RecurringLesson recurring = new RecurringLesson(date.getDayOfWeek(), LocalTime.of(14, 0), "Geometry",
+                new LessonDuration("60"));
+        model.setPerson(other, new PersonBuilder(other).withRecurringLesson(recurring).build());
+        NextLesson proposed = new NextLesson(date, LocalTime.of(14, 30), "Algebra", DURATION);
+
+        assertCommandFailure(new NextLessonCommand(INDEX_FIRST_PERSON, proposed), model,
+                String.format(Messages.MESSAGE_RECURRING_LESSON_CLASH, other.getName().fullName,
+                        recurring.getDay(), recurring.getTime(), recurring.getDuration().getDurationMinutes()));
     }
 
     @Test
