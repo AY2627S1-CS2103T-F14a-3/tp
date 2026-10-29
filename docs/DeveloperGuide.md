@@ -230,21 +230,21 @@ The activity diagram below follows parsing, validation, clash rejection, and mod
 
 ### Recurring lesson feature
 
-The `recurringlesson` command records a weekly lesson comprising a day, time, and topic for a student. Its implementation spans the Model, Logic, Storage, and UI components while keeping the recurring schedule separate from the student's one-off next lesson.
+The `recurringlesson` command records a weekly lesson comprising a day, time, duration, and topic for a student. Its implementation spans the Model, Logic, Storage, and UI components while keeping the recurring schedule separate from the student's one-off next lesson.
 
 #### Model representation
 
-`RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, and a topic. Its constructor requires all three values and trims and rejects a blank topic. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
+`RecurringLesson` is a value object containing a `DayOfWeek`, a `LocalTime`, a topic, and a `LessonDuration`. Its constructor requires all four values and trims and rejects a blank topic. `LessonDuration` validates a whole number from 1 to 1440 minutes. `Person` stores the value as an `Optional<RecurringLesson>`, allowing each student to have either zero or one recurring weekly lesson.
 
 Student records are replaced rather than mutated. `Person.withNote(...)`, `withNextLesson(...)`, and `withRecurringLesson(...)` return a new `Person` with only the specified value changed, preserving every other field. The note and lesson setting/clearing commands use these methods; an empty `Optional` explicitly clears a lesson, while null arguments are rejected.
 
 #### Command execution
 
-`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser rejects missing or duplicate `day/`, `time/`, and `topic/` prefixes, parses the displayed student index, accepts a case-insensitive day of the week, and requires time to use the `HH:mm` format. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
+`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser rejects missing or duplicate `day/`, `time/`, `dur/`, and `topic/` prefixes, parses the displayed student index, and accepts a case-insensitive day of the week. Time must be a valid 24-hour time in the exact `HH:mm` format, and `dur/` must supply a whole number from 1 to 1440 minutes. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
 
-When executed, `RecurringLessonCommand` obtains the currently displayed student list and checks that the specified index exists. It passes the original and replacement `Person` objects to `Model#setPerson(...)`, then resets the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. If parsing fails, a `ParseException` is thrown; if the displayed index is invalid, a `CommandException` is thrown. In either case, the model is not changed and the address book is not saved.
+When executed, `RecurringLessonCommand` obtains the currently displayed student list and checks that the specified index exists. It uses `TimetableClashChecker` to check the proposed lesson against all students' next lessons and recurring schedules, using their durations as described in the timetable clash detection section above. Once these checks pass, it passes the original and replacement `Person` objects to `Model#setPerson(...)`, then resets the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. If parsing fails, a `ParseException` is thrown; if the displayed index is invalid or the lesson clashes, a `CommandException` is thrown. In these cases, the model is not changed and the address book is not saved.
 
-The following sequence diagram shows the successful execution of `recurringlesson 1 day/MONDAY time/16:30 topic/Algebra`.
+The following sequence diagram shows the successful execution of `recurringlesson 1 day/MONDAY time/16:30 dur/60 topic/Algebra`, assuming the displayed index is valid and the lesson does not clash with the existing timetable.
 
 <puml src="diagrams/RecurringLessonSequenceDiagram.puml" alt="Sequence diagram for setting a recurring lesson" />
 
@@ -262,7 +262,7 @@ Both diagrams treat the Model and Storage components as black boxes. They omit l
 
 #### Storage and UI updates
 
-After either command completes successfully, `LogicManager` passes the address book to the `Storage` component. This normal save also occurs when `clearrecurringlesson` finds no recurring lesson and leaves the model unchanged. `JsonAdaptedPerson` represents the optional recurring lesson using `JsonAdaptedRecurringLesson`, which stores its day, time, and topic as JSON-compatible strings. When the data is loaded again, the adapter validates those strings before reconstructing the `RecurringLesson` model object.
+After either command completes successfully, `LogicManager` passes the address book to the `Storage` component. This normal save also occurs when `clearrecurringlesson` finds no recurring lesson and leaves the model unchanged. `JsonAdaptedPerson` represents the optional recurring lesson using `JsonAdaptedRecurringLesson`, which stores its day, time, and topic as JSON-compatible strings and its duration as an integer `durationMinutes` field. When the data is loaded again, the adapter validates the stored values before reconstructing the `RecurringLesson` model object. For compatibility with older data, a missing or null duration defaults to 60 minutes and a stored duration above 1440 is capped at 1440 minutes; zero or negative durations are rejected.
 
 `PersonListPanel` displays the `ObservableList<Person>` exposed by Logic and backed by the model's filtered list. Replacing the `Person` in the model updates this list, after which `PersonCard` obtains and formats the student's recurring lesson for display.
 
