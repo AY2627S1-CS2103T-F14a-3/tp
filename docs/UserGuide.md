@@ -113,11 +113,13 @@ Student tags are displayed below the student's name. If a student does not have 
 
 ### Viewing the earliest upcoming lesson: `upcoming`
 
-Shows the student with the earliest upcoming next lesson.
+Shows the student or students with the earliest upcoming lesson, including weekly recurring lessons.
 
 Format: `upcoming`
 
-* Only scheduled next lessons that have not yet started are considered, across all students.
+* Searches all students, including those hidden by `find` or `filter`, and compares one-off next lessons with the next occurrence of each weekly recurring lesson.
+* Only lesson starts at or after the current local time are considered. A recurring lesson whose start has passed is considered at its next occurrence one week later, even if today's lesson is still ongoing.
+* Each matching student is shown once, including when their next lesson and recurring occurrence start at the same time.
 * If several students share the earliest lesson time, all of them are shown.
 * If no upcoming lesson is scheduled, an error message is shown. Use `list` to show all students again.
 

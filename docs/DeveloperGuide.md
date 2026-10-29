@@ -180,10 +180,21 @@ Only members relevant to lesson priority are shown.
 * `SortCommand` passes `Person.COMPARATOR_BY_NEXT_LESSON` to `Model.sortPersons(...)`, then resets the filter to show all students.
   The comparator orders students by their next lesson's start time, placing students without a next lesson last.
   `ModelManager` delegates sorting to the address book; the storage-list classes are omitted from this focused diagram.
-* `UpcomingCommand` reads all students through `Model.getAddressBook()`, finds the earliest next lesson at or after the current time,
-  and updates the filter to show every student whose lesson starts at that time. If none exists, it reports an error.
-* `Person` may reference one `NextLesson`. `NextLesson.getDateTime()` supplies the start time used by both commands.
-  Recurring schedules do not participate directly in these priority calculations.
+* `UpcomingCommand` reads all students through `Model.getAddressBook()`, compares each future next lesson with the
+  next occurrence of each recurring lesson, and shows students whose earliest lesson starts at the overall minimum.
+  If none exists, it reports an error.
+* `Person` may reference one `NextLesson` and one `RecurringLesson`. `NextLesson.getDateTime()` supplies the one-off
+  start time; `RecurringLesson.getNextOccurrence(...)` supplies the next weekly start. `SortCommand` still sorts by
+  next lessons only.
+
+### Upcoming lesson selection
+
+`UpcomingCommand` takes one local-time snapshot from its clock. `RecurringLesson#getNextOccurrence(...)` uses the
+next matching weekday, including today, and advances one week if that start has passed. The command searches all
+student records, not just those currently displayed. A student appears only once when both lesson types represent
+the same occurrence. Selection changes only the displayed-list filter, not student records or their saved order.
+The filter keeps the same time snapshot until another command changes it; rerun `upcoming` to refresh the selection.
+A supplied `Clock` allows deterministic boundary tests.
 
 ### Timetable-clash detection
 
