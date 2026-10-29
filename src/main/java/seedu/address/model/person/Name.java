@@ -11,13 +11,15 @@ public class Name {
 
     public static final String MESSAGE_CONSTRAINTS =
             "Names should only contain alphanumeric characters, spaces, hyphens, and apostrophes, "
-                    + "and should not be blank";
+                    + "should not be blank, and should use hyphens and apostrophes only between "
+                    + "alphanumeric characters";
 
     /*
-     * The first character of the name must be alphanumeric so that blank names and names beginning with
-     * punctuation remain invalid.
+     * Each hyphen or apostrophe must join two alphanumeric name segments. Spaces may separate name segments,
+     * while the first character must be alphanumeric.
      */
-    public static final String VALIDATION_REGEX = "[\\p{Alnum}][\\p{Alnum} '\\-]*";
+    public static final String VALIDATION_REGEX =
+            "[\\p{Alnum}]+(?:['-][\\p{Alnum}]+)*(?: +[\\p{Alnum}]+(?:['-][\\p{Alnum}]+)*)* *";
 
     public final String fullName;
 
