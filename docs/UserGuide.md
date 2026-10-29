@@ -32,6 +32,8 @@ TutorTrack is a desktop contact-management application for private tutors who ma
 
    * `list` : Lists all students.
 
+   * `view 1` : Shows the complete record of the 1st student in the current list.
+
    * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a student named `John Doe` to TutorTrack.
 
    * `delete 3` : Deletes the 3rd student shown in the current list.
@@ -103,13 +105,30 @@ Shows a list of all students in TutorTrack.
 
 Format: `list`
 
-Each student card groups information into the following sections:
+Each student is shown as a concise summary containing:
 
-* **Academic Information** — the student's school level and subject
-* **Contact Details** — the student's phone number, email address, and home address
-* **Tutoring Information** — the student's next lesson and note
+* the student's name
+* school level and subject, when specified
+* phone number
+* next lesson, when scheduled
+* recurring lesson, when scheduled
 
-Student tags are displayed below the student's name. If a student does not have a scheduled lesson, the card displays `Next lesson: Not scheduled`. Empty notes and optional lesson topics are not displayed.
+Unspecified academic fields and unscheduled lessons are omitted from the summary instead of being shown as `Not specified` or `Not scheduled`.
+
+### Viewing a student's complete record: `view`
+
+Shows the complete record of a student in the right-hand panel.
+
+Format: `view INDEX`
+
+* The index refers to the index number shown in the current displayed list, including results from `find`, `filter`, `sort`, and `upcoming`.
+* The index must be a positive integer identifying a student in that list.
+* The complete record includes academic information, contact details, tags, next and recurring lessons, lesson topics, and the student's note.
+* Running another successful command clears the detail panel to avoid showing information that may no longer be current.
+
+Example: `view 1` displays the complete record of the first student in the current list.
+
+![result for 'view 1'](images/viewAlex.png)
 
 ### Viewing the earliest upcoming lesson: `upcoming`
 
@@ -335,6 +354,7 @@ Action     | Format and Examples
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **Filter** | `filter [l/SCHOOL_LEVEL] [s/SUBJECT] [t/TAG]...`<br> e.g., `filter l/Secondary 4 s/Mathematics t/weekday`
 **List**   | `list`
+**View**   | `view INDEX`<br> e.g., `view 2`
 **Upcoming** | `upcoming`
 **Sort**   | `sort`
 **Next lesson** | `nextlesson INDEX date/YYYY-MM-DD time/HH:mm dur/MINUTES topic/TOPIC`<br> e.g., `nextlesson 1 date/2030-06-15 time/14:30 dur/90 topic/Algebra`

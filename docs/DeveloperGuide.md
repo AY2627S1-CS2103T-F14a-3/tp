@@ -71,7 +71,7 @@ The **API** of this component is specified in [`Ui.java`](https://github.com/se-
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
-The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
+The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, `PersonDetailsPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
 The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
 
@@ -170,6 +170,13 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Student summary and detail view
+
+The student list uses `PersonCard` to show a concise summary containing the student's name, phone number, and any available academic or lesson information. Default academic values and absent lessons are omitted so that tutors can scan more students without scrolling through complete records.
+
+The `view INDEX` command parses an index relative to the current filtered list. `ViewCommand` rejects an index outside that list and otherwise places the selected immutable `Person` in the returned `CommandResult`. It does not modify the model or storage data.
+
+`MainWindow` reads the optional selected person from `CommandResult` and creates a `PersonDetailsPanel` in the right-hand side of the split layout. The panel shows the student's complete academic, contact, scheduling, tag, and note information. A later successful non-view command restores the prompt, preventing an edited or deleted student's old record from remaining visible.
 ### Lesson priority and ordering
 
 The following class diagram shows the model and logic classes involved in the `sort` and `upcoming` commands.
@@ -501,6 +508,22 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 3a. The selected index does not refer to a student in the displayed list.
   * 3a1. TutorTrack displays an invalid-index error.
   * 3a2. Use case resumes at step 3.
+
+#### Use case: UC05 — View a student's complete record
+
+**MSS**
+
+1. Tutor requests to view a student using an index from the displayed list.
+2. TutorTrack validates the supplied index.
+3. TutorTrack displays the student's complete record in the right-hand panel.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The selected index does not refer to a student in the displayed list.
+  * 2a1. TutorTrack displays an invalid-index error.
+  * 2a2. Use case resumes at step 1.
 
 ### Non-Functional Requirements
 

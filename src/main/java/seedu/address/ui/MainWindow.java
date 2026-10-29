@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
@@ -17,6 +18,7 @@ import seedu.address.logic.Logic;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.Person;
 
 /**
  * The Main Window. Provides the basic application layout containing
@@ -25,6 +27,8 @@ import seedu.address.logic.parser.exceptions.ParseException;
 public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
+    private static final String PERSON_DETAILS_PROMPT =
+            "Enter 'view INDEX' to view a student's full details.";
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
@@ -45,6 +49,9 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private StackPane personListPanelPlaceholder;
+
+    @FXML
+    private StackPane personDetailsPanelPlaceholder;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -182,6 +189,8 @@ public class MainWindow extends UiPart<Stage> {
             logger.info("Result: " + commandResult.getFeedbackToUser());
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
 
+            commandResult.getPersonToView().ifPresentOrElse(this::showPersonDetails, this::clearPersonDetails);
+
             if (commandResult.isShowHelp()) {
                 handleHelp();
             }
@@ -196,5 +205,17 @@ public class MainWindow extends UiPart<Stage> {
             resultDisplay.setFeedbackToUser(e.getMessage());
             throw e;
         }
+    }
+
+    private void showPersonDetails(Person person) {
+        PersonDetailsPanel personDetailsPanel = new PersonDetailsPanel(person);
+        personDetailsPanelPlaceholder.getChildren().setAll(personDetailsPanel.getRoot());
+    }
+
+    private void clearPersonDetails() {
+        Label prompt = new Label(PERSON_DETAILS_PROMPT);
+        prompt.getStyleClass().add("details-placeholder-text");
+        prompt.setWrapText(true);
+        personDetailsPanelPlaceholder.getChildren().setAll(prompt);
     }
 }
