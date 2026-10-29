@@ -291,6 +291,8 @@ Format: `exit`
 
 TutorTrack automatically saves data after every command. You do not need to save manually.
 
+If saving fails, TutorTrack displays an error and restores the student records, their order, and the displayed list to their state before the command. Resolve the reported file-access problem before retrying the command.
+
 ### Editing the data file
 
 TutorTrack data is saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
