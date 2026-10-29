@@ -302,6 +302,8 @@ TutorTrack data is saved automatically as a JSON file `[JAR file location]/data/
 **Caution:**
 If your changes make the data file invalid, TutorTrack starts with an empty student list at the next run. The invalid file remains on disk until you run a command (TutorTrack saves after every command). Still, we recommend backing up the file before editing it.<br>
 Furthermore, certain edits can cause TutorTrack to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
+
+Student names that differ only in capitalization, repeated spaces, or surrounding spaces are considered duplicates. After upgrading TutorTrack, a data file containing such records cannot be loaded. If TutorTrack starts with an empty student list after an upgrade, close it without running a command, back up `data/addressbook.json`, and remove or rename the duplicate records in the JSON file before restarting TutorTrack. Running a command while the student list is empty may overwrite the invalid data file.
 </box>
 
 --------------------------------------------------------------------------------------------------------------------
