@@ -1,11 +1,15 @@
 package seedu.address.commons.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.testutil.SerializableTestClass;
 import seedu.address.testutil.TestUtil;
@@ -16,6 +20,9 @@ import seedu.address.testutil.TestUtil;
 public class JsonUtilTest {
 
     private static final Path SERIALIZATION_FILE = TestUtil.getFilePathInSandboxFolder("serialize.json");
+
+    @TempDir
+    public Path testFolder;
 
     @Test
     public void serializeObjectToJsonFile_noExceptionThrown() throws IOException {
@@ -37,6 +44,23 @@ public class JsonUtilTest {
         assertEquals(serializableTestClass.getName(), SerializableTestClass.getNameTestValue());
         assertEquals(serializableTestClass.getListOfLocalDateTimes(), SerializableTestClass.getListTestValues());
         assertEquals(serializableTestClass.getMapOfIntegerToString(), SerializableTestClass.getHashMapTestValues());
+    }
+
+    @Test
+    public void saveJsonFile_serializationFails_preservesExistingFileAndCreatesNoNewFile() throws Exception {
+        Path existing = testFolder.resolve("existing.json");
+        Path missing = testFolder.resolve("missing.json");
+        Files.writeString(existing, "original");
+        Object circular = new Object() {
+            private final Object self = this;
+        };
+        assertThrows(IOException.class, () -> JsonUtil.saveJsonFile(circular, existing));
+        assertThrows(IOException.class, () -> JsonUtil.saveJsonFile(circular, missing));
+        assertEquals("original", Files.readString(existing));
+        assertFalse(Files.exists(missing));
+        try (var files = Files.list(testFolder)) {
+            assertEquals(1, files.count());
+        }
     }
 
     //TODO: @Test jsonUtil_readJsonStringToObjectInstance_correctObject()
