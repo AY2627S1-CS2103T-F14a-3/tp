@@ -139,6 +139,54 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
+    public void readAddressBook_jsonNull_throwsDataLoadingException() throws Exception {
+        Path filePath = testFolder.resolve("null.json");
+        Files.writeString(filePath, "null");
+        assertThrows(DataLoadingException.class, () -> new JsonAddressBookStorage(filePath).readAddressBook());
+    }
+
+    @Test
+    public void readAddressBook_emptyPersonList_success() throws Exception {
+        Path filePath = testFolder.resolve("empty.json");
+        Files.writeString(filePath, "{ \"persons\": [] }");
+        assertEquals(new AddressBook(), new AddressBook(new JsonAddressBookStorage(filePath).readAddressBook().get()));
+    }
+
+    @Test
+    public void readAddressBook_fractionalRecurringLessonDuration_throwsDataLoadingException() throws Exception {
+        Path filePath = testFolder.resolve("fractionalRecurring.json");
+        Files.writeString(filePath, personJson("\"recurringLesson\": {\"day\": \"MONDAY\", \"time\": \"10:00\", "
+                + "\"topic\": \"Algebra\", \"durationMinutes\": 1.9}"));
+        assertThrows(DataLoadingException.class, () -> new JsonAddressBookStorage(filePath).readAddressBook());
+    }
+
+    @Test
+    public void readAddressBook_fractionalNextLessonDuration_throwsDataLoadingException() throws Exception {
+        Path filePath = testFolder.resolve("fractionalNext.json");
+        Files.writeString(filePath, personJson("\"nextLesson\": {\"date\": \"2999-01-01\", \"time\": \"10:00\", "
+                + "\"topic\": \"Algebra\", \"durationMinutes\": 60.5}"));
+        assertThrows(DataLoadingException.class, () -> new JsonAddressBookStorage(filePath).readAddressBook());
+    }
+
+    @Test
+    public void readAddressBook_integerAndMissingRecurringLessonDuration_success() throws Exception {
+        Path filePath = testFolder.resolve("integerDuration.json");
+        Files.writeString(filePath, personJson("\"recurringLesson\": {\"day\": \"MONDAY\", \"time\": \"10:00\", "
+                + "\"topic\": \"Algebra\", \"durationMinutes\": 90}"));
+        assertEquals(1, new JsonAddressBookStorage(filePath).readAddressBook().get().getPersonList().size());
+
+        Path legacyPath = testFolder.resolve("legacyDuration.json");
+        Files.writeString(legacyPath, personJson("\"recurringLesson\": {\"day\": \"MONDAY\", \"time\": \"10:00\", "
+                + "\"topic\": \"Algebra\"}"));
+        assertEquals(1, new JsonAddressBookStorage(legacyPath).readAddressBook().get().getPersonList().size());
+    }
+
+    private static String personJson(String lessonField) {
+        return "{ \"persons\": [ { \"name\": \"Alpha\", \"phone\": \"90000001\", \"email\": \"alpha@example.com\", "
+                + "\"address\": \"Block One\", \"tags\": [], " + lessonField + " } ] }";
+    }
+
+    @Test
     public void readAndSaveAddressBook_allInOrder_success() throws Exception {
         Path filePath = testFolder.resolve("TempAddressBook.json");
         AddressBook original = getTypicalAddressBook();

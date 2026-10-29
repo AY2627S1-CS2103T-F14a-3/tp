@@ -21,7 +21,7 @@ public class Name {
      * while the first character must be alphanumeric.
      */
     public static final String VALIDATION_REGEX =
-            "[\\p{Alnum}]+(?:['-][\\p{Alnum}]+)*(?: +[\\p{Alnum}]+(?:['-][\\p{Alnum}]+)*)* *";
+            "[\\p{L}\\p{N}]+(?:['-][\\p{L}\\p{N}]+)*(?: +[\\p{L}\\p{N}]+(?:['-][\\p{L}\\p{N}]+)*)* *";
 
     public final String fullName;
 
