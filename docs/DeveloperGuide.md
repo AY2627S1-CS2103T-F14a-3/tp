@@ -23,7 +23,7 @@
 
 ## **Setting up, getting started**
 
-Refer to the guide [_Setting up and getting started_](SettingUp.md).
+Refer to the guide [_Setting up and getting started_](SettingUp.html).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ The following provides a quick overview of the main components and their interac
 
 **Main components of the architecture**
 
-**`Main`** (consisting of classes [`Main`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
+**`Main`** (consisting of classes [`Main`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
 * At app launch, it initializes the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
 
@@ -71,13 +71,13 @@ The sections below give more details of each component.
 
 ### UI component
 
-The **API** of this component is specified in [`Ui.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/ui/Ui.java)
+The **API** of this component is specified in [`Ui.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/ui/Ui.java)
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
 The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, `PersonDetailsPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
-The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
+The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/ui/MainWindow.java).
 
 The `UI` component,
 
@@ -88,7 +88,7 @@ The `UI` component,
 
 ### Logic component
 
-**API** : [`Logic.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/logic/Logic.java)
+**API** : [`Logic.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/logic/Logic.java)
 
 Here's a (partial) class diagram of the `Logic` component:
 
@@ -114,7 +114,7 @@ How the `Logic` component works:
 
 1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
 1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
+1. The command can communicate with the `Model` when it is executed (e.g. to delete a student).<br>
    Note that although this is shown as a single step in the diagram above for simplicity, the code can require several interactions between the command object and the `Model` to complete the operation.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
 
@@ -127,7 +127,8 @@ How the parsing works:
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/model/Model.java)
+
 
 <puml src="diagrams/ModelClassDiagram.puml" width="600" alt="Structure of the Model component" />
 
@@ -143,7 +144,7 @@ The `Model` component,
 
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-F14a-3/tp/blob/master/src/main/java/seedu/address/storage/Storage.java)
 
 <puml src="diagrams/StorageClassDiagram.puml" width="550" />
 
@@ -174,7 +175,7 @@ The student list uses `PersonCard` to show a concise summary containing the stud
 
 The `view INDEX` command parses an index relative to the current filtered list. `ViewCommand` rejects an index outside that list and otherwise places the selected immutable `Person` in the returned `CommandResult`. It does not modify the model or storage data.
 
-`MainWindow` reads the optional selected person from `CommandResult` and creates a `PersonDetailsPanel` in the right-hand side of the split layout. The panel shows the student's complete academic, contact, scheduling, tag, and note information. A later successful non-view command restores the prompt, preventing an edited or deleted student's old record from remaining visible.
+`MainWindow` reads the optional selected student from `CommandResult` and creates a `PersonDetailsPanel` in the right-hand side of the split layout. The panel shows the student's complete academic, contact, scheduling, tag, and note information. A later successful non-view command restores the prompt, preventing an edited or deleted student's old record from remaining visible.
 
 ### Lesson priority and ordering
 
@@ -239,7 +240,7 @@ Student records are replaced rather than mutated. `Person.withNote(...)`, `withN
 
 #### Command execution
 
-`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser rejects missing or duplicate `day/`, `time/`, `dur/`, and `topic/` prefixes, parses the displayed student index, and accepts a case-insensitive day of the week. Time must be a valid 24-hour time in the exact `HH:mm` format, and `dur/` must supply a whole number from 1 to 1440 minutes. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
+`AddressBookParser` delegates the command arguments to `RecurringLessonCommandParser`. The command parser requires `day/`, `time/`, `dur/`, and a final `topic/` prefix. It rejects duplicate structured fields before `topic/`, parses the displayed student index, and accepts a case-insensitive day of the week. Everything after the first `topic/`, including further prefix-like text, belongs to the topic. Time must be a valid 24-hour time in the exact `HH:mm` format, and `dur/` must supply a whole number from 1 to 1440 minutes. It then creates the validated `RecurringLesson` and `RecurringLessonCommand` objects.
 
 When executed, `RecurringLessonCommand` obtains the currently displayed student list and checks that the specified index exists. It uses `TimetableClashChecker` to check the proposed lesson against all students' next lessons and recurring schedules, using their durations as described in the timetable clash detection section above. Once these checks pass, it passes the original and replacement `Person` objects to `Model#setPerson(...)`, then resets the displayed-list predicate to `PREDICATE_SHOW_ALL_PERSONS`. If parsing fails, a `ParseException` is thrown; if the displayed index is invalid or the lesson clashes, a `CommandException` is thrown. In these cases, the model is not changed and the address book is not saved.
 
@@ -263,7 +264,7 @@ Both diagrams treat the Model and Storage components as black boxes. They omit l
 
 After either command completes successfully, `LogicManager` passes the address book to the `Storage` component. This normal save also occurs when `clearrecurringlesson` finds no recurring lesson and leaves the model unchanged. `JsonAdaptedPerson` represents the optional recurring lesson using `JsonAdaptedRecurringLesson`, which stores its day, time, and topic as JSON-compatible strings and its duration as an integer `durationMinutes` field. When the data is loaded again, the adapter validates the stored values before reconstructing the `RecurringLesson` model object. For compatibility with older data, a missing or null duration defaults to 60 minutes and a stored duration above 1440 is capped at 1440 minutes; zero or negative durations are rejected.
 
-`PersonListPanel` displays the `ObservableList<Person>` exposed by Logic and backed by the model's filtered list. Replacing the `Person` in the model updates this list, after which `PersonCard` obtains and formats the student's recurring lesson for display.
+`PersonListPanel` displays the `ObservableList<Person>` exposed by Logic and backed by the model's filtered list. Replacing the `Person` in the model updates this list, after which `PersonCard` formats the recurring schedule for the summary. The `view` command displays the full record, including the topic and note, in `PersonDetailsPanel`.
 
 #### Design considerations
 
@@ -281,7 +282,8 @@ After either command completes successfully, `LogicManager` passes the address b
 
 <box type="info" seamless>
 
-**Note:** This feature is a design proposal only. TutorTrack does not currently have `undo` or `redo` commands, and the class and method names below do not exist in the code base.
+**Proposed design only:** Undo/redo is not implemented in v1.5. The classes, methods, commands, and diagrams in
+this section describe a possible future extension; they are not APIs or behaviour available in the current app.
 </box>
 
 #### Proposed Implementation
@@ -292,7 +294,7 @@ The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It ex
 * `VersionedAddressBook#undo()` -- Restores the previous address book state from its history.
 * `VersionedAddressBook#redo()` -- Restores a previously undone address book state from its history.
 
-These operations are exposed in the `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
+These operations would be exposed in the proposed `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
 
 Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
 
@@ -369,14 +371,17 @@ The following activity diagram summarizes what happens when a user executes a ne
   * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
   * Cons: We must ensure that the implementation of each individual command is correct.
 
+
+
+
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Documentation, logging, testing, dev-ops**
 
-* [Documentation guide](Documentation.md)
-* [Testing guide](Testing.md)
-* [Logging guide](Logging.md)
-* [DevOps guide](DevOps.md)
+* [Documentation guide](Documentation.html)
+* [Testing guide](Testing.html)
+* [Logging guide](Logging.html)
+* [DevOps guide](DevOps.html)
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -571,7 +576,9 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 4a. No lesson is scheduled.
   * 4a1. TutorTrack displays an error. Use case ends.
 
-1. TutorTrack should work on any _mainstream OS_ with Java `25` or later installed.
+### Non-Functional Requirements
+
+1. TutorTrack should work on any _mainstream OS_ with Java `25` installed.
 2. TutorTrack should respond to a command within 1 second when managing up to 1,000 student records under normal operating conditions.
 3. TutorTrack should persist data from every successful data-modifying command and recover that data on the next launch after a normal shutdown.
 4. TutorTrack should store all student data locally and should not require an internet connection for normal operation.
@@ -583,7 +590,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * **Academic information**: Tutoring-related information about a student, such as the student's subject and school level.
 * **Displayed student list**: The numbered list of students currently shown in TutorTrack. It may contain every student or only the results of the latest search.
-* **Mainstream OS**: A currently supported version of Windows, Linux, or macOS that can run Java `25` or later.
+* **Mainstream OS**: A currently supported version of Windows, Linux, or macOS that can run Java `25`.
 * **Next lesson**: A one-off lesson recorded for a student, with a date, start time, duration, and topic. A student has at most one.
 * **Recurring lesson**: A weekly lesson recorded for a student, with a weekday, start time, duration, and topic. A student has at most one.
 * **Timetable clash**: Two lessons, across any students, whose time ranges overlap. Lessons that end exactly when another starts do not clash.
@@ -606,24 +613,16 @@ testers are expected to do more *exploratory* testing.
 
 ### Launch and shutdown
 
-1. Initial launch
+Use a separate writable folder with disposable data. Confirm Java 25 with `java -version`; Mac users should use
+the Java installation linked from the User Guide. Run each launch from the folder containing the JAR.
 
-   1. Download `TutorTrack.jar` and copy it into an empty, writable folder.
-
-   1. Open a terminal in that folder and run `java -jar "TutorTrack.jar"` (Java 25).<br>
-      Expected: The GUI opens with sample students. The window size may not be optimal.
-
-1. Saving window preferences
-
-   1. Resize the window and move it to a different location. Close the window.
-
-   1. Relaunch from the same folder with `java -jar "TutorTrack.jar"`.<br>
-      Expected: The most recent window size and location are retained.
-
-1. Exit
-
-   1. Enter `exit`.<br>
-      Expected: The application closes. Closing with the window's close button behaves the same way.
+1. Launch with `java -jar "TutorTrack.jar"`.<br>
+   Expected: The GUI opens with sample students on the first launch. The command box is below the feedback area.
+1. Resize and move the window, then close it using its close button.
+1. Relaunch using the same command and working directory.<br>
+   Expected: The previous window size and position are restored from `preferences.json`.
+1. Run `help`, then close the Help window and run `exit`.<br>
+   Expected: Help displays the TutorTrack guide URL, and exiting closes the application windows.
 
 ### Walkthrough of all features
 
@@ -643,7 +642,7 @@ Lesson dates must be in the future, so the examples use 2099.
 | 9 | `find tester` | Both students are displayed. |
 | 10 | `filter s/Science` | Only Tester Two is displayed. |
 | 11 | `list` | Both students are displayed again. |
-| 12 | `note 1 note/Needs extra practice` | The note appears on student 1. |
+| 12 | `note 1 note/Needs extra practice`, then `view 1` | The details panel shows Tester One with the saved note. |
 | 13 | `nextlesson 1 date/2099-01-05 time/14:00 dur/60 topic/Algebra` | The lesson is saved for student 1. |
 | 14 | `nextlesson 2 date/2099-01-05 time/14:30 dur/60 topic/Cells` | Rejected with a message naming the clashing student. |
 | 15 | `nextlesson 2 date/2099-01-05 time/15:00 dur/60 topic/Cells` | Accepted, because back-to-back lessons are allowed. |
@@ -657,18 +656,19 @@ Lesson dates must be in the future, so the examples use 2099.
 
 ### Deleting a student
 
-1. Deleting a student while all students are being shown
+Use a separate test copy. Run `clear` and then add two disposable students:
 
-   1. Prerequisites: Run `list` with multiple students in the list.
+```text
+add n/Delete Alice p/90000001 e/deletealice@example.com a/Block One
+add n/Delete Ben p/90000002 e/deleteben@example.com a/Block Two
+```
 
-   1. Test case: `delete 1`<br>
-      Expected: The first student is deleted from the list. The result message shows the deleted student's details.
-
-   1. Test case: `delete 0`<br>
-      Expected: No student is deleted. An invalid-command-format error is shown.
-
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `delete 999` (larger than the list size)<br>
-      Expected: Similar to previous; no student is deleted.
+1. Run `list`, followed by `delete 1`.<br>
+   Expected: Delete Alice is removed, Delete Ben remains, and feedback identifies the deleted student.
+1. Run `delete 0`, `delete x`, `delete`, and `delete 2` separately.<br>
+   Expected: Each command reports an invalid format or index. Delete Ben remains unchanged.
+1. Run `find Ben`, followed by `delete 1`.<br>
+   Expected: Delete Ben is removed using its displayed index. Run `list` to confirm that no students remain.
 
 ### Filtering students
 

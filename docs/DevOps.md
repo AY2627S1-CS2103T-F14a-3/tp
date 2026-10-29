@@ -1,4 +1,4 @@
-﻿---
+---
   layout: default.md
   title: "DevOps guide"
   pageNav: 3
